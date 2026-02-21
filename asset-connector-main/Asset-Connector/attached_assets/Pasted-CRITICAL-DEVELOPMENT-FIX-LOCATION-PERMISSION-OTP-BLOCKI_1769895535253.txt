@@ -1,0 +1,72 @@
+CRITICAL DEVELOPMENT FIX: LOCATION PERMISSION + OTP BLOCKING PREVIEW
+
+The app is currently BLOCKED in preview mode because:
+- Location permission cannot resolve in web preview
+- OTP cannot be delivered without a real backend
+
+THIS IS EXPECTED BEHAVIOR AND MUST BE HANDLED.
+
+====================================
+REQUIRED SOLUTION (MANDATORY)
+====================================
+
+1. DETECT ENVIRONMENT
+- Detect if the app is running in:
+  - Development / Preview (Web)
+  - OR Production (Real Mobile)
+
+------------------------------------
+2. LOCATION PERMISSION (PREVIEW MODE)
+------------------------------------
+IF environment == Preview / Development:
+- Automatically mock location permission as GRANTED
+- Inject a fake but valid location (example: Baghdad coordinates)
+- Do NOT wait for browser geolocation response
+- Button "السماح بالوصول للموقع" should:
+  - Animate as success
+  - Immediately navigate to OTP screen
+
+IF environment == Production:
+- Request real location permission
+- Block user if permission is denied
+
+------------------------------------
+3. OTP VERIFICATION (PREVIEW MODE)
+------------------------------------
+IF environment == Preview / Development:
+- Use MOCK OTP logic
+- Accept one of the following (choose one):
+  - Fixed OTP: 123456
+  - OR accept ANY 6-digit code as valid
+- (Optional UI hint): "رمز تجريبي: 123456"
+- Do NOT attempt to send SMS or WhatsApp
+- Immediately proceed after valid input
+
+IF environment == Production:
+- Require real OTP verification via backend
+- SMS / WhatsApp / Firebase (not implemented now)
+
+------------------------------------
+4. STRICT RULES
+------------------------------------
+- These mocks apply ONLY to Preview / Development
+- Production logic must remain strict and secure
+- UI flow must remain IDENTICAL in both modes
+- Do NOT block UI waiting for permissions in preview
+- Do NOT remove any existing UI or features
+
+------------------------------------
+5. FINAL FLOW (PREVIEW)
+------------------------------------
+Login Screen
+→ Location Screen (Mocked)
+→ OTP Screen (Mocked)
+→ Role Selection
+→ App
+
+====================================
+APPLY THIS FIX IMMEDIATELY
+DO NOT ASK QUESTIONS
+DO NOT SIMPLIFY
+DO NOT REMOVE FEATURES
+====================================

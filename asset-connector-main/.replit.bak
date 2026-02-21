@@ -1,0 +1,59 @@
+modules = ["nodejs-20"]
+[nix]
+channel = "stable-25_05"
+packages = ["unzip"]
+
+[agent]
+expertMode = true
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Server"
+
+[[workflows.workflow]]
+name = "Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd Asset-Connector && PORT=5000 npx tsx server/index.ts & sleep 3 && cd Asset-Connector && npx expo start --tunnel --port 8081 --clear"
+waitForPort = 5000
+
+[[ports]]
+localPort = 3000
+externalPort = 3001
+
+[[ports]]
+localPort = 3001
+externalPort = 3000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 5001
+externalPort = 3003
+
+[[ports]]
+localPort = 8081
+
+[[ports]]
+localPort = 8082
+externalPort = 3002
+
+[userenv]
+
+[userenv.shared]
+EXPO_PUBLIC_DOMAIN = "e5831086-283f-4573-88ff-84635531cdde-00-23f7h2rc0roma.pike.replit.dev"
