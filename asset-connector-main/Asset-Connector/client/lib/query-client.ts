@@ -1,8 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 export function getApiUrl() {
-  const domain = process.env.EXPO_PUBLIC_DOMAIN;
+  const explicitUrl = process.env.EXPO_PUBLIC_API_BASE_URL;
+  if (explicitUrl && explicitUrl.length > 3) {
+    return explicitUrl.replace(/\/+$/, "");
+  }
 
+  const domain = process.env.EXPO_PUBLIC_DOMAIN;
   if (domain && domain.length > 3) {
     const clean = domain
       .trim()
@@ -10,6 +14,14 @@ export function getApiUrl() {
       .replace("http://", "")
       .replace(/\/+$/, "");
     return `https://${clean}`;
+  }
+
+  const replitDomains = process.env.REPLIT_DOMAINS;
+  if (replitDomains) {
+    const firstDomain = replitDomains.split(",")[0].trim();
+    if (firstDomain.length > 3) {
+      return `https://${firstDomain}`;
+    }
   }
 
   if (typeof window !== "undefined" && window.location?.hostname) {

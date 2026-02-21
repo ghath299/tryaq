@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import * as fs from "fs";
 import * as path from "path";
+import * as net from "net";
 
 const app = express();
 const log = console.log;
@@ -212,15 +213,30 @@ function setupErrorHandler(app: express.Application) {
 
   setupErrorHandler(app);
 
-  const port = Number(process.env.PORT) || 5000;
-  server.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`Express API server running on port ${port}`);
-    },
-  );
+  const preferredPort = Number(process.env.PORT) || 5000;
+
+  function isPortAvailable(port: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const tester = net.createServer();
+      tester.once("error", () => resolve(false));
+      tester.once("listening", () => {
+        tester.close(() => resolve(true));
+      });
+      tester.listen(port, "0.0.0.0");
+    });
+  }
+
+  let port = preferredPort;
+  if (!(await isPortAvailable(port))) {
+    log(`Port ${port} is in use, trying ${port + 1}...`);
+    port = port + 1;
+    if (!(await isPortAvailable(port))) {
+      console.error(`Ports ${preferredPort} and ${port} are both in use. Exiting.`);
+      process.exit(1);
+    }
+  }
+
+  server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
+    log(`Express API server running on port ${port}`);
+  });
 })();

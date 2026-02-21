@@ -33,3 +33,13 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[userenv]
+
+[userenv.shared]
+EXPO_PUBLIC_API_BASE_URL = "https://d920424f-8dac-40e8-bc3f-ea3b97a7f63b-00-1c97s21p1hrgi.sisko.replit.dev"
+EXPO_PUBLIC_DOMAIN = "d920424f-8dac-40e8-bc3f-ea3b97a7f63b-00-1c97s21p1hrgi.sisko.replit.dev"
