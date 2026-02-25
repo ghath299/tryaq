@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
@@ -26,17 +26,29 @@ export function MapViewComponent({
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundSecondary }, style]}>
-      <Feather name="map-pin" size={48} color={theme.textSecondary} />
-      <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md }}>
-        {t("map")}
+      <View style={[styles.iconCircle, { backgroundColor: theme.primary + '15' }]}>
+        <Feather name="map" size={40} color={theme.primary} />
+      </View>
+      
+      <ThemedText type="h4" style={{ color: theme.text, marginTop: Spacing.md }}>
+        {t("map") || "الخريطة"}
       </ThemedText>
+      
       {title ? (
-        <ThemedText type="caption" style={{ color: theme.textSecondary, marginTop: Spacing.xs }}>
+        <ThemedText type="body" style={{ color: theme.textSecondary, marginTop: 4, textAlign: 'center' }}>
           {title}
         </ThemedText>
       ) : null}
-      <ThemedText type="caption" style={{ color: theme.textSecondary, fontSize: 10 }}>
-        ({lat.toFixed(4)}, {lng.toFixed(4)})
+
+      <View style={[styles.coordsBadge, { backgroundColor: theme.backgroundRoot }]}>
+        <Feather name="map-pin" size={12} color={theme.primary} />
+        <ThemedText type="caption" style={{ color: theme.textSecondary, marginLeft: 6, fontWeight: '600' }}>
+          {lat.toFixed(6)}, {lng.toFixed(6)}
+        </ThemedText>
+      </View>
+      
+      <ThemedText type="caption" style={{ color: theme.primary, marginTop: Spacing.sm, opacity: 0.8 }}>
+        جاري تهيئة نظام الخرائط...
       </ThemedText>
     </View>
   );
@@ -47,6 +59,24 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 200,
+    minHeight: 220,
+    padding: 20,
   },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  coordsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
+  }
 });

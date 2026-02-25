@@ -7,15 +7,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { Spacing } from "@/constants/theme";
 
-// Conditional import for Leaflet on web
-let L: any;
-if (Platform.OS === "web") {
-  try {
-    // We'll use a script injection approach for simplicity in this environment
-    // or rely on the user having added the CDN links to the index.html
-  } catch (e) {}
-}
-
 interface MapViewComponentProps {
   lat: number;
   lng: number;
@@ -47,16 +38,21 @@ export function MapViewComponent({
             leafletMap.current.remove();
           }
           
-          leafletMap.current = Leaflet.map(mapRef.current).setView([lat, lng], 13);
+          leafletMap.current = Leaflet.map(mapRef.current).setView([lat, lng], 15);
           
           Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           }).addTo(leafletMap.current);
 
           Leaflet.marker([lat, lng])
             .addTo(leafletMap.current)
             .bindPopup(title || "")
             .openPopup();
+          
+          // Fix for leaflet grey tiles issue in some containers
+          setTimeout(() => {
+            leafletMap.current?.invalidateSize();
+          }, 200);
         } else {
           // Retry if Leaflet isn't loaded yet
           setTimeout(initMap, 500);
@@ -83,24 +79,36 @@ export function MapViewComponent({
             width: '100%', 
             height: '100%', 
             minHeight: '200px',
-            borderRadius: '12px'
+            borderRadius: '12px',
+            zIndex: 1
           }} 
         />
+        {/* Fallback styling for when Leaflet isn't loaded yet */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          .leaflet-container { height: 100%; width: 100%; z-index: 1; }
+        `}} />
       </View>
     );
   }
 
+  // Native fallback (what we see in the screenshot)
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundSecondary }, style]}>
-      <Feather name="map-pin" size={48} color={theme.textSecondary} />
-      <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md }}>
-        {t("map")}
+      <Feather name="map" size={48} color={theme.primary} />
+      <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md, fontWeight: '600' }}>
+        {t("map") || "الخريطة"}
       </ThemedText>
       {title ? (
-        <ThemedText type="caption" style={{ color: theme.textSecondary, marginTop: Spacing.xs }}>
+        <ThemedText type="caption" style={{ color: theme.text, marginTop: Spacing.xs, fontWeight: 'bold' }}>
           {title}
         </ThemedText>
       ) : null}
+      <View style={styles.coordsContainer}>
+        <Feather name="map-pin" size={12} color={theme.primary} />
+        <ThemedText type="caption" style={{ color: theme.textSecondary, fontSize: 11, marginLeft: 4 }}>
+          {lat.toFixed(4)}, {lng.toFixed(4)}
+        </ThemedText>
+      </View>
     </View>
   );
 }
@@ -110,12 +118,26 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 200,
+    minHeight: 220,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   webContainer: {
     flex: 1,
     width: '100%',
     height: '100%',
     minHeight: 200,
+    borderRadius: 12,
+    overflow: 'hidden'
+  },
+  coordsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
   }
 });
