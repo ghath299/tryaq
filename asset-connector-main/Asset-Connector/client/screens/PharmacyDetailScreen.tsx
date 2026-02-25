@@ -30,7 +30,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 
 import { ThemedText } from "@/components/ThemedText";
-import { MapViewComponent } from "@/components/MapView.native";
+import { MapViewComponent } from "@/components/MapView";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { BorderRadius, Spacing } from "@/constants/theme";

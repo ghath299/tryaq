@@ -23,91 +23,33 @@ export function MapViewComponent({
   style,
 }: MapViewComponentProps) {
   const { theme } = useTheme();
-  const { t } = useApp();
-  const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMap = useRef<any>(null);
-
-  useEffect(() => {
-    if (Platform.OS === "web" && mapRef.current) {
-      const initMap = () => {
-        // @ts-ignore
-        if (typeof window !== "undefined" && window.L) {
-          // @ts-ignore
-          const Leaflet = window.L;
-          if (leafletMap.current) {
-            leafletMap.current.remove();
-          }
-          
-          // Add CSS to head if not present
-          if (!document.getElementById('leaflet-css')) {
-            const link = document.createElement('link');
-            link.id = 'leaflet-css';
-            link.rel = 'stylesheet';
-            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-            link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-            link.crossOrigin = '';
-            document.head.appendChild(link);
-          }
-
-          leafletMap.current = Leaflet.map(mapRef.current).setView([lat, lng], 15);
-          
-          Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }).addTo(leafletMap.current);
-
-          Leaflet.marker([lat, lng])
-            .addTo(leafletMap.current)
-            .bindPopup(title || "")
-            .openPopup();
-          
-          // Fix for leaflet grey tiles issue in some containers
-          setTimeout(() => {
-            leafletMap.current?.invalidateSize();
-          }, 200);
-        } else {
-          // Retry if Leaflet isn't loaded yet
-          setTimeout(initMap, 500);
-        }
-      };
-
-      initMap();
-    }
-
-    return () => {
-      if (leafletMap.current) {
-        leafletMap.current.remove();
-        leafletMap.current = null;
-      }
-    };
-  }, [lat, lng, title]);
-
+  
   if (Platform.OS === "web") {
+    // Leaflet often fails in Expo Web, using an iframe for reliability
+    const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.01}%2C${lat-0.01}%2C${lng+0.01}%2C${lat+0.01}&layer=mapnik&marker=${lat}%2C${lng}`;
+    
     return (
       <View style={[styles.webContainer, style]}>
-        <div 
-          ref={mapRef} 
-          style={{ 
-            width: '100%', 
-            height: '100%', 
-            minHeight: '200px',
-            borderRadius: '12px',
-            zIndex: 1
-          }} 
+        <iframe
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          scrolling="no"
+          marginHeight={0}
+          marginWidth={0}
+          src={mapUrl}
+          style={{ borderRadius: 12, border: '5px solid red', backgroundColor: 'yellow' }}
         />
-        {/* Fallback styling for when Leaflet isn't loaded yet */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          .leaflet-container { height: 100%; width: 100%; z-index: 1; }
-        `}} />
       </View>
     );
   }
 
-  // Native fallback (what we see in the screenshot)
+  // Native fallback
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundSecondary }, style]}>
       <Feather name="map" size={48} color={theme.primary} />
       <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md, fontWeight: '600' }}>
-        {t("map") || "الخريطة"}
+        الخريطة
       </ThemedText>
       {title ? (
         <ThemedText type="caption" style={{ color: theme.text, marginTop: Spacing.xs, fontWeight: 'bold' }}>
