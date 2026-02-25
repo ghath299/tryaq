@@ -4,7 +4,14 @@
     <title>APP_NAME_PLACEHOLDER</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
+      #map {
+        height: 300px;
+        width: 100%;
+        margin-top: 20px;
+        border-radius: 12px;
+      }
       * {
         box-sizing: border-box;
       }
@@ -388,12 +395,15 @@
             <a href="exps://EXPS_URL_PLACEHOLDER" class="open-button"
               >Open in Expo Go</a
             >
+            <div id="map"></div>
+          </div>
           </div>
         </div>
       </div>
     </div>
 
     <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
       (function () {
         const ua = navigator.userAgent;
@@ -449,6 +459,16 @@
         });
 
         qrCode.append(document.getElementById("qr-code"));
+
+        // Initialize Leaflet Map
+        const map = L.map('map').setView([33.3152, 44.3661], 11); // Baghdad coordinates
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        L.marker([33.3152, 44.3661]).addTo(map)
+            .bindPopup('بغداد، العراق')
+            .openPopup();
 
         if (isAndroid || isIOS) {
           loadingEl.style.display = "block";

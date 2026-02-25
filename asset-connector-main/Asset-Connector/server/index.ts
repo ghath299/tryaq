@@ -227,12 +227,15 @@ function setupErrorHandler(app: express.Application) {
   }
 
   let port = preferredPort;
-  if (!(await isPortAvailable(port))) {
-    log(`Port ${port} is in use, trying ${port + 1}...`);
-    port = port + 1;
-    if (!(await isPortAvailable(port))) {
-      console.error(`Ports ${preferredPort} and ${port} are both in use. Exiting.`);
-      process.exit(1);
+  const available5000 = await isPortAvailable(5000);
+  if (!available5000) {
+    log(`Port 5000 is in use, trying 5001...`);
+    const available5001 = await isPortAvailable(5001);
+    if (available5001) {
+      port = 5001;
+    } else {
+      log(`Port 5001 is also in use, trying 5002...`);
+      port = 5002;
     }
   }
 
