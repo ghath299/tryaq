@@ -154,6 +154,9 @@ const styles = StyleSheet.create({
     height: 400,
     minHeight: 400,
     borderRadius: 12,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    borderWidth: 5,
+    borderColor: 'red',
+    backgroundColor: 'yellow'
   }
 });
