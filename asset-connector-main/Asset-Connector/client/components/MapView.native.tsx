@@ -1,6 +1,10 @@
 import React from "react";
-import { Platform, StyleSheet } from "react-native";
-import RNMapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { Platform, StyleSheet, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { ThemedText } from "@/components/ThemedText";
+import { useTheme } from "@/hooks/useTheme";
+import { useApp } from "@/contexts/AppContext";
+import { Spacing } from "@/constants/theme";
 
 interface MapViewComponentProps {
   lat: number;
@@ -17,29 +21,32 @@ export function MapViewComponent({
   description,
   style,
 }: MapViewComponentProps) {
+  const { theme } = useTheme();
+  const { t } = useApp();
+
   return (
-    <RNMapView
-      style={[styles.map, style]}
-      provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-      initialRegion={{
-        latitude: lat,
-        longitude: lng,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }}
-    >
-      <Marker
-        coordinate={{ latitude: lat, longitude: lng }}
-        title={title}
-        description={description}
-      />
-    </RNMapView>
+    <View style={[styles.container, { backgroundColor: theme.backgroundSecondary }, style]}>
+      <Feather name="map-pin" size={48} color={theme.textSecondary} />
+      <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md }}>
+        {t("map")}
+      </ThemedText>
+      {title ? (
+        <ThemedText type="caption" style={{ color: theme.textSecondary, marginTop: Spacing.xs }}>
+          {title}
+        </ThemedText>
+      ) : null}
+      <ThemedText type="caption" style={{ color: theme.textSecondary, fontSize: 10 }}>
+        ({lat.toFixed(4)}, {lng.toFixed(4)})
+      </ThemedText>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  map: {
+  container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     minHeight: 200,
   },
 });
