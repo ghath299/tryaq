@@ -8,7 +8,7 @@ import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Button } from "@/components/Button";
-import { MapViewComponent } from "@/components/MapView";
+import { MapViewComponent } from "@/components/MapView.native";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
