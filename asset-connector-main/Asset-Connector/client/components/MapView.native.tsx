@@ -46,10 +46,6 @@ export function MapViewComponent({
           {lat.toFixed(6)}, {lng.toFixed(6)}
         </ThemedText>
       </View>
-      
-      <ThemedText type="caption" style={{ color: theme.primary, marginTop: Spacing.sm, opacity: 0.8 }}>
-        جاري تهيئة نظام الخرائط...
-      </ThemedText>
     </View>
   );
 }
