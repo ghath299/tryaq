@@ -38,6 +38,17 @@ export function MapViewComponent({
             leafletMap.current.remove();
           }
           
+          // Add CSS to head if not present
+          if (!document.getElementById('leaflet-css')) {
+            const link = document.createElement('link');
+            link.id = 'leaflet-css';
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+            link.crossOrigin = '';
+            document.head.appendChild(link);
+          }
+
           leafletMap.current = Leaflet.map(mapRef.current).setView([lat, lng], 15);
           
           Leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -126,8 +137,8 @@ const styles = StyleSheet.create({
   webContainer: {
     flex: 1,
     width: '100%',
-    height: '100%',
-    minHeight: 200,
+    height: 400,
+    minHeight: 400,
     borderRadius: 12,
     overflow: 'hidden'
   },
