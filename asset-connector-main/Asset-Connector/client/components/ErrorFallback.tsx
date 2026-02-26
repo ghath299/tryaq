@@ -9,10 +9,6 @@ import {
   Modal,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
-import { useTheme } from "@/hooks/useTheme";
-import { Spacing, BorderRadius, Fonts } from "@/constants/theme";
 
 export type ErrorFallbackProps = {
   error: Error;
@@ -20,7 +16,6 @@ export type ErrorFallbackProps = {
 };
 
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
-  const { theme } = useTheme();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleRestart = async () => {
@@ -34,55 +29,40 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
 
   const formatErrorDetails = (): string => {
     let details = `Error: ${error.message}\n\n`;
-    if (error.stack) {
-      details += `Stack Trace:\n${error.stack}`;
-    }
+    if (error.stack) details += `Stack Trace:\n${error.stack}`;
     return details;
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       {__DEV__ ? (
         <Pressable
           onPress={() => setIsModalVisible(true)}
           style={({ pressed }) => [
             styles.topButton,
-            {
-              backgroundColor: theme.backgroundDefault,
-              opacity: pressed ? 0.8 : 1,
-            },
+            { opacity: pressed ? 0.8 : 1 },
           ]}
         >
-          <Feather name="alert-circle" size={20} color={theme.text} />
+          <Feather name="alert-circle" size={20} color="#fff" />
         </Pressable>
       ) : null}
 
       <View style={styles.content}>
-        <ThemedText type="h1" style={styles.title}>
-          Something went wrong
-        </ThemedText>
+        <Text style={styles.title}>Something went wrong</Text>
 
-        <ThemedText type="body" style={styles.message}>
-          Please reload the app to continue.
-        </ThemedText>
+        <Text style={styles.message}>Please reload the app to continue.</Text>
 
         <Pressable
           onPress={handleRestart}
           style={({ pressed }) => [
             styles.button,
             {
-              backgroundColor: theme.link,
               opacity: pressed ? 0.9 : 1,
               transform: [{ scale: pressed ? 0.98 : 1 }],
             },
           ]}
         >
-          <ThemedText
-            type="body"
-            style={[styles.buttonText, { color: theme.buttonText }]}
-          >
-            Try Again
-          </ThemedText>
+          <Text style={styles.buttonText}>Try Again</Text>
         </Pressable>
       </View>
 
@@ -94,11 +74,9 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           onRequestClose={() => setIsModalVisible(false)}
         >
           <View style={styles.modalOverlay}>
-            <ThemedView style={styles.modalContainer}>
+            <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <ThemedText type="h2" style={styles.modalTitle}>
-                  Error Details
-                </ThemedText>
+                <Text style={styles.modalTitle}>Error Details</Text>
                 <Pressable
                   onPress={() => setIsModalVisible(false)}
                   style={({ pressed }) => [
@@ -106,7 +84,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                     { opacity: pressed ? 0.6 : 1 },
                   ]}
                 >
-                  <Feather name="x" size={24} color={theme.text} />
+                  <Feather name="x" size={24} color="#fff" />
                 </Pressable>
               </View>
 
@@ -115,31 +93,17 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                 contentContainerStyle={styles.modalScrollContent}
                 showsVerticalScrollIndicator
               >
-                <View
-                  style={[
-                    styles.errorContainer,
-                    { backgroundColor: theme.backgroundDefault },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.errorText,
-                      {
-                        color: theme.text,
-                        fontFamily: Fonts?.mono || "monospace",
-                      },
-                    ]}
-                    selectable
-                  >
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText} selectable>
                     {formatErrorDetails()}
                   </Text>
                 </View>
               </ScrollView>
-            </ThemedView>
+            </View>
           </View>
         </Modal>
       ) : null}
-    </ThemedView>
+    </View>
   );
 }
 
@@ -150,54 +114,55 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-    padding: Spacing["2xl"],
+    padding: 24,
+    backgroundColor: "#0f172a",
   },
   content: {
     alignItems: "center",
     justifyContent: "center",
-    gap: Spacing.lg,
+    gap: 16,
     width: "100%",
     maxWidth: 600,
   },
   title: {
     textAlign: "center",
     lineHeight: 40,
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#fff",
   },
   message: {
     textAlign: "center",
-    opacity: 0.7,
+    opacity: 0.8,
     lineHeight: 24,
+    fontSize: 14,
+    color: "#e5e7eb",
   },
   topButton: {
     position: "absolute",
-    top: Spacing["2xl"] + Spacing.lg,
-    right: Spacing.lg,
+    top: 24,
+    right: 16,
     width: 44,
     height: 44,
-    borderRadius: BorderRadius.md,
+    borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
+    backgroundColor: "rgba(255,255,255,0.12)",
   },
   button: {
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing["2xl"],
+    paddingVertical: 14,
+    borderRadius: 12,
+    paddingHorizontal: 24,
     minWidth: 200,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: "#2d7dff",
   },
   buttonText: {
-    fontWeight: "600",
+    fontWeight: "700",
     textAlign: "center",
     fontSize: 16,
+    color: "#fff",
   },
   modalOverlay: {
     flex: 1,
@@ -207,40 +172,46 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: "100%",
     height: "90%",
-    borderTopLeftRadius: BorderRadius.lg,
-    borderTopRightRadius: BorderRadius.lg,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    backgroundColor: "#0b1220",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(128, 128, 128, 0.2)",
+    borderBottomColor: "rgba(255,255,255,0.12)",
   },
   modalTitle: {
-    fontWeight: "600",
+    fontWeight: "700",
+    fontSize: 16,
+    color: "#fff",
   },
   closeButton: {
-    padding: Spacing.xs,
+    padding: 6,
   },
   modalScrollView: {
     flex: 1,
   },
   modalScrollContent: {
-    padding: Spacing.lg,
+    padding: 16,
   },
   errorContainer: {
     width: "100%",
-    borderRadius: BorderRadius.md,
+    borderRadius: 12,
     overflow: "hidden",
-    padding: Spacing.lg,
+    padding: 16,
+    backgroundColor: "rgba(255,255,255,0.06)",
   },
   errorText: {
     fontSize: 12,
     lineHeight: 18,
     width: "100%",
+    color: "#e5e7eb",
+    fontFamily: "monospace",
   },
 });

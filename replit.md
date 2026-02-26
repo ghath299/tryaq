@@ -29,7 +29,7 @@ Preferred communication style: Simple, everyday language.
 - **Patient**: Bottom tab navigator (Home, Doctors, Medicines, Pharmacies) wrapped in a drawer navigator for settings/profile
 - **Doctor**: Drawer navigator (Dashboard, Appointments, Patients, Schedule, Profile)
 - **Pharmacist**: Drawer navigator (Dashboard, Orders, Inventory, Prescriptions, Profile)
-- **Root**: Native stack navigator handles auth screens (Login → Location Permission → OTP) and detail screens (DoctorDetail, PharmacyDetail, BookAppointment, etc.)
+- **Root**: Native stack navigator handles auth screens (Login → Location Permission → OTP) and detail screens (DoctorDetail, PharmacyDetail, PharmacyPicker, PharmacyRoute, BookAppointment, etc.)
 
 **Animation**: Heavy use of `react-native-reanimated` throughout. Components like `AnimatedButton`, `AnimatedCard`, `ScrollFadeIn`, and list items all use spring/timing animations. Every transition, card, and button has micro-interactions.
 
@@ -37,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 
 **Fonts**: Tajawal (Arabic font family) loaded via `expo-font` from local assets.
 
-**Platform-specific**: `MapView.native.tsx` uses `react-native-maps` on mobile; `MapView.tsx` shows a placeholder on web.
+**Platform-specific**: `MapView.native.tsx` uses `react-native-maps` on mobile; `MapView.tsx` uses OpenStreetMap iframe on web. `PharmacyRouteScreen` uses `react-native-maps` with `UrlTile` for OpenStreetMap tiles (light/dark) on native, and iframe fallback on web.
 
 **i18n/RTL**: Bilingual Arabic/English with RTL layout support. Translations are inline in `AppContext`. Language toggle available in drawer.
 

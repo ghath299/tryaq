@@ -213,33 +213,9 @@ function setupErrorHandler(app: express.Application) {
 
   setupErrorHandler(app);
 
-  const preferredPort = Number(process.env.PORT) || 5000;
+  const port = 5000;
 
-  function isPortAvailable(port: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      const tester = net.createServer();
-      tester.once("error", () => resolve(false));
-      tester.once("listening", () => {
-        tester.close(() => resolve(true));
-      });
-      tester.listen(port, "0.0.0.0");
-    });
-  }
-
-  let port = preferredPort;
-  const available5000 = await isPortAvailable(5000);
-  if (!available5000) {
-    log(`Port 5000 is in use, trying 5001...`);
-    const available5001 = await isPortAvailable(5001);
-    if (available5001) {
-      port = 5001;
-    } else {
-      log(`Port 5001 is also in use, trying 5002...`);
-      port = 5002;
-    }
-  }
-
-  server.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
+  server.listen({ port, host: "0.0.0.0" }, () => {
     log(`Express API server running on port ${port}`);
   });
 })();

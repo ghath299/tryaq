@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Platform, View, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { useApp } from "@/contexts/AppContext";
 import { Spacing } from "@/constants/theme";
 
 interface MapViewComponentProps {
@@ -38,7 +37,7 @@ export function MapViewComponent({
           marginHeight={0}
           marginWidth={0}
           src={mapUrl}
-          style={{ borderRadius: 12, border: '5px solid red', backgroundColor: 'yellow' }}
+          style={{ borderRadius: 12, border: 'none' }}
         />
       </View>
     );

@@ -21,6 +21,8 @@ import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import MyBookingsScreen from "@/screens/MyBookingsScreen";
 import MyOrdersScreen from "@/screens/MyOrdersScreen";
 import MedicinePharmaciesScreen from "@/screens/MedicinePharmaciesScreen";
+import PharmacyPickerScreen from "@/screens/PharmacyPickerScreen";
+import PharmacyRouteScreen from "@/screens/PharmacyRouteScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
@@ -36,6 +38,8 @@ export type RootStackParamList = {
   PharmacyDetail: { pharmacyId: string };
   BookAppointment: { doctorId: string };
   MedicinePharmacies: { medicineId?: string; initialQuery?: string };
+  PharmacyPicker: { pharmacyIds?: string[]; medicineName?: string };
+  PharmacyRoute: { pharmacyId: string };
   MyBookings: undefined;
   MyOrders: undefined;
   CareerJoin: { type: "doctor" | "pharmacist" };
@@ -137,6 +141,23 @@ function PatientNavigator() {
         component={MedicinePharmaciesScreen}
         options={{
           title: "الصيدليات المتوفرة",
+          animation: "slide_from_right",
+        }}
+      />
+      <Stack.Screen
+        name="PharmacyPicker"
+        component={PharmacyPickerScreen}
+        options={{
+          title: t("pharmacies"),
+          animation: "slide_from_right",
+        }}
+      />
+      <Stack.Screen
+        name="PharmacyRoute"
+        component={PharmacyRouteScreen}
+        options={{
+          title: "",
+          headerTransparent: true,
           animation: "slide_from_right",
         }}
       />

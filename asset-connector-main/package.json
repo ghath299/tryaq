@@ -10,7 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "expo-image-manipulator": "^14.0.8"
+    "expo-image-manipulator": "^14.0.8",
+    "react-native-maps": "1.20.1"
   },
   "devDependencies": {
     "@types/react": "~19.1.10",

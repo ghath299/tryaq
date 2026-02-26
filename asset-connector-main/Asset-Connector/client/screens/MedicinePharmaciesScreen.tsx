@@ -155,7 +155,10 @@ export default function MedicinePharmaciesScreen() {
           renderItem={({ item }) => (
             <Pressable
               style={[styles.card, { backgroundColor: theme.backgroundDefault }]}
-              onPress={() => navigation.navigate("PharmacyDetail" as never, { pharmacyId: item.id } as never)}
+              onPress={() => navigation.navigate("PharmacyPicker" as never, {
+                pharmacyIds: pharmacies.map((p: Pharmacy) => p.id),
+                medicineName: selectedMedicine ? (language === "ar" ? selectedMedicine.nameAr : selectedMedicine.nameEn) : undefined,
+              } as never)}
             >
               <ThemedText type="body" style={{ fontWeight: "700" }}>{language === "ar" ? item.nameAr : item.nameEn}</ThemedText>
               <ThemedText type="small" style={{ color: theme.textSecondary }}>

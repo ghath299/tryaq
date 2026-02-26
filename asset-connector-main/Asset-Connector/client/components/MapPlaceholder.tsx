@@ -29,7 +29,7 @@ export function MapPlaceholder({
     <View style={[styles.container, { backgroundColor: theme.backgroundSecondary }, style]}>
       <Feather name="map-pin" size={48} color={theme.textSecondary} />
       <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md }}>
-        TESTING: AI IS WORKING
+        {t("map")}
       </ThemedText>
       {title ? (
         <ThemedText type="caption" style={{ color: theme.textSecondary, marginTop: Spacing.xs }}>
