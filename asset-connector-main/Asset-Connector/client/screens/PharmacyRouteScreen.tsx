@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -142,7 +148,7 @@ export default function PharmacyRouteScreen() {
   const pharmacyId = route.params?.pharmacyId;
   const pharmacy = useMemo(
     () => allPharmacies.find((p) => p.id === pharmacyId),
-    [pharmacyId]
+    [pharmacyId],
   );
 
   const mapRef = useRef<any>(null);
@@ -163,8 +169,9 @@ export default function PharmacyRouteScreen() {
   }));
 
   const pharmacyCoord: Coord | null = useMemo(
-    () => (pharmacy ? { latitude: pharmacy.lat, longitude: pharmacy.lng } : null),
-    [pharmacy]
+    () =>
+      pharmacy ? { latitude: pharmacy.lat, longitude: pharmacy.lng } : null,
+    [pharmacy],
   );
 
   const tileUrl = useMemo(() => (isDark ? DARK_TILE : LIGHT_TILE), [isDark]);
@@ -180,9 +187,12 @@ export default function PharmacyRouteScreen() {
             ? "يرجى تفعيل خدمة الموقع من الإعدادات"
             : "Please enable location services in Settings",
           [
-            { text: language === "ar" ? "الإعدادات" : "Settings", onPress: () => Linking.openSettings() },
+            {
+              text: language === "ar" ? "الإعدادات" : "Settings",
+              onPress: () => Linking.openSettings(),
+            },
             { text: language === "ar" ? "إلغاء" : "Cancel", style: "cancel" },
-          ]
+          ],
         );
         return null;
       }
@@ -218,7 +228,7 @@ export default function PharmacyRouteScreen() {
         setRouteError(
           language === "ar"
             ? "فشل في حساب المسار. تحقق من الاتصال."
-            : "Failed to calculate route. Check connection."
+            : "Failed to calculate route. Check connection.",
         );
 
         try {
@@ -232,7 +242,7 @@ export default function PharmacyRouteScreen() {
         setIsLoadingRoute(false);
       }
     },
-    [userLocation, pharmacyCoord, language]
+    [userLocation, pharmacyCoord, language],
   );
 
   useEffect(() => {
@@ -273,7 +283,11 @@ export default function PharmacyRouteScreen() {
         }
 
         const sub = await Location.watchPositionAsync(
-          { accuracy: Location.Accuracy.High, distanceInterval: 10, timeInterval: 3000 },
+          {
+            accuracy: Location.Accuracy.High,
+            distanceInterval: 10,
+            timeInterval: 3000,
+          },
           (loc) => {
             if (!mounted) return;
             const coord: Coord = {
@@ -286,11 +300,14 @@ export default function PharmacyRouteScreen() {
             mapRef.current?.animateCamera({ center: coord }, { duration: 500 });
 
             const now = Date.now();
-            if (now - lastRecalcRef.current > RECALC_INTERVAL && pharmacyCoord) {
+            if (
+              now - lastRecalcRef.current > RECALC_INTERVAL &&
+              pharmacyCoord
+            ) {
               lastRecalcRef.current = now;
               loadRoute(coord);
             }
-          }
+          },
         );
         if (mounted) watchRef.current = sub;
       } catch {
@@ -308,15 +325,12 @@ export default function PharmacyRouteScreen() {
     };
   }, [trackMe, pharmacyCoord, loadRoute]);
 
-  const fitMapToMarkers = useCallback(
-    (from: Coord, to: Coord) => {
-      mapRef.current?.fitToCoordinates([from, to], {
-        edgePadding: { top: 100, right: 60, bottom: 300, left: 60 },
-        animated: true,
-      });
-    },
-    []
-  );
+  const fitMapToMarkers = useCallback((from: Coord, to: Coord) => {
+    mapRef.current?.fitToCoordinates([from, to], {
+      edgePadding: { top: 100, right: 60, bottom: 300, left: 60 },
+      animated: true,
+    });
+  }, []);
 
   const handleRecenter = useCallback(() => {
     if (userLocation && pharmacyCoord) {
@@ -328,31 +342,49 @@ export default function PharmacyRouteScreen() {
     mapRef.current?.animateCamera({ heading: 0 }, { duration: 300 });
   }, []);
 
-  const handleZoom = useCallback(
-    (zoomIn: boolean) => {
-      mapRef.current?.getCamera().then((cam) => {
-        const newZoom = (cam.zoom || 14) + (zoomIn ? 1 : -1);
-        mapRef.current?.animateCamera({ zoom: Math.max(3, Math.min(20, newZoom)) }, { duration: 300 });
-      });
-    },
-    []
-  );
+  const handleZoom = useCallback((zoomIn: boolean) => {
+    mapRef.current?.getCamera().then((cam) => {
+      const newZoom = (cam.zoom || 14) + (zoomIn ? 1 : -1);
+      mapRef.current?.animateCamera(
+        { zoom: Math.max(3, Math.min(20, newZoom)) },
+        { duration: 300 },
+      );
+    });
+  }, []);
 
   const handleRetry = useCallback(() => {
     loadRoute();
   }, [loadRoute]);
 
   const handleCallPhone = useCallback(() => {
-    if (pharmacy?.phone) Linking.openURL(`tel:${pharmacy.phone.replace(/\s+/g, "")}`);
+    if (pharmacy?.phone)
+      Linking.openURL(`tel:${pharmacy.phone.replace(/\s+/g, "")}`);
   }, [pharmacy]);
 
   const handleWhatsApp = useCallback(() => {
-    if (pharmacy?.phone) Linking.openURL(`https://wa.me/${pharmacy.phone.replace(/\D/g, "")}`);
+    if (pharmacy?.phone)
+      Linking.openURL(`https://wa.me/${pharmacy.phone.replace(/\D/g, "")}`);
   }, [pharmacy]);
 
-  const handleOpenWaze = useCallback(() => {
+  const handleOpenWaze = useCallback(async () => {
     if (!pharmacyCoord) return;
-    Linking.openURL(`https://waze.com/ul?ll=${pharmacyCoord.latitude},${pharmacyCoord.longitude}&navigate=yes`);
+
+    const lat = pharmacyCoord.latitude;
+    const lng = pharmacyCoord.longitude;
+
+    const wazeAppUrl = `waze://?ll=${lat},${lng}&navigate=yes`;
+    const wazeWebUrl = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+    try {
+      const canOpen = await Linking.canOpenURL(wazeAppUrl);
+      if (canOpen) {
+        await Linking.openURL(wazeAppUrl);
+      } else {
+        await Linking.openURL(wazeWebUrl);
+      }
+    } catch {
+      await Linking.openURL(wazeWebUrl);
+    }
   }, [pharmacyCoord]);
 
   const handleOpenMaps = useCallback(() => {
@@ -373,7 +405,8 @@ export default function PharmacyRouteScreen() {
   }, [pharmacyCoord, pharmacy, language]);
 
   const handleInfo = useCallback(() => {
-    if (pharmacy) navigation.navigate("PharmacyDetail", { pharmacyId: pharmacy.id });
+    if (pharmacy)
+      navigation.navigate("PharmacyDetail", { pharmacyId: pharmacy.id });
   }, [pharmacy, navigation]);
 
   if (!pharmacy || !pharmacyCoord) {
@@ -386,7 +419,8 @@ export default function PharmacyRouteScreen() {
 
   const rtl = language === "ar";
   const pharmacyName = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const pharmacyAddress = language === "ar" ? pharmacy.address : pharmacy.addressEn;
+  const pharmacyAddress =
+    language === "ar" ? pharmacy.address : pharmacy.addressEn;
   const routeColor = isDark ? "#5EDFFF" : "#1F6AE1";
   const routeOutlineColor = isDark ? "#1F6AE1" : "#5EDFFF40";
 
@@ -404,7 +438,9 @@ export default function PharmacyRouteScreen() {
               border: "none",
               width: "100%",
               height: "100%",
-              filter: isDark ? "invert(0.9) hue-rotate(180deg) saturate(0.6)" : "none",
+              filter: isDark
+                ? "invert(0.9) hue-rotate(180deg) saturate(0.6)"
+                : "none",
             }}
           />
         </View>
@@ -433,18 +469,38 @@ export default function PharmacyRouteScreen() {
           {userLocation && (
             <RNMarker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }}>
               <View style={styles.userMarkerOuter}>
-                <View style={[styles.userMarkerGlow, { backgroundColor: theme.primary + "30" }]} />
-                <View style={[styles.userMarkerInner, { backgroundColor: theme.primary, borderColor: "#FFF" }]} />
+                <View
+                  style={[
+                    styles.userMarkerGlow,
+                    { backgroundColor: theme.primary + "30" },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.userMarkerInner,
+                    { backgroundColor: theme.primary, borderColor: "#FFF" },
+                  ]}
+                />
               </View>
             </RNMarker>
           )}
 
           <RNMarker coordinate={pharmacyCoord} anchor={{ x: 0.5, y: 1 }}>
             <View style={styles.pharmacyMarkerContainer}>
-              <View style={[styles.pharmacyMarkerBubble, { backgroundColor: isDark ? "#FF6B6B" : "#E53935" }]}>
+              <View
+                style={[
+                  styles.pharmacyMarkerBubble,
+                  { backgroundColor: isDark ? "#FF6B6B" : "#E53935" },
+                ]}
+              >
                 <Feather name="plus" size={18} color="#FFF" />
               </View>
-              <View style={[styles.pharmacyMarkerTail, { borderTopColor: isDark ? "#FF6B6B" : "#E53935" }]} />
+              <View
+                style={[
+                  styles.pharmacyMarkerTail,
+                  { borderTopColor: isDark ? "#FF6B6B" : "#E53935" },
+                ]}
+              />
             </View>
           </RNMarker>
 
@@ -472,20 +528,41 @@ export default function PharmacyRouteScreen() {
       {locationAccuracy !== null && locationAccuracy > 50 && (
         <View style={[styles.gpsBadge, { backgroundColor: theme.warning }]}>
           <Feather name="alert-triangle" size={12} color="#000" />
-          <ThemedText type="caption" style={{ color: "#000", marginLeft: 4, fontWeight: "600" }}>
+          <ThemedText
+            type="caption"
+            style={{ color: "#000", marginLeft: 4, fontWeight: "600" }}
+          >
             GPS {language === "ar" ? "ضعيف" : "weak"}
           </ThemedText>
         </View>
       )}
 
       <View style={styles.controlsColumn}>
-        <Pressable style={[styles.controlBtn, { backgroundColor: theme.card, ...Shadows.small }]} onPress={handleNorthReset}>
+        <Pressable
+          style={[
+            styles.controlBtn,
+            { backgroundColor: theme.card, ...Shadows.small },
+          ]}
+          onPress={handleNorthReset}
+        >
           <MaterialIcons name="explore" size={22} color={theme.text} />
         </Pressable>
-        <Pressable style={[styles.controlBtn, { backgroundColor: theme.card, ...Shadows.small }]} onPress={() => handleZoom(true)}>
+        <Pressable
+          style={[
+            styles.controlBtn,
+            { backgroundColor: theme.card, ...Shadows.small },
+          ]}
+          onPress={() => handleZoom(true)}
+        >
           <Feather name="plus" size={20} color={theme.text} />
         </Pressable>
-        <Pressable style={[styles.controlBtn, { backgroundColor: theme.card, ...Shadows.small }]} onPress={() => handleZoom(false)}>
+        <Pressable
+          style={[
+            styles.controlBtn,
+            { backgroundColor: theme.card, ...Shadows.small },
+          ]}
+          onPress={() => handleZoom(false)}
+        >
           <Feather name="minus" size={20} color={theme.text} />
         </Pressable>
         <Pressable
@@ -498,22 +575,48 @@ export default function PharmacyRouteScreen() {
           ]}
           onPress={() => setTrackMe((v) => !v)}
         >
-          <Feather name="crosshair" size={20} color={trackMe ? "#FFF" : theme.text} />
+          <Feather
+            name="crosshair"
+            size={20}
+            color={trackMe ? "#FFF" : theme.text}
+          />
         </Pressable>
-        <Pressable style={[styles.controlBtn, { backgroundColor: theme.card, ...Shadows.small }]} onPress={handleRecenter}>
+        <Pressable
+          style={[
+            styles.controlBtn,
+            { backgroundColor: theme.card, ...Shadows.small },
+          ]}
+          onPress={handleRecenter}
+        >
           <Feather name="maximize" size={20} color={theme.text} />
         </Pressable>
       </View>
 
       <Animated.View
         entering={FadeInUp.delay(300).duration(500)}
-        style={[styles.bottomSheet, { backgroundColor: theme.card }, sheetStyle]}
+        style={[
+          styles.bottomSheet,
+          { backgroundColor: theme.card },
+          sheetStyle,
+        ]}
       >
         <View style={[styles.sheetHandle, { backgroundColor: theme.border }]} />
 
         <View style={styles.sheetHeader}>
-          <View style={[styles.sheetNameRow, rtl && { flexDirection: "row-reverse" }]}>
-            <ThemedText type="h4" style={{ fontWeight: "700", flex: 1, textAlign: rtl ? "right" : "left" }}>
+          <View
+            style={[
+              styles.sheetNameRow,
+              rtl && { flexDirection: "row-reverse" },
+            ]}
+          >
+            <ThemedText
+              type="h4"
+              style={{
+                fontWeight: "700",
+                flex: 1,
+                textAlign: rtl ? "right" : "left",
+              }}
+            >
               {pharmacyName}
             </ThemedText>
             <Pressable>
@@ -521,9 +624,21 @@ export default function PharmacyRouteScreen() {
             </Pressable>
           </View>
           {pharmacyAddress ? (
-            <View style={{ flexDirection: rtl ? "row-reverse" : "row", alignItems: "center", marginTop: 4 }}>
+            <View
+              style={{
+                flexDirection: rtl ? "row-reverse" : "row",
+                alignItems: "center",
+                marginTop: 4,
+              }}
+            >
               <Feather name="map-pin" size={12} color={theme.textSecondary} />
-              <ThemedText type="caption" style={{ color: theme.textSecondary, [rtl ? "marginRight" : "marginLeft"]: 4 }}>
+              <ThemedText
+                type="caption"
+                style={{
+                  color: theme.textSecondary,
+                  [rtl ? "marginRight" : "marginLeft"]: 4,
+                }}
+              >
                 {pharmacyAddress}
               </ThemedText>
             </View>
@@ -531,73 +646,175 @@ export default function PharmacyRouteScreen() {
         </View>
 
         {isLoadingRoute ? (
-          <View style={[styles.loadingRoute, rtl && { flexDirection: "row-reverse" }]}>
+          <View
+            style={[
+              styles.loadingRoute,
+              rtl && { flexDirection: "row-reverse" },
+            ]}
+          >
             <ActivityIndicator size="small" color={theme.primary} />
-            <ThemedText type="small" style={{ color: theme.textSecondary, [rtl ? "marginRight" : "marginLeft"]: Spacing.sm }}>
-              {language === "ar" ? "جاري حساب المسار..." : "Calculating route..."}
+            <ThemedText
+              type="small"
+              style={{
+                color: theme.textSecondary,
+                [rtl ? "marginRight" : "marginLeft"]: Spacing.sm,
+              }}
+            >
+              {language === "ar"
+                ? "جاري حساب المسار..."
+                : "Calculating route..."}
             </ThemedText>
           </View>
         ) : routeError && !routeData ? (
-          <View style={[styles.errorRow, rtl && { flexDirection: "row-reverse" }]}>
-            <ThemedText type="small" style={{ color: theme.error, flex: 1, textAlign: rtl ? "right" : "left" }}>
+          <View
+            style={[styles.errorRow, rtl && { flexDirection: "row-reverse" }]}
+          >
+            <ThemedText
+              type="small"
+              style={{
+                color: theme.error,
+                flex: 1,
+                textAlign: rtl ? "right" : "left",
+              }}
+            >
               {routeError}
             </ThemedText>
-            <Pressable style={[styles.retryBtn, { backgroundColor: theme.primary }]} onPress={handleRetry}>
+            <Pressable
+              style={[styles.retryBtn, { backgroundColor: theme.primary }]}
+              onPress={handleRetry}
+            >
               <Feather name="refresh-cw" size={14} color="#FFF" />
-              <ThemedText type="caption" style={{ color: "#FFF", [rtl ? "marginRight" : "marginLeft"]: 4 }}>
+              <ThemedText
+                type="caption"
+                style={{
+                  color: "#FFF",
+                  [rtl ? "marginRight" : "marginLeft"]: 4,
+                }}
+              >
                 {language === "ar" ? "إعادة" : "Retry"}
               </ThemedText>
             </Pressable>
           </View>
         ) : routeData ? (
-          <View style={[styles.pillsRow, rtl && { flexDirection: "row-reverse" }]}>
-            <View style={[styles.pill, { backgroundColor: theme.primary + "15" }]}>
+          <View
+            style={[styles.pillsRow, rtl && { flexDirection: "row-reverse" }]}
+          >
+            <View
+              style={[styles.pill, { backgroundColor: theme.primary + "15" }]}
+            >
               <Feather name="navigation" size={14} color={theme.primary} />
-              <ThemedText type="small" style={{ color: theme.primary, fontWeight: "700", [rtl ? "marginRight" : "marginLeft"]: 4 }}>
-                {routeData.distanceKm.toFixed(1)} {language === "ar" ? "كم" : "km"}
+              <ThemedText
+                type="small"
+                style={{
+                  color: theme.primary,
+                  fontWeight: "700",
+                  [rtl ? "marginRight" : "marginLeft"]: 4,
+                }}
+              >
+                {routeData.distanceKm.toFixed(1)}{" "}
+                {language === "ar" ? "كم" : "km"}
               </ThemedText>
             </View>
-            <View style={[styles.pill, { backgroundColor: theme.accent + "15" }]}>
+            <View
+              style={[styles.pill, { backgroundColor: theme.accent + "15" }]}
+            >
               <Feather name="clock" size={14} color={theme.accent} />
-              <ThemedText type="small" style={{ color: theme.accent, fontWeight: "700", [rtl ? "marginRight" : "marginLeft"]: 4 }}>
-                {Math.ceil(routeData.durationMin)} {language === "ar" ? "دقيقة" : "min"}
+              <ThemedText
+                type="small"
+                style={{
+                  color: theme.accent,
+                  fontWeight: "700",
+                  [rtl ? "marginRight" : "marginLeft"]: 4,
+                }}
+              >
+                {Math.ceil(routeData.durationMin)}{" "}
+                {language === "ar" ? "دقيقة" : "min"}
               </ThemedText>
             </View>
           </View>
         ) : null}
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.buttonsScroll}>
-          <Pressable style={[styles.sheetBtn, { backgroundColor: "#8B5CF6" }]} onPress={handleOpenWaze}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.buttonsScroll}
+        >
+          <Pressable
+            style={[styles.sheetBtn, { backgroundColor: "#8B5CF6" }]}
+            onPress={handleOpenWaze}
+          >
             <MaterialIcons name="navigation" size={18} color="#FFF" />
-            <ThemedText type="caption" style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}>Waze</ThemedText>
+            <ThemedText
+              type="caption"
+              style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}
+            >
+              Waze
+            </ThemedText>
           </Pressable>
-          <Pressable style={[styles.sheetBtn, { backgroundColor: "#1F6AE1" }]} onPress={handleOpenMaps}>
+          <Pressable
+            style={[styles.sheetBtn, { backgroundColor: "#1F6AE1" }]}
+            onPress={handleOpenMaps}
+          >
             <Feather name="map" size={18} color="#FFF" />
-            <ThemedText type="caption" style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}>
+            <ThemedText
+              type="caption"
+              style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}
+            >
               {language === "ar" ? "خرائط" : "Maps"}
             </ThemedText>
           </Pressable>
-          <Pressable style={[styles.sheetBtn, { backgroundColor: "#4CD964" }]} onPress={handleCallPhone}>
+          <Pressable
+            style={[styles.sheetBtn, { backgroundColor: "#4CD964" }]}
+            onPress={handleCallPhone}
+          >
             <Feather name="phone" size={18} color="#FFF" />
-            <ThemedText type="caption" style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}>
+            <ThemedText
+              type="caption"
+              style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}
+            >
               {language === "ar" ? "اتصال" : "Call"}
             </ThemedText>
           </Pressable>
-          <Pressable style={[styles.sheetBtn, { backgroundColor: "#25D366" }]} onPress={handleWhatsApp}>
+          <Pressable
+            style={[styles.sheetBtn, { backgroundColor: "#25D366" }]}
+            onPress={handleWhatsApp}
+          >
             <Feather name="message-circle" size={18} color="#FFF" />
-            <ThemedText type="caption" style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}>
+            <ThemedText
+              type="caption"
+              style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}
+            >
               {language === "ar" ? "واتساب" : "WhatsApp"}
             </ThemedText>
           </Pressable>
-          <Pressable style={[styles.sheetBtn, { backgroundColor: theme.primary }]} onPress={handleShare}>
+          <Pressable
+            style={[styles.sheetBtn, { backgroundColor: theme.primary }]}
+            onPress={handleShare}
+          >
             <Feather name="share-2" size={18} color="#FFF" />
-            <ThemedText type="caption" style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}>
+            <ThemedText
+              type="caption"
+              style={{ color: "#FFF", fontWeight: "600", marginTop: 2 }}
+            >
               {language === "ar" ? "مشاركة" : "Share"}
             </ThemedText>
           </Pressable>
-          <Pressable style={[styles.sheetBtn, { backgroundColor: theme.backgroundSecondary, borderWidth: 1, borderColor: theme.border }]} onPress={handleInfo}>
+          <Pressable
+            style={[
+              styles.sheetBtn,
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderWidth: 1,
+                borderColor: theme.border,
+              },
+            ]}
+            onPress={handleInfo}
+          >
             <Feather name="info" size={18} color={theme.text} />
-            <ThemedText type="caption" style={{ fontWeight: "600", marginTop: 2 }}>
+            <ThemedText
+              type="caption"
+              style={{ fontWeight: "600", marginTop: 2 }}
+            >
               {language === "ar" ? "معلومات" : "Info"}
             </ThemedText>
           </Pressable>
@@ -693,9 +910,22 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   sheetHeader: { marginBottom: Spacing.md },
-  sheetNameRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  loadingRoute: { flexDirection: "row", alignItems: "center", marginBottom: Spacing.md },
-  errorRow: { flexDirection: "row", alignItems: "center", marginBottom: Spacing.md, gap: Spacing.sm },
+  sheetNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  loadingRoute: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing.md,
+  },
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
+  },
   retryBtn: {
     flexDirection: "row",
     alignItems: "center",
