@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Linking,
+  Platform,
   Pressable,
   StyleSheet,
   TextInput,
@@ -122,6 +124,22 @@ export default function PharmacyPickerScreen() {
       const province = language === "ar" ? item.provinceAr : item.provinceEn;
       const dist = getDistance(item);
 
+      const handleOpenWaze = async (lat: number, lng: number) => {
+        const dlink = `waze://?ll=${lat},${lng}&navigate=yes`;
+        const wlink = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+        try {
+          const supported = await Linking.canOpenURL(dlink);
+          if (supported) {
+            await Linking.openURL(dlink);
+          } else {
+            await Linking.openURL(wlink);
+          }
+        } catch (err) {
+          console.error("Failed to open Waze:", err);
+          await Linking.openURL(wlink);
+        }
+      };
+
       return (
         <Animated.View entering={FadeInUp.delay(index * 60).duration(400)}>
           <View
@@ -160,11 +178,7 @@ export default function PharmacyPickerScreen() {
             <View style={[styles.cardActions, rtl && { flexDirection: "row-reverse" }]}>
               <Pressable
                 style={[styles.actionBtn, { backgroundColor: theme.primary }]}
-                onPress={() =>
-                  navigation.navigate("PharmacyRoute", {
-                    pharmacyId: item.id,
-                  })
-                }
+                onPress={() => handleOpenWaze(item.lat, item.lng)}
               >
                 <Feather name="navigation" size={16} color="#FFF" />
                 <ThemedText type="small" style={{ color: "#FFF", fontWeight: "600", [rtl ? "marginRight" : "marginLeft"]: 6 }}>
