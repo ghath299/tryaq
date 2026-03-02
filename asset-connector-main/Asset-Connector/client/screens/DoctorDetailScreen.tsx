@@ -74,7 +74,6 @@ export default function DoctorDetailScreen() {
   const district = isRTL ? doctor.districtAr : doctor.districtEn;
   const clinicAddress = isRTL ? doctor.clinicAddress : doctor.clinicAddressEn;
 
-  const clinicSource = require("../assets/placeholders/clinic.jpg");
   const doctorSource = require("../assets/placeholders/doctor.png");
 
   const handleBookAppointment = () => {
@@ -101,19 +100,12 @@ export default function DoctorDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeIn.duration(300)}>
-          <View style={{ height: heroHeight }}>
-            <Image
-              source={clinicSource}
-              style={StyleSheet.absoluteFill}
-              resizeMode="cover"
-            />
-            <LinearGradient
-              colors={["transparent", "rgba(0,0,0,0.6)"]}
-              style={StyleSheet.absoluteFill}
-              start={{ x: 0.5, y: 0.3 }}
-              end={{ x: 0.5, y: 1 }}
-            />
-          </View>
+          <LinearGradient
+            colors={isDark ? [theme.primary + "30", theme.backgroundRoot] : [theme.primary + "25", theme.backgroundRoot]}
+            style={{ height: heroHeight }}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          />
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(100).duration(400)} style={styles.profileSection}>
