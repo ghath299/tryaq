@@ -58,7 +58,7 @@ function DrawerButton() {
   const handlePress = () => {
     scale.value = withSequence(
       withSpring(0.9, Animation.spring.snappy),
-      withSpring(1, Animation.spring.gentle)
+      withSpring(1, Animation.spring.gentle),
     );
     navigation.dispatch(DrawerActions.openDrawer());
   };
@@ -90,10 +90,16 @@ function AuthNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
       )}
       {authStep === "location" && (
-        <Stack.Screen name="LocationPermission" component={LocationPermissionScreen} />
+        <Stack.Screen
+          name="LocationPermission"
+          component={LocationPermissionScreen}
+        />
       )}
       {authStep === "otp" && (
-        <Stack.Screen name="OTPVerification" component={OTPVerificationScreen} />
+        <Stack.Screen
+          name="OTPVerification"
+          component={OTPVerificationScreen}
+        />
       )}
     </Stack.Navigator>
   );
@@ -102,11 +108,29 @@ function AuthNavigator() {
 function PatientNavigator() {
   const screenOptions = useScreenOptions();
   const { t } = useApp();
+  const { theme } = useTheme();
 
   return (
     <Stack.Navigator
       screenOptions={{
         ...screenOptions,
+
+        // ✅ هذا الجزء هو اللي يحل مشكلة "الهيدر يبقى أبيض"
+        headerStyle: {
+          // نخلي لون الهيدر مثل خلفية الثيم
+          backgroundColor: theme.backgroundRoot,
+        },
+        headerTintColor: theme.text,
+        headerTitleStyle: {
+          color: theme.text,
+        },
+
+        // ✅ يمنع شفافيات/لون أبيض وراه
+        headerTransparent: false,
+
+        // ✅ يخفي الظل الافتراضي (إذا تحب تخليه رجّعها true)
+        headerShadowVisible: false,
+
         animation: "fade_from_bottom",
         animationDuration: 300,
       }}
@@ -116,6 +140,7 @@ function PatientNavigator() {
         component={DrawerNavigator}
         options={{ headerShown: false }}
       />
+
       <Stack.Screen
         name="DoctorDetail"
         component={DoctorDetailScreen}
@@ -125,6 +150,7 @@ function PatientNavigator() {
           animation: "slide_from_right",
         }}
       />
+
       <Stack.Screen
         name="PharmacyDetail"
         component={PharmacyDetailScreen}
@@ -134,6 +160,7 @@ function PatientNavigator() {
           animation: "slide_from_right",
         }}
       />
+
       <Stack.Screen
         name="MedicinePharmacies"
         component={MedicinePharmaciesScreen}
@@ -142,6 +169,7 @@ function PatientNavigator() {
           animation: "slide_from_right",
         }}
       />
+
       <Stack.Screen
         name="PharmacyPicker"
         component={PharmacyPickerScreen}
@@ -150,6 +178,7 @@ function PatientNavigator() {
           animation: "slide_from_right",
         }}
       />
+
       <Stack.Screen
         name="BookAppointment"
         component={BookAppointmentScreen}
@@ -159,6 +188,7 @@ function PatientNavigator() {
           animation: "slide_from_bottom",
         }}
       />
+
       <Stack.Screen
         name="MyBookings"
         component={MyBookingsScreen}
@@ -168,6 +198,7 @@ function PatientNavigator() {
           animation: "fade_from_bottom",
         }}
       />
+
       <Stack.Screen
         name="MyOrders"
         component={MyOrdersScreen}
@@ -177,11 +208,15 @@ function PatientNavigator() {
           animation: "fade_from_bottom",
         }}
       />
+
       <Stack.Screen
         name="CareerJoin"
         component={CareerJoinScreen}
         options={({ route }) => ({
-          title: (route.params as any)?.type === "doctor" ? "انضم كطبيب" : "انضم كصيدلاني",
+          title:
+            (route.params as any)?.type === "doctor"
+              ? "انضم كطبيب"
+              : "انضم كصيدلاني",
           animation: "slide_from_right",
         })}
       />
@@ -195,7 +230,14 @@ export default function RootStackNavigator() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: theme.backgroundRoot }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: theme.backgroundRoot,
+        }}
+      >
         <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );

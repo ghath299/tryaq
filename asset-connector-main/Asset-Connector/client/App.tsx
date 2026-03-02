@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, I18nManager } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -55,8 +55,10 @@ export default function App() {
               <SafeAreaProvider>
                 <GestureHandlerRootView style={styles.root}>
                   <KeyboardProvider>
+                    {/* 🔥 تم تعديل الستاتس بار هنا */}
+                    <StatusBar style="light" backgroundColor="#000" />
+
                     <AppContent />
-                    <StatusBar style="auto" />
                   </KeyboardProvider>
                 </GestureHandlerRootView>
               </SafeAreaProvider>
@@ -71,5 +73,6 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: "#000",
   },
 });

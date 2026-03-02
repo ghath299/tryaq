@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -21,10 +21,7 @@ import Animated, {
   withSequence,
   withRepeat,
   FadeInUp,
-  FadeInDown,
   FadeIn,
-  interpolate,
-  Extrapolation,
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -39,7 +36,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const SLIDER_WIDTH = SCREEN_WIDTH - Spacing.lg * 2;
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 interface SectionHeaderProps {
   title: string;
@@ -48,7 +44,12 @@ interface SectionHeaderProps {
   index?: number;
 }
 
-function SectionHeader({ title, onViewAll, viewAllLabel, index = 0 }: SectionHeaderProps) {
+function SectionHeader({
+  title,
+  onViewAll,
+  viewAllLabel,
+  index = 0,
+}: SectionHeaderProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
 
@@ -60,7 +61,7 @@ function SectionHeader({ title, onViewAll, viewAllLabel, index = 0 }: SectionHea
     if (onViewAll) {
       scale.value = withSequence(
         withSpring(0.95, Animation.spring.snappy),
-        withSpring(1, Animation.spring.gentle)
+        withSpring(1, Animation.spring.gentle),
       );
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onViewAll();
@@ -76,7 +77,10 @@ function SectionHeader({ title, onViewAll, viewAllLabel, index = 0 }: SectionHea
       {onViewAll ? (
         <AnimatedPressable onPress={handlePress} style={animatedStyle}>
           <View style={styles.viewAllButton}>
-            <ThemedText type="small" style={{ color: theme.primaryDark, fontWeight: "600" }}>
+            <ThemedText
+              type="small"
+              style={{ color: theme.primaryDark, fontWeight: "600" }}
+            >
               {viewAllLabel}
             </ThemedText>
             <Feather name="chevron-right" size={16} color={theme.primaryDark} />
@@ -93,9 +97,13 @@ interface PromotedDoctorCardProps {
   index: number;
 }
 
-function PromotedDoctorCard({ doctor, onPress, index }: PromotedDoctorCardProps) {
+function PromotedDoctorCard({
+  doctor,
+  onPress,
+  index,
+}: PromotedDoctorCardProps) {
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { language } = useApp();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
@@ -103,10 +111,7 @@ function PromotedDoctorCard({ doctor, onPress, index }: PromotedDoctorCardProps)
   const specialty = language === "ar" ? doctor.specialtyAr : doctor.specialtyEn;
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const handlePressIn = () => {
@@ -131,14 +136,16 @@ function PromotedDoctorCard({ doctor, onPress, index }: PromotedDoctorCardProps)
       shadowOpacity: 0.15,
       shadowRadius: 12,
     },
-    android: {
-      elevation: 4,
-    },
+    android: { elevation: 4 },
     default: {},
   });
 
   return (
-    <Animated.View entering={FadeInUp.delay(200 + index * 80).duration(400).springify()}>
+    <Animated.View
+      entering={FadeInUp.delay(200 + index * 80)
+        .duration(400)
+        .springify()}
+    >
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -156,20 +163,33 @@ function PromotedDoctorCard({ doctor, onPress, index }: PromotedDoctorCardProps)
         >
           <Feather name="user" size={28} color={theme.primary} />
         </LinearGradient>
+
         <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
           {name}
         </ThemedText>
-        <ThemedText type="small" style={{ color: theme.textSecondary }} numberOfLines={1}>
+
+        <ThemedText
+          type="small"
+          style={{ color: theme.textSecondary }}
+          numberOfLines={1}
+        >
           {specialty}
         </ThemedText>
+
         <View style={styles.promotedRating}>
           <Feather name="star" size={12} color="#FFB800" />
-          <ThemedText type="caption" style={{ color: theme.textSecondary, marginLeft: 4 }}>
+          <ThemedText
+            type="caption"
+            style={{ color: theme.textSecondary, marginLeft: 4 }}
+          >
             {doctor.rating}
           </ThemedText>
         </View>
+
         {doctor.isVerified ? (
-          <View style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}>
+          <View
+            style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}
+          >
             <Feather name="check" size={10} color="#FFFFFF" />
           </View>
         ) : null}
@@ -184,20 +204,22 @@ interface PromotedPharmacyCardProps {
   index: number;
 }
 
-function PromotedPharmacyCard({ pharmacy, onPress, index }: PromotedPharmacyCardProps) {
+function PromotedPharmacyCard({
+  pharmacy,
+  onPress,
+  index,
+}: PromotedPharmacyCardProps) {
   const { theme } = useTheme();
   const { language, t } = useApp();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
   const name = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const district = language === "ar" ? pharmacy.districtAr : pharmacy.districtEn;
+  const district =
+    language === "ar" ? pharmacy.districtAr : pharmacy.districtEn;
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const handlePressIn = () => {
@@ -222,14 +244,16 @@ function PromotedPharmacyCard({ pharmacy, onPress, index }: PromotedPharmacyCard
       shadowOpacity: 0.15,
       shadowRadius: 12,
     },
-    android: {
-      elevation: 4,
-    },
+    android: { elevation: 4 },
     default: {},
   });
 
   return (
-    <Animated.View entering={FadeInUp.delay(300 + index * 80).duration(400).springify()}>
+    <Animated.View
+      entering={FadeInUp.delay(300 + index * 80)
+        .duration(400)
+        .springify()}
+    >
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -247,16 +271,31 @@ function PromotedPharmacyCard({ pharmacy, onPress, index }: PromotedPharmacyCard
         >
           <Feather name="plus-square" size={28} color={theme.primaryDark} />
         </LinearGradient>
+
         <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
           {name}
         </ThemedText>
-        <ThemedText type="small" style={{ color: theme.textSecondary }} numberOfLines={1}>
+
+        <ThemedText
+          type="small"
+          style={{ color: theme.textSecondary }}
+          numberOfLines={1}
+        >
           {district}
         </ThemedText>
+
         {pharmacy.hasDelivery ? (
-          <View style={[styles.deliveryBadge, { backgroundColor: theme.success + "15" }]}>
+          <View
+            style={[
+              styles.deliveryBadge,
+              { backgroundColor: theme.success + "15" },
+            ]}
+          >
             <Feather name="truck" size={10} color={theme.success} />
-            <ThemedText type="caption" style={{ color: theme.success, marginLeft: 4 }}>
+            <ThemedText
+              type="caption"
+              style={{ color: theme.success, marginLeft: 4 }}
+            >
               {t("delivery")}
             </ThemedText>
           </View>
@@ -272,23 +311,28 @@ interface AnnouncementSlideProps {
   activeIndex: number;
 }
 
-function AnnouncementSlide({ item, index, activeIndex }: AnnouncementSlideProps) {
+function AnnouncementSlide({
+  item,
+  index,
+  activeIndex,
+}: AnnouncementSlideProps) {
   const { theme } = useTheme();
   const { language } = useApp();
   const pulseValue = useSharedValue(1);
 
   const title = language === "ar" ? item.titleAr : item.titleEn;
-  const description = language === "ar" ? item.descriptionAr : item.descriptionEn;
+  const description =
+    language === "ar" ? item.descriptionAr : item.descriptionEn;
 
   useEffect(() => {
     if (index === activeIndex) {
       pulseValue.value = withRepeat(
         withSequence(
           withTiming(1.02, { duration: 2000 }),
-          withTiming(1, { duration: 2000 })
+          withTiming(1, { duration: 2000 }),
         ),
         -1,
-        true
+        true,
       );
     }
   }, [index, activeIndex]);
@@ -333,6 +377,7 @@ function AnnouncementSlide({ item, index, activeIndex }: AnnouncementSlideProps)
             />
           ))}
         </View>
+
         <View style={styles.slideContent}>
           <ThemedText type="h2" style={styles.slideTitle}>
             {title}
@@ -341,9 +386,16 @@ function AnnouncementSlide({ item, index, activeIndex }: AnnouncementSlideProps)
             {description}
           </ThemedText>
         </View>
+
         <View style={styles.slideIcon}>
           <Feather
-            name={item.type === "event" ? "calendar" : item.type === "promotion" ? "gift" : "bell"}
+            name={
+              item.type === "event"
+                ? "calendar"
+                : item.type === "promotion"
+                  ? "gift"
+                  : "bell"
+            }
             size={64}
             color="rgba(255,255,255,0.2)"
           />
@@ -352,7 +404,6 @@ function AnnouncementSlide({ item, index, activeIndex }: AnnouncementSlideProps)
     </Animated.View>
   );
 }
-
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -364,6 +415,17 @@ export default function HomeScreen() {
 
   const [activeSlide, setActiveSlide] = useState(0);
   const sliderRef = useRef<FlatList>(null);
+
+  // ✅ هذا هو الحل: خلي لون الهيدر يتبع الثيم (بدل الأبيض)
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.backgroundRoot },
+      headerTintColor: theme.text,
+      headerTitleStyle: { color: theme.text },
+      headerShadowVisible: false,
+      headerTransparent: false,
+    });
+  }, [navigation, theme.backgroundRoot, theme.text]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -383,13 +445,11 @@ export default function HomeScreen() {
 
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
 
-
-
-
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
       contentContainerStyle={{
+        // ملاحظة: لا نخليها headerHeight حتى ما يصير فراغ زايد
         paddingTop: Spacing.md,
         paddingBottom: tabBarHeight + insets.bottom + Spacing.xl,
       }}
@@ -406,7 +466,11 @@ export default function HomeScreen() {
           viewabilityConfig={viewabilityConfig}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
-            <AnnouncementSlide item={item} index={index} activeIndex={activeSlide} />
+            <AnnouncementSlide
+              item={item}
+              index={index}
+              activeIndex={activeSlide}
+            />
           )}
           style={styles.slider}
           contentContainerStyle={styles.sliderContent}
@@ -421,7 +485,8 @@ export default function HomeScreen() {
               style={[
                 styles.dot,
                 {
-                  backgroundColor: index === activeSlide ? theme.primary : theme.border,
+                  backgroundColor:
+                    index === activeSlide ? theme.primary : theme.border,
                   width: index === activeSlide ? 24 : 8,
                 },
               ]}
@@ -429,20 +494,6 @@ export default function HomeScreen() {
           ))}
         </View>
       </Animated.View>
-
-      {/* Quick Actions Hidden as per user request */}
-      {/* <View style={styles.quickActionsContainer}>
-        {quickActions.map((action, index) => (
-          <QuickAction
-            key={action.screen}
-            icon={action.icon}
-            label={action.label}
-            color={action.color}
-            index={index}
-            onPress={() => navigation.navigate(action.screen as never)}
-          />
-        ))}
-      </View> */}
 
       <SectionHeader
         title={t("promotedDoctors")}
@@ -461,7 +512,9 @@ export default function HomeScreen() {
           <PromotedDoctorCard
             doctor={item}
             index={index}
-            onPress={() => navigation.navigate("DoctorDetail", { doctorId: item.id })}
+            onPress={() =>
+              navigation.navigate("DoctorDetail", { doctorId: item.id })
+            }
           />
         )}
       />
@@ -483,61 +536,90 @@ export default function HomeScreen() {
           <PromotedPharmacyCard
             pharmacy={item}
             index={index}
-            onPress={() => navigation.navigate("PharmacyDetail", { pharmacyId: item.id })}
+            onPress={() =>
+              navigation.navigate("PharmacyDetail", { pharmacyId: item.id })
+            }
           />
         )}
       />
 
-      <SectionHeader title={t("healthEvents")} viewAllLabel={t("viewAll")} index={2} />
+      <SectionHeader
+        title={t("healthEvents")}
+        viewAllLabel={t("viewAll")}
+        index={2}
+      />
       <View style={styles.eventsContainer}>
-        {announcements.filter((a) => a.type === "event").map((event, index) => {
-          const eventTitle = language === "ar" ? event.titleAr : event.titleEn;
-          const eventDesc = language === "ar" ? event.descriptionAr : event.descriptionEn;
-          
-          return (
-            <Animated.View
-              key={event.id}
-              entering={FadeInUp.delay(400 + index * 80).duration(400).springify()}
-            >
-              <Pressable
-                style={[
-                  styles.eventCard,
-                  {
-                    backgroundColor: theme.backgroundDefault,
-                  },
-                  Platform.select({
-                    ios: {
-                      shadowColor: theme.primary,
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 8,
-                    },
-                    android: { elevation: 2 },
-                    default: {},
-                  }),
-                ]}
+        {announcements
+          .filter((a) => a.type === "event")
+          .map((event, index) => {
+            const eventTitle =
+              language === "ar" ? event.titleAr : event.titleEn;
+            const eventDesc =
+              language === "ar" ? event.descriptionAr : event.descriptionEn;
+
+            return (
+              <Animated.View
+                key={event.id}
+                entering={FadeInUp.delay(400 + index * 80)
+                  .duration(400)
+                  .springify()}
               >
-                <LinearGradient
-                  colors={[theme.primary + "20", theme.primaryDark + "10"]}
-                  style={styles.eventIcon}
+                <Pressable
+                  style={[
+                    styles.eventCard,
+                    { backgroundColor: theme.backgroundDefault },
+                    Platform.select({
+                      ios: {
+                        shadowColor: theme.primary,
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                      },
+                      android: { elevation: 2 },
+                      default: {},
+                    }),
+                  ]}
                 >
-                  <Feather name="calendar" size={20} color={theme.primary} />
-                </LinearGradient>
-                <View style={styles.eventInfo}>
-                  <ThemedText type="body" numberOfLines={1} style={{ fontWeight: "500" }}>
-                    {eventTitle}
-                  </ThemedText>
-                  <ThemedText type="small" style={{ color: theme.textSecondary }} numberOfLines={1}>
-                    {eventDesc}
-                  </ThemedText>
-                </View>
-                <View style={[styles.eventArrow, { backgroundColor: theme.primary + "10" }]}>
-                  <Feather name="chevron-right" size={18} color={theme.primary} />
-                </View>
-              </Pressable>
-            </Animated.View>
-          );
-        })}
+                  <LinearGradient
+                    colors={[theme.primary + "20", theme.primaryDark + "10"]}
+                    style={styles.eventIcon}
+                  >
+                    <Feather name="calendar" size={20} color={theme.primary} />
+                  </LinearGradient>
+
+                  <View style={styles.eventInfo}>
+                    <ThemedText
+                      type="body"
+                      numberOfLines={1}
+                      style={{ fontWeight: "500" }}
+                    >
+                      {eventTitle}
+                    </ThemedText>
+                    <ThemedText
+                      type="small"
+                      style={{ color: theme.textSecondary }}
+                      numberOfLines={1}
+                    >
+                      {eventDesc}
+                    </ThemedText>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.eventArrow,
+                      { backgroundColor: theme.primary + "10" },
+                    ]}
+                  >
+                    <Feather
+                      name="chevron-right"
+                      size={18}
+                      color={theme.primary}
+                    />
+                  </View>
+                </Pressable>
+              </Animated.View>
+            );
+          })}
       </View>
     </ScrollView>
   );
@@ -603,12 +685,6 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     marginHorizontal: 4,
-  },
-  quickActionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.xl,
   },
   sectionHeader: {
     flexDirection: "row",

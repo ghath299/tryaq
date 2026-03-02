@@ -146,55 +146,55 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
       >
         <LinearGradient
           colors={[theme.primary + "25", theme.primaryDark + "15"]}
-          style={styles.doctorAvatar}
+          style={[styles.doctorAvatar, language === "ar" && { marginRight: 0, marginLeft: Spacing.lg }]}
         >
           <Feather name="user" size={28} color={theme.primary} />
         </LinearGradient>
 
         <View style={styles.doctorInfo}>
-          <View style={styles.doctorHeader}>
-            <ThemedText type="h4" style={styles.doctorName} numberOfLines={1}>
+          <View style={[styles.doctorHeader, language === "ar" && { flexDirection: "row-reverse" }]}>
+            <ThemedText type="h4" style={[styles.doctorName, language === "ar" && { textAlign: "right" }]} numberOfLines={1}>
               {name}
             </ThemedText>
             {doctor.isVerified ? (
-              <View style={[styles.verifiedIcon, { backgroundColor: theme.primary }]}>
+              <View style={[styles.verifiedIcon, { backgroundColor: theme.primary }, language === "ar" && { marginLeft: 0, marginRight: Spacing.xs }]}>
                 <Feather name="check" size={10} color="#FFFFFF" />
               </View>
             ) : null}
           </View>
 
-          <ThemedText type="small" style={{ color: theme.primaryDark, fontWeight: "500" }}>
+          <ThemedText type="small" style={[{ color: theme.primaryDark, fontWeight: "500" }, language === "ar" && { textAlign: "right" }]}>
             {specialty}
           </ThemedText>
 
-          <View style={styles.doctorMeta}>
-            <View style={styles.metaItem}>
+          <View style={[styles.doctorMeta, language === "ar" && { alignItems: "flex-end" }]}>
+            <View style={[styles.metaItem, language === "ar" && { flexDirection: "row-reverse" }]}>
               <Feather name="map-pin" size={12} color={theme.textSecondary} />
-              <ThemedText type="caption" style={{ color: theme.textSecondary, marginLeft: 4 }}>
+              <ThemedText type="caption" style={[{ color: theme.textSecondary, marginLeft: 4 }, language === "ar" && { marginLeft: 0, marginRight: 4 }]}>
                 {province} - {district}
               </ThemedText>
             </View>
           </View>
 
-          <View style={styles.doctorFooter}>
-            <View style={styles.ratingContainer}>
+          <View style={[styles.doctorFooter, language === "ar" && { flexDirection: "row-reverse" }]}>
+            <View style={[styles.ratingContainer, language === "ar" && { flexDirection: "row-reverse" }]}>
               <Feather name="star" size={14} color="#FFB800" />
-              <ThemedText type="small" style={{ fontWeight: "600", marginLeft: 4 }}>
+              <ThemedText type="small" style={[{ fontWeight: "600", marginLeft: 4 }, language === "ar" && { marginLeft: 0, marginRight: 4 }]}>
                 {doctor.rating}
               </ThemedText>
             </View>
 
-            <View style={[styles.distanceChip, { backgroundColor: theme.primary + "15" }]}>
+            <View style={[styles.distanceChip, { backgroundColor: theme.primary + "15" }, language === "ar" && { flexDirection: "row-reverse" }]}>
               <Feather name="navigation" size={12} color={theme.primary} />
-              <ThemedText type="caption" style={{ color: theme.primary, marginLeft: 4, fontWeight: "500" }}>
+              <ThemedText type="caption" style={[{ color: theme.primary, marginLeft: 4, fontWeight: "500" }, language === "ar" && { marginLeft: 0, marginRight: 4 }]}>
                 {doctor.distance} {t("km")}
               </ThemedText>
             </View>
           </View>
         </View>
 
-        <View style={[styles.arrowContainer, { backgroundColor: theme.primary + "10" }]}>
-          <Feather name="chevron-right" size={20} color={theme.primary} />
+        <View style={[styles.arrowContainer, { backgroundColor: theme.primary + "10" }, language === "ar" && { marginLeft: 0, marginRight: Spacing.sm }]}>
+          <Feather name={language === "ar" ? "chevron-left" : "chevron-right"} size={20} color={theme.primary} />
         </View>
       </AnimatedPressable>
     </Animated.View>

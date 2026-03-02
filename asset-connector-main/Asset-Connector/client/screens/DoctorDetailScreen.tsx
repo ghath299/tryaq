@@ -1,5 +1,14 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  ImageBackground,
+  TouchableOpacity,
+  Linking,
+  useWindowDimensions,
+  StyleSheet as RNStyleSheet,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
@@ -8,15 +17,24 @@ import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Button } from "@/components/Button";
-import { MapViewComponent } from "@/components/MapView";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { doctors } from "@/data/mockData";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+type DoctorDetailRouteProp = RouteProp<
+  { DoctorDetail: { doctorId: string } },
+  "DoctorDetail"
+>;
 
-type DoctorDetailRouteProp = RouteProp<{ DoctorDetail: { doctorId: string } }, "DoctorDetail">;
+const openWaze = (lat: number, lng: number) => {
+  const deep = `waze://?ll=${lat},${lng}&navigate=yes`;
+  const web = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+  Linking.openURL(deep).catch(() => {
+    Linking.openURL(web).catch(() => {});
+  });
+};
 
 export default function DoctorDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -25,85 +43,241 @@ export default function DoctorDetailScreen() {
   const { language, t } = useApp();
   const route = useRoute<DoctorDetailRouteProp>();
   const navigation = useNavigation<any>();
+  const { width: W } = useWindowDimensions();
+
+  const isRTL = language === "ar";
+
+  // ✅ ترجمة داخل الملف بدون AppContext
+  const TXT = {
+    route: isRTL ? "المسار" : "Route",
+    clinicInfo: isRTL ? "معلومات العيادة" : "Clinic Info",
+    clinic: isRTL ? "العيادة" : "Clinic",
+    workingHours: isRTL ? "ساعات العمل" : "Working Hours",
+    distance: isRTL ? "المسافة" : "Distance",
+    km: isRTL ? "كم" : "km",
+  };
 
   const doctor = doctors.find((d) => d.id === route.params?.doctorId);
 
   if (!doctor) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
-        <ThemedText type="body">{t("error")}</ThemedText>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
+      >
+        <ThemedText>{t("error")}</ThemedText>
       </View>
     );
   }
 
-  const name = language === "ar" ? doctor.nameAr : doctor.nameEn;
-  const specialty = language === "ar" ? doctor.specialtyAr : doctor.specialtyEn;
-  const province = language === "ar" ? doctor.provinceAr : doctor.provinceEn;
-  const district = language === "ar" ? doctor.districtAr : doctor.districtEn;
-  const clinicAddress = language === "ar" ? doctor.clinicAddress : doctor.clinicAddressEn;
+  const name = isRTL ? doctor.nameAr : doctor.nameEn;
+  const specialty = isRTL ? doctor.specialtyAr : doctor.specialtyEn;
+  const province = isRTL ? doctor.provinceAr : doctor.provinceEn;
+  const district = isRTL ? doctor.districtAr : doctor.districtEn;
+  const clinicAddress = isRTL ? doctor.clinicAddress : doctor.clinicAddressEn;
+
+  // ✅ صور افتراضية
+  const clinicSource = require("../assets/placeholders/clinic.jpg");
+  const doctorSource = require("../assets/placeholders/doctor.png");
 
   const handleBookAppointment = () => {
-    navigation.navigate("BookAppointment" as never, { doctorId: doctor.id } as never);
+    navigation.navigate(
+      "BookAppointment" as never,
+      { doctorId: doctor.id } as never,
+    );
   };
+
+  /**
+   * ✅ Safe header universal:
+   * نأخذ الأكبر حتى لا يقص على أي جهاز.
+   */
+  const SAFE_HEADER_FALLBACK = 44;
+  const safeHeader = Math.max(headerHeight, insets.top + SAFE_HEADER_FALLBACK);
+
+  /**
+   * ✅ كل القياسات ديناميكية حسب الجهاز (بدون عرض ثابت):
+   * heroWidth = عرض الشاشة ناقص padding
+   * heroHeight = يعتمد على aspectRatio ثابت (شكل موحد على كل الأجهزة)
+   */
+  const heroSidePadding = Spacing.lg * 2;
+  const heroWidth = Math.max(0, W - heroSidePadding);
+  const heroAspect = 16 / 10; // شكل ثابت (تقدر تغيّره لِـ 16/9 أو 16/11 حسب ذوقك)
+  const heroHeight = Math.round(heroWidth / heroAspect);
+
+  /**
+   * ✅ الافاتار يعتمد على عرض الهيرو (مو على رقم ثابت)
+   */
+  const avatarSize = Math.round(heroWidth * 0.26);
+
+  /**
+   * ✅ مكان الافاتار: نصفه داخل ونصفه خارج (ستايل فخم)
+   * هذا ديناميكي ويشتغل على كل الأجهزة بدون سالب -170
+   */
+  const avatarTop = Math.round(heroHeight - avatarSize / 2);
+
+  /**
+   * ✅ حتى ما ينضغط محتوى الهيرو على الأجهزة الصغيرة:
+   * ننزل محتوى النصوص (الاسم/زر المسار) تحت الافاتار بشكل محسوب
+   */
+  const heroContentTopPadding = avatarTop + avatarSize + Spacing.sm;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <ScrollView
         contentContainerStyle={{
-          paddingTop: headerHeight,
-          paddingBottom: insets.bottom + 100,
+          paddingTop: 0,
+          paddingBottom: insets.bottom + 110,
         }}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeIn.duration(400)}>
-          <View style={styles.mapContainer}>
-            <MapViewComponent
-              lat={doctor.lat}
-              lng={doctor.lng}
-              title={name}
-              description={specialty}
-            />
+        {/* HERO */}
+        <Animated.View entering={FadeIn.duration(280)}>
+          <View style={styles.heroWrap}>
+            <View
+              style={[
+                styles.heroCard,
+                { width: heroWidth, height: heroHeight },
+              ]}
+            >
+              {/* الخلفية */}
+              <ImageBackground
+                source={clinicSource}
+                style={RNStyleSheet.absoluteFill}
+                resizeMode="cover"
+                imageStyle={{ borderRadius: BorderRadius.lg }}
+              >
+                {/* ✅ overlay لا يغطي النصوص ولا يمنع اللمس */}
+                <View
+                  pointerEvents="none"
+                  style={[
+                    styles.heroOverlay,
+                    { backgroundColor: "rgba(0,0,0,0.45)" },
+                  ]}
+                />
+              </ImageBackground>
+
+              {/* ✅ مسافة آمنة تحت الهيدر/النوتش */}
+              <View style={{ height: safeHeader }} />
+
+              {/* ✅ Avatar فوق الكل (حل Honor/Xiaomi) */}
+              <View
+                style={[
+                  styles.avatarFloating,
+                  {
+                    top: avatarTop,
+                    width: avatarSize,
+                    height: avatarSize,
+                    borderRadius: 999,
+                    borderColor: theme.primary + "AA",
+                  },
+                ]}
+              >
+                  <ImageBackground
+                    source={doctorSource}
+                    style={{ width: "100%", height: "100%" }}
+                    imageStyle={{ borderRadius: 999 }}
+                    resizeMode="cover"
+                  />
+              </View>
+
+              {/* ✅ طبقة محتوى الهيرو فوق كلشي (حل اختفاء النصوص على Honor) */}
+              <View style={styles.heroContentLayer}>
+                <View
+                  style={[
+                    styles.heroContent,
+                    {
+                      paddingTop: heroContentTopPadding,
+                    },
+                  ]}
+                >
+                  <View style={[styles.heroNameRow, isRTL && styles.rtlRow]}>
+                    <ThemedText
+                      type="h2"
+                      style={[styles.heroName, { color: "#fff" }]}
+                    >
+                      {name}
+                    </ThemedText>
+                    {doctor.isVerified ? (
+                      <Feather
+                        name="check-circle"
+                        size={20}
+                        color={theme.primary}
+                      />
+                    ) : null}
+                  </View>
+
+                  <ThemedText style={{ color: "rgba(255,255,255,0.85)" }}>
+                    {specialty}
+                  </ThemedText>
+
+                  <View style={[styles.heroRatingRow, isRTL && styles.rtlRow]}>
+                    <Feather name="star" size={16} color={theme.warning} />
+                    <ThemedText
+                      style={{ marginHorizontal: Spacing.xs, color: "#fff" }}
+                    >
+                      {doctor.rating}
+                    </ThemedText>
+                  </View>
+
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => openWaze(doctor.lat, doctor.lng)}
+                    style={[
+                      styles.wazeBtn,
+                      {
+                        borderColor: "rgba(255,255,255,0.25)",
+                        backgroundColor: "rgba(255,255,255,0.14)",
+                      },
+                    ]}
+                  >
+                    <Feather name="navigation" size={18} color="#fff" />
+                    <ThemedText style={{ color: "#fff", fontWeight: "800" }}>
+                      {TXT.route}
+                    </ThemedText>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
           </View>
         </Animated.View>
 
+        {/* CONTENT */}
         <Animated.View
-          entering={FadeInUp.delay(100).duration(400)}
+          entering={FadeInUp.delay(120).duration(300)}
           style={styles.content}
         >
-          <View style={styles.headerSection}>
-            <View style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}>
-              <Feather name="user" size={40} color={theme.primary} />
+          <View style={[styles.headerSection, isRTL && styles.rtlRow]}>
+            <View
+              style={[
+                styles.miniIcon,
+                { backgroundColor: theme.primary + "20" },
+              ]}
+            >
+              <Feather name="info" size={22} color={theme.primary} />
             </View>
+
             <View style={styles.headerInfo}>
-              <View style={styles.nameRow}>
-                <ThemedText type="h2" style={styles.name}>
-                  {name}
-                </ThemedText>
-                {doctor.isVerified ? (
-                  <Feather name="check-circle" size={20} color={theme.primary} />
-                ) : null}
-              </View>
-              <ThemedText type="body" style={{ color: theme.textSecondary }}>
-                {specialty}
+              <ThemedText style={{ color: theme.textSecondary }}>
+                {TXT.clinicInfo}
               </ThemedText>
-              <View style={styles.ratingRow}>
-                <Feather name="star" size={16} color={theme.warning} />
-                <ThemedText type="body" style={{ marginLeft: Spacing.xs }}>
-                  {doctor.rating}
-                </ThemedText>
-              </View>
             </View>
           </View>
 
-          <View style={[styles.infoCard, { backgroundColor: theme.backgroundDefault }]}>
-            <View style={styles.infoRow}>
+          <View
+            style={[
+              styles.infoCard,
+              { backgroundColor: theme.backgroundDefault },
+            ]}
+          >
+            <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
               <Feather name="map-pin" size={20} color={theme.primary} />
-              <View style={styles.infoContent}>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                  {t("clinic")}
+              <View
+                style={[styles.infoContent, isRTL && styles.infoContentRTL]}
+              >
+                <ThemedText style={{ color: theme.textSecondary }}>
+                  {TXT.clinic}
                 </ThemedText>
-                <ThemedText type="body">{clinicAddress}</ThemedText>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>
+                <ThemedText>{clinicAddress}</ThemedText>
+                <ThemedText style={{ color: theme.textSecondary }}>
                   {province} - {district}
                 </ThemedText>
               </View>
@@ -111,14 +285,16 @@ export default function DoctorDetailScreen() {
 
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-            <View style={styles.infoRow}>
+            <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
               <Feather name="clock" size={20} color={theme.primary} />
-              <View style={styles.infoContent}>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                  {t("workingHours")}
+              <View
+                style={[styles.infoContent, isRTL && styles.infoContentRTL]}
+              >
+                <ThemedText style={{ color: theme.textSecondary }}>
+                  {TXT.workingHours}
                 </ThemedText>
-                <ThemedText type="body">{doctor.workingHours}</ThemedText>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>
+                <ThemedText>{doctor.workingHours}</ThemedText>
+                <ThemedText style={{ color: theme.textSecondary }}>
                   {doctor.workingDays.join(" - ")}
                 </ThemedText>
               </View>
@@ -126,26 +302,16 @@ export default function DoctorDetailScreen() {
 
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-            <View style={styles.infoRow}>
-              <Feather name="phone" size={20} color={theme.primary} />
-              <View style={styles.infoContent}>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                  {t("phone")}
-                </ThemedText>
-                <ThemedText type="body">{doctor.phone}</ThemedText>
-              </View>
-            </View>
-
-            <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
-            <View style={styles.infoRow}>
+            <View style={[styles.infoRow, isRTL && styles.rtlRow]}>
               <Feather name="navigation" size={20} color={theme.primary} />
-              <View style={styles.infoContent}>
-                <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                  {t("distance")}
+              <View
+                style={[styles.infoContent, isRTL && styles.infoContentRTL]}
+              >
+                <ThemedText style={{ color: theme.textSecondary }}>
+                  {TXT.distance}
                 </ThemedText>
-                <ThemedText type="body">
-                  {doctor.distance} {t("km")}
+                <ThemedText>
+                  {doctor.distance} {TXT.km}
                 </ThemedText>
               </View>
             </View>
@@ -153,8 +319,9 @@ export default function DoctorDetailScreen() {
         </Animated.View>
       </ScrollView>
 
+      {/* FOOTER */}
       <Animated.View
-        entering={FadeInUp.delay(300).duration(400)}
+        entering={FadeInUp.delay(220).duration(300)}
         style={[
           styles.footer,
           {
@@ -172,61 +339,117 @@ export default function DoctorDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  mapContainer: {
-    height: 200,
-  },
-  content: {
-    padding: Spacing.lg,
-  },
-  headerSection: {
-    flexDirection: "row",
-    marginBottom: Spacing.xl,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: BorderRadius.full,
+  container: { flex: 1 },
+
+  heroWrap: {
+    paddingHorizontal: Spacing.lg,
     alignItems: "center",
-    justifyContent: "center",
-    marginRight: Spacing.lg,
   },
-  headerInfo: {
+
+  heroCard: {
+    borderRadius: BorderRadius.lg,
+    overflow: "hidden",
+    position: "relative",
+  },
+
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+
+  // ✅ طبقة فوق كلشي (حل Honor: zIndex وحده ما يكفي، نضيف elevation)
+  heroContentLayer: {
+    position: "relative",
+    zIndex: 20,
+    elevation: 20,
+  },
+
+  heroContent: {
     flex: 1,
-    justifyContent: "center",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    gap: Spacing.xs,
   },
-  nameRow: {
+
+  avatarFloating: {
+    position: "absolute",
+    alignSelf: "center",
+    borderWidth: 3,
+    padding: 3,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    zIndex: 30,
+    elevation: 30,
+  },
+
+  heroNameRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.sm,
-    marginBottom: Spacing.xs,
   },
-  name: {
-    flex: 1,
-  },
-  ratingRow: {
+
+  heroName: { textAlign: "center" },
+
+  heroRatingRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: Spacing.xs,
   },
+
+  wazeBtn: {
+    marginTop: Spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
+
+  content: { padding: Spacing.lg },
+
+  headerSection: {
+    flexDirection: "row",
+    marginBottom: Spacing.lg,
+    alignItems: "center",
+  },
+
+  miniIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.md,
+  },
+
+  headerInfo: { flex: 1 },
+
   infoCard: {
     borderRadius: BorderRadius.md,
     padding: Spacing.lg,
   },
+
   infoRow: {
     flexDirection: "row",
     alignItems: "flex-start",
   },
+
   infoContent: {
     flex: 1,
     marginLeft: Spacing.md,
   },
+
+  infoContentRTL: {
+    marginLeft: 0,
+    marginRight: Spacing.md,
+  },
+
   divider: {
     height: 1,
     marginVertical: Spacing.md,
   },
+
   footer: {
     position: "absolute",
     bottom: 0,
@@ -236,7 +459,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "rgba(0,0,0,0.05)",
   },
-  bookButton: {
-    width: "100%",
+
+  bookButton: { width: "100%" },
+
+  rtlRow: {
+    flexDirection: "row-reverse",
   },
 });
