@@ -624,6 +624,6 @@ const styles = StyleSheet.create({
   confidenceFill: { height: "100%" },
   extractedBox: { backgroundColor: "#252525", padding: 10, borderRadius: 8, marginTop: 4 },
   resultActions: { flexDirection: "row", padding: Spacing.lg, gap: Spacing.md, borderTopWidth: 1 },
-  secondaryActionButton: { flex: 1, height: 44, borderRadius: 10, borderHorizontal: 1, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 6, borderWidth: 1 },
+  secondaryActionButton: { flex: 1, height: 44, borderRadius: 10, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 6, borderWidth: 1 },
   actionButton: { flex: 2, height: 44, borderRadius: 10, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8 },
 });

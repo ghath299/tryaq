@@ -160,9 +160,9 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           <ThemedText type="h4" style={[styles.userName, language === "ar" && { textAlign: "right" }]}>
             {user?.fullName || "مرحباً بك"}
           </ThemedText>
-          {user?.phone || (user as any)?.phoneNumber ? (
+          {user?.phoneNumber ? (
             <ThemedText type="small" style={[styles.userInfo, language === "ar" && { textAlign: "right" }]}>
-              {((user as any).phone || (user as any).phoneNumber)}
+              {user.phoneNumber}
             </ThemedText>
           ) : null}
         </LinearGradient>
