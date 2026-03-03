@@ -166,6 +166,15 @@ export default function PharmacyDetailScreen() {
     loadInitialMessages();
   }, [fetchMessages, pharmacyId, scrollToBottom]);
 
+  const sortedMessages = useMemo(
+    () =>
+      [...messages].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ),
+    [messages],
+  );
+
   if (!pharmacy) {
     return (
       <View
@@ -336,15 +345,6 @@ export default function PharmacyDetailScreen() {
       setIsLoadingMore(false);
     }
   };
-
-  const sortedMessages = useMemo(
-    () =>
-      [...messages].sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      ),
-    [messages],
-  );
 
   const renderHeader = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.header}>
