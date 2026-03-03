@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   FlatList,
   Linking,
-  Platform,
   Pressable,
   StyleSheet,
   TextInput,
@@ -28,7 +27,12 @@ type PharmacyLocal = (typeof allPharmacies)[number];
 
 type SortMode = "nearest" | "alphabetical";
 
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+function haversineKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
   const toRad = (v: number) => (v * Math.PI) / 180;
   const R = 6371;
   const dLat = toRad(lat2 - lat1);
@@ -41,8 +45,8 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
 
 export default function PharmacyPickerScreen() {
   const headerHeight = useHeaderHeight();
-  const { theme, isDark } = useTheme();
-  const { language, t } = useApp();
+  const { theme } = useTheme();
+  const { language } = useApp();
   const navigation = useNavigation<any>();
   const route = useRoute<RouteProp<RootStackParamList, "PharmacyPicker">>();
 
@@ -51,7 +55,10 @@ export default function PharmacyPickerScreen() {
 
   const [searchText, setSearchText] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("nearest");
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [locationLoading, setLocationLoading] = useState(true);
 
   useEffect(() => {
@@ -59,8 +66,13 @@ export default function PharmacyPickerScreen() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === "granted") {
-          const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-          setUserLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+          const loc = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+          setUserLocation({
+            lat: loc.coords.latitude,
+            lng: loc.coords.longitude,
+          });
         }
       } catch {
         // location not available
@@ -87,7 +99,7 @@ export default function PharmacyPickerScreen() {
           p.nameAr.toLowerCase().includes(q) ||
           p.nameEn.toLowerCase().includes(q) ||
           p.address.toLowerCase().includes(q) ||
-          (p.addressEn && p.addressEn.toLowerCase().includes(q))
+          (p.addressEn && p.addressEn.toLowerCase().includes(q)),
       );
     }
 
@@ -95,7 +107,7 @@ export default function PharmacyPickerScreen() {
       list.sort(
         (a, b) =>
           haversineKm(userLocation.lat, userLocation.lng, a.lat, a.lng) -
-          haversineKm(userLocation.lat, userLocation.lng, b.lat, b.lng)
+          haversineKm(userLocation.lat, userLocation.lng, b.lat, b.lng),
       );
     } else {
       list.sort((a, b) => {
@@ -111,9 +123,14 @@ export default function PharmacyPickerScreen() {
   const getDistance = useCallback(
     (pharmacy: PharmacyLocal) => {
       if (!userLocation) return null;
-      return haversineKm(userLocation.lat, userLocation.lng, pharmacy.lat, pharmacy.lng);
+      return haversineKm(
+        userLocation.lat,
+        userLocation.lng,
+        pharmacy.lat,
+        pharmacy.lng,
+      );
     },
-    [userLocation]
+    [userLocation],
   );
 
   const renderPharmacy = useCallback(
@@ -148,25 +165,78 @@ export default function PharmacyPickerScreen() {
               { backgroundColor: theme.card, ...Shadows.medium },
             ]}
           >
-            <View style={[styles.cardHeader, rtl && { flexDirection: "row-reverse" }]}>
-              <View style={[styles.pharmacyIcon, { backgroundColor: theme.primary + "20" }]}>
+            <View
+              style={[
+                styles.cardHeader,
+                rtl && { flexDirection: "row-reverse" },
+              ]}
+            >
+              <View
+                style={[
+                  styles.pharmacyIcon,
+                  { backgroundColor: theme.primary + "20" },
+                ]}
+              >
                 <Feather name="plus-circle" size={24} color={theme.primary} />
               </View>
               <View style={styles.cardInfo}>
-                <ThemedText type="h4" style={{ fontWeight: "700", textAlign: rtl ? "right" : "left" }}>
+                <ThemedText
+                  type="h4"
+                  style={{
+                    fontWeight: "700",
+                    textAlign: rtl ? "right" : "left",
+                  }}
+                >
                   {name}
                 </ThemedText>
-                <View style={[styles.locationRow, rtl && { flexDirection: "row-reverse" }]}>
-                  <Feather name="map-pin" size={12} color={theme.textSecondary} />
-                  <ThemedText type="caption" style={{ color: theme.textSecondary, [rtl ? "marginRight" : "marginLeft"]: 4 }}>
+                <View
+                  style={[
+                    styles.locationRow,
+                    rtl && { flexDirection: "row-reverse" },
+                  ]}
+                >
+                  <Feather
+                    name="map-pin"
+                    size={12}
+                    color={theme.textSecondary}
+                  />
+                  <ThemedText
+                    type="caption"
+                    style={{
+                      color: theme.textSecondary,
+                      [rtl ? "marginRight" : "marginLeft"]: 4,
+                    }}
+                  >
                     {province} - {address}
                   </ThemedText>
                 </View>
                 {dist !== null && (
-                  <View style={[styles.distanceBadge, rtl && { alignItems: "flex-end" }]}>
-                    <View style={[styles.distancePill, { backgroundColor: theme.primary + "15" }, rtl && { flexDirection: "row-reverse" }]}>
-                      <Feather name="navigation" size={10} color={theme.primary} />
-                      <ThemedText type="caption" style={{ color: theme.primary, fontWeight: "600", [rtl ? "marginRight" : "marginLeft"]: 4 }}>
+                  <View
+                    style={[
+                      styles.distanceBadge,
+                      rtl && { alignItems: "flex-end" },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.distancePill,
+                        { backgroundColor: theme.primary + "15" },
+                        rtl && { flexDirection: "row-reverse" },
+                      ]}
+                    >
+                      <Feather
+                        name="navigation"
+                        size={10}
+                        color={theme.primary}
+                      />
+                      <ThemedText
+                        type="caption"
+                        style={{
+                          color: theme.primary,
+                          fontWeight: "600",
+                          [rtl ? "marginRight" : "marginLeft"]: 4,
+                        }}
+                      >
                         {dist.toFixed(1)} {language === "ar" ? "كم" : "km"}
                       </ThemedText>
                     </View>
@@ -175,18 +245,37 @@ export default function PharmacyPickerScreen() {
               </View>
             </View>
 
-            <View style={[styles.cardActions, rtl && { flexDirection: "row-reverse" }]}>
+            <View
+              style={[
+                styles.cardActions,
+                rtl && { flexDirection: "row-reverse" },
+              ]}
+            >
               <Pressable
                 style={[styles.actionBtn, { backgroundColor: theme.primary }]}
                 onPress={() => handleOpenWaze(item.lat, item.lng)}
               >
                 <Feather name="navigation" size={16} color="#FFF" />
-                <ThemedText type="small" style={{ color: "#FFF", fontWeight: "600", [rtl ? "marginRight" : "marginLeft"]: 6 }}>
+                <ThemedText
+                  type="small"
+                  style={{
+                    color: "#FFF",
+                    fontWeight: "600",
+                    [rtl ? "marginRight" : "marginLeft"]: 6,
+                  }}
+                >
                   {language === "ar" ? "المسار" : "Route"}
                 </ThemedText>
               </Pressable>
               <Pressable
-                style={[styles.actionBtn, { backgroundColor: theme.backgroundSecondary, borderWidth: 1, borderColor: theme.border }]}
+                style={[
+                  styles.actionBtn,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                  },
+                ]}
                 onPress={() =>
                   navigation.navigate("PharmacyDetail", {
                     pharmacyId: item.id,
@@ -194,7 +283,13 @@ export default function PharmacyPickerScreen() {
                 }
               >
                 <Feather name="info" size={16} color={theme.text} />
-                <ThemedText type="small" style={{ fontWeight: "600", [rtl ? "marginRight" : "marginLeft"]: 6 }}>
+                <ThemedText
+                  type="small"
+                  style={{
+                    fontWeight: "600",
+                    [rtl ? "marginRight" : "marginLeft"]: 6,
+                  }}
+                >
                   {language === "ar" ? "معلومات" : "Info"}
                 </ThemedText>
               </Pressable>
@@ -203,29 +298,58 @@ export default function PharmacyPickerScreen() {
         </Animated.View>
       );
     },
-    [language, theme, getDistance, navigation]
+    [language, theme, getDistance, navigation],
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundRoot, paddingTop: headerHeight }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.backgroundRoot, paddingTop: headerHeight },
+      ]}
+    >
       {medicineName ? (
-        <View style={[styles.medicineHeader, { backgroundColor: theme.primary + "10" }]}>
+        <View
+          style={[
+            styles.medicineHeader,
+            { backgroundColor: theme.primary + "10" },
+          ]}
+        >
           <Feather name="package" size={16} color={theme.primary} />
-          <ThemedText type="small" style={{ color: theme.primary, fontWeight: "600", marginLeft: 8 }}>
+          <ThemedText
+            type="small"
+            style={{ color: theme.primary, fontWeight: "600", marginLeft: 8 }}
+          >
             {medicineName}
           </ThemedText>
         </View>
       ) : null}
 
       <View style={styles.searchSection}>
-        <View style={[styles.searchInput, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.searchInput,
+            {
+              backgroundColor: theme.backgroundSecondary,
+              borderColor: theme.border,
+            },
+          ]}
+        >
           <Feather name="search" size={18} color={theme.textSecondary} />
           <TextInput
             value={searchText}
             onChangeText={setSearchText}
-            placeholder={language === "ar" ? "ابحث عن صيدلية..." : "Search pharmacy..."}
+            placeholder={
+              language === "ar" ? "ابحث عن صيدلية..." : "Search pharmacy..."
+            }
             placeholderTextColor={theme.textSecondary}
-            style={[styles.input, { color: theme.text, textAlign: language === "ar" ? "right" : "left" }]}
+            style={[
+              styles.input,
+              {
+                color: theme.text,
+                textAlign: language === "ar" ? "right" : "left",
+              },
+            ]}
           />
         </View>
 
@@ -234,8 +358,12 @@ export default function PharmacyPickerScreen() {
             style={[
               styles.sortBtn,
               {
-                backgroundColor: sortMode === "nearest" ? theme.primary : theme.backgroundSecondary,
-                borderColor: sortMode === "nearest" ? theme.primary : theme.border,
+                backgroundColor:
+                  sortMode === "nearest"
+                    ? theme.primary
+                    : theme.backgroundSecondary,
+                borderColor:
+                  sortMode === "nearest" ? theme.primary : theme.border,
               },
             ]}
             onPress={() => setSortMode("nearest")}
@@ -260,8 +388,12 @@ export default function PharmacyPickerScreen() {
             style={[
               styles.sortBtn,
               {
-                backgroundColor: sortMode === "alphabetical" ? theme.primary : theme.backgroundSecondary,
-                borderColor: sortMode === "alphabetical" ? theme.primary : theme.border,
+                backgroundColor:
+                  sortMode === "alphabetical"
+                    ? theme.primary
+                    : theme.backgroundSecondary,
+                borderColor:
+                  sortMode === "alphabetical" ? theme.primary : theme.border,
               },
             ]}
             onPress={() => setSortMode("alphabetical")}
@@ -284,7 +416,11 @@ export default function PharmacyPickerScreen() {
           </Pressable>
 
           {locationLoading && (
-            <ActivityIndicator size="small" color={theme.primary} style={{ marginLeft: 8 }} />
+            <ActivityIndicator
+              size="small"
+              color={theme.primary}
+              style={{ marginLeft: 8 }}
+            />
           )}
         </View>
       </View>
@@ -298,7 +434,10 @@ export default function PharmacyPickerScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Feather name="inbox" size={48} color={theme.border} />
-            <ThemedText type="body" style={{ color: theme.textSecondary, marginTop: Spacing.md }}>
+            <ThemedText
+              type="body"
+              style={{ color: theme.textSecondary, marginTop: Spacing.md }}
+            >
               {language === "ar" ? "لا توجد صيدليات" : "No pharmacies found"}
             </ThemedText>
           </View>
@@ -319,7 +458,11 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
     borderRadius: BorderRadius.md,
   },
-  searchSection: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md, gap: Spacing.sm },
+  searchSection: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    gap: Spacing.sm,
+  },
   searchInput: {
     flexDirection: "row",
     alignItems: "center",
@@ -345,7 +488,11 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     marginBottom: 4,
   },
-  cardHeader: { flexDirection: "row", alignItems: "flex-start", gap: Spacing.md },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: Spacing.md,
+  },
   pharmacyIcon: {
     width: 48,
     height: 48,

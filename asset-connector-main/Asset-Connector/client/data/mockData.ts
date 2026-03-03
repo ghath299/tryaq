@@ -262,9 +262,7 @@ export const orders = [
     pharmacyId: "1",
     pharmacyNameAr: "صيدلية الشفاء",
     pharmacyNameEn: "Al-Shifa Pharmacy",
-    medicines: [
-      { medicineId: "1", name: "باراسيتامول", quantity: 2 },
-    ],
+    medicines: [{ medicineId: "1", name: "باراسيتامول", quantity: 2 }],
     date: "2024-01-14",
     status: "delivered",
     deliveryType: "delivery",

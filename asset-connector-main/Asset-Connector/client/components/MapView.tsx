@@ -22,11 +22,11 @@ export function MapViewComponent({
   style,
 }: MapViewComponentProps) {
   const { theme } = useTheme();
-  
+
   if (Platform.OS === "web") {
     // Leaflet often fails in Expo Web, using an iframe for reliability
-    const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.01}%2C${lat-0.01}%2C${lng+0.01}%2C${lat+0.01}&layer=mapnik&marker=${lat}%2C${lng}`;
-    
+    const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik&marker=${lat}%2C${lng}`;
+
     return (
       <View style={[styles.webContainer, style]}>
         <iframe
@@ -37,7 +37,7 @@ export function MapViewComponent({
           marginHeight={0}
           marginWidth={0}
           src={mapUrl}
-          style={{ borderRadius: 12, border: 'none' }}
+          style={{ borderRadius: 12, border: "none" }}
         />
       </View>
     );
@@ -45,19 +45,42 @@ export function MapViewComponent({
 
   // Native fallback
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundSecondary }, style]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.backgroundSecondary },
+        style,
+      ]}
+    >
       <Feather name="map" size={48} color={theme.primary} />
-      <ThemedText type="small" style={{ color: theme.textSecondary, marginTop: Spacing.md, fontWeight: '600' }}>
+      <ThemedText
+        type="small"
+        style={{
+          color: theme.textSecondary,
+          marginTop: Spacing.md,
+          fontWeight: "600",
+        }}
+      >
         الخريطة
       </ThemedText>
       {title ? (
-        <ThemedText type="caption" style={{ color: theme.text, marginTop: Spacing.xs, fontWeight: 'bold' }}>
+        <ThemedText
+          type="caption"
+          style={{
+            color: theme.text,
+            marginTop: Spacing.xs,
+            fontWeight: "bold",
+          }}
+        >
           {title}
         </ThemedText>
       ) : null}
       <View style={styles.coordsContainer}>
         <Feather name="map-pin" size={12} color={theme.primary} />
-        <ThemedText type="caption" style={{ color: theme.textSecondary, fontSize: 11, marginLeft: 4 }}>
+        <ThemedText
+          type="caption"
+          style={{ color: theme.textSecondary, fontSize: 11, marginLeft: 4 }}
+        >
           {lat.toFixed(4)}, {lng.toFixed(4)}
         </ThemedText>
       </View>
@@ -73,23 +96,23 @@ const styles = StyleSheet.create({
     minHeight: 220,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
+    borderColor: "rgba(0,0,0,0.05)",
   },
   webContainer: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     height: 400,
     minHeight: 400,
     borderRadius: 12,
-    overflow: 'hidden'
+    overflow: "hidden",
   },
   coordsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 8,
-    backgroundColor: 'rgba(0,0,0,0.03)',
+    backgroundColor: "rgba(0,0,0,0.03)",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
-  }
+  },
 });

@@ -1,0 +1,55 @@
+تقرير المشاكل المكتشفة في المشروع
+🔴 مشاكل حقيقية تحتاج إصلاح
+1. مكونات غير مستخدمة (ملفات ميتة):
+
+client/components/DoctorCard.tsx — لا يستورده أي ملف في المشروع
+client/components/MapPlaceholder.tsx — لا يستورده أي ملف
+client/components/MapView.native.tsx — يُستخدم فقط من PharmacyDetailScreen لكن بعد حذف شاشة الخريطة الداخلية قد يحتاج مراجعة
+ملف ghath في الجذر — ملف غريب (370 بايت) لا علاقة له بالمشروع
+2. متغيرات مستوردة ولا تُستخدم (14 حالة):
+
+interpolateColor و AnimatedLinearGradient في AnimatedButton.tsx
+View في Button.tsx
+ScrollView و Switch في DrawerContent.tsx
+View في ملفات متعددة
+withTiming في ملفين
+I18nManager مستورد لكن لا يُستخدم
+isDark معرّف لكن لا يُستخدم في 3 ملفات
+Platform مستورد لكن لا يُستخدم
+useScreenOptions مستورد لكن لا يُستخدم في ملف
+3. مشاكل React Hooks (7 حالات):
+
+useEffect ينقصه dependencies في عدة ملفات (pulseValue, elevation, glowOpacity, delay/index/progress, orb1Y/orb2X/pulseScale, handleSelectMedicine/initialQuery, scanPulse/scanRotate)
+هذا يمكن أن يسبب سلوك غير متوقع في الأنيميشن أو عدم تحديث القيم
+4. var بدلاً من let/const (4 حالات):
+
+في أحد الملفات يُستخدم var وهو أسلوب قديم وممكن يسبب مشاكل في النطاق (scope)
+5. ترتيب imports خاطئ:
+
+في أحد الملفات يوجد import في وسط الكود بدلاً من أعلى الملف
+🟡 مشاكل متوسطة
+6. Navigation type-safety ضعيف:
+
+8 أماكن تستخدم as never للتحايل على TypeScript في التنقل بين الشاشات. هذا يمنع TypeScript من اكتشاف أخطاء الأسماء أو البارامترات
+7. قاعدة البيانات غير متصلة:
+
+drizzle.config.ts يتطلب DATABASE_URL لكن لا يوجد متغير بيئة محدد
+التطبيق يعمل بالكامل على MemStorage (بيانات وهمية في الذاكرة) — لا توجد قاعدة بيانات فعلية
+8. أخطاء صامتة (Silent catches):
+
+PharmacyPickerScreen.tsx سطر 65 — catch {} فارغ بدون أي تسجيل للخطأ
+server/index.ts سطر 82 — نفس الشيء
+9. console.log في الإنتاج:
+
+21 عبارة console.log/warn/error متبقية في كود العميل — بعضها تصحيح أخطاء مؤقت مثل [AuthNavigator] Rendering with authStep: و [AuthContext] يجب حذفها قبل النشر
+🟢 ملاحظات بسيطة
+10. تنسيق الكود (Prettier):
+
+717 خطأ تنسيق — كلها قابلة للإصلاح التلقائي بأمر واحد (npm run format)
+11. مجلد ghath:
+
+ملف بحجم 370 بايت في جذر المشروع، لا يستورده أي كود — يبدو أنه ملف مؤقت أو خطأ
+هل تريدني أصلح هذه المشاكل؟ أقدر أبدأ بالأهم (حذف الملفات الميتة، إصلاح ال imports غير المستخدمة، وتنظيف الكود).
+
+
+Scroll to latest

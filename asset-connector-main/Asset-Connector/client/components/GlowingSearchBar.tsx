@@ -32,7 +32,7 @@ export function GlowingSearchBar({
   const { theme } = useTheme();
   const { language, t } = useApp();
   const [isFocused, setIsFocused] = useState(false);
-  
+
   const glowOpacity = useSharedValue(0.3);
   const scale = useSharedValue(1);
   const borderProgress = useSharedValue(0);
@@ -41,23 +41,27 @@ export function GlowingSearchBar({
     glowOpacity.value = withRepeat(
       withSequence(
         withTiming(0.5, { duration: 1500 }),
-        withTiming(0.3, { duration: 1500 })
+        withTiming(0.3, { duration: 1500 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
   const handleFocus = () => {
     setIsFocused(true);
     scale.value = withSpring(1.02, Animation.spring.gentle);
-    borderProgress.value = withTiming(1, { duration: Animation.duration.normal });
+    borderProgress.value = withTiming(1, {
+      duration: Animation.duration.normal,
+    });
   };
 
   const handleBlur = () => {
     setIsFocused(false);
     scale.value = withSpring(1, Animation.spring.gentle);
-    borderProgress.value = withTiming(0, { duration: Animation.duration.normal });
+    borderProgress.value = withTiming(0, {
+      duration: Animation.duration.normal,
+    });
   };
 
   const containerStyle = useAnimatedStyle(() => ({
@@ -77,13 +81,17 @@ export function GlowingSearchBar({
     <Animated.View style={[styles.wrapper, containerStyle]}>
       <Animated.View style={[styles.glowContainer, glowStyle]}>
         <LinearGradient
-          colors={[theme.primary + "40", theme.primaryDark + "20", "transparent"]}
+          colors={[
+            theme.primary + "40",
+            theme.primaryDark + "20",
+            "transparent",
+          ]}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={styles.glow}
         />
       </Animated.View>
-      
+
       <Animated.View
         style={[
           styles.container,
@@ -106,10 +114,10 @@ export function GlowingSearchBar({
         ]}
       >
         <View style={styles.iconContainer}>
-          <Feather 
-            name="search" 
-            size={22} 
-            color={isFocused ? theme.primary : theme.textSecondary} 
+          <Feather
+            name="search"
+            size={22}
+            color={isFocused ? theme.primary : theme.textSecondary}
           />
         </View>
         <TextInput

@@ -51,6 +51,11 @@ export type ChatMessage = {
 
 export const chatsByPharmacyId: Record<string, ChatMessage[]> = {
   "1": [
-    { id: "m1", text: "أهلاً وسهلاً، كيف نكدر نساعدك؟", sender: "pharmacy", createdAt: new Date().toISOString() },
+    {
+      id: "m1",
+      text: "أهلاً وسهلاً، كيف نكدر نساعدك؟",
+      sender: "pharmacy",
+      createdAt: new Date().toISOString(),
+    },
   ],
 };

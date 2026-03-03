@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TextInput, StyleSheet, Pressable } from "react-native";
+import { TextInput, StyleSheet, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Animated, {
   useAnimatedStyle,

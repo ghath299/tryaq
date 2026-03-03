@@ -1,5 +1,11 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, Pressable, ViewStyle, StyleProp, View, Platform } from "react-native";
+import {
+  StyleSheet,
+  Pressable,
+  ViewStyle,
+  StyleProp,
+  Platform,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,

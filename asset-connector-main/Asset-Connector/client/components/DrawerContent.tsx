@@ -1,10 +1,10 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, Pressable, Switch } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { 
-  DrawerContentComponentProps, 
-  DrawerContentScrollView 
+import {
+  DrawerContentComponentProps,
+  DrawerContentScrollView,
 } from "@react-navigation/drawer";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
@@ -40,10 +40,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
   const isRTL = language === "ar";
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateX: translateX.value },
-    ],
+    transform: [{ scale: scale.value }, { translateX: translateX.value }],
   }));
 
   const handlePressIn = () => {
@@ -62,24 +59,44 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
   };
 
   return (
-    <Animated.View entering={FadeInLeft.delay(100 + index * 60).duration(400).springify()}>
+    <Animated.View
+      entering={FadeInLeft.delay(100 + index * 60)
+        .duration(400)
+        .springify()}
+    >
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[
-          styles.drawerItem, 
+          styles.drawerItem,
           isRTL && { flexDirection: "row-reverse" },
-          animatedStyle
+          animatedStyle,
         ]}
       >
-        <View style={[styles.iconCircle, { backgroundColor: theme.primary + "15" }]}>
+        <View
+          style={[styles.iconCircle, { backgroundColor: theme.primary + "15" }]}
+        >
           <Feather name={icon} size={20} color={theme.primary} />
         </View>
-        <ThemedText type="body" style={[styles.drawerItemLabel, isRTL && { marginLeft: 0, marginRight: Spacing.md, textAlign: "right" }]}>
+        <ThemedText
+          type="body"
+          style={[
+            styles.drawerItemLabel,
+            isRTL && {
+              marginLeft: 0,
+              marginRight: Spacing.md,
+              textAlign: "right",
+            },
+          ]}
+        >
           {label}
         </ThemedText>
-        <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={18} color={theme.textSecondary} />
+        <Feather
+          name={isRTL ? "chevron-left" : "chevron-right"}
+          size={18}
+          color={theme.textSecondary}
+        />
       </AnimatedPressable>
     </Animated.View>
   );
@@ -127,9 +144,9 @@ export function DrawerContent(props: DrawerContentComponentProps) {
   return (
     <DrawerContentScrollView
       {...props}
-      contentContainerStyle={{ 
-        paddingTop: 0, 
-        paddingBottom: insets.bottom 
+      contentContainerStyle={{
+        paddingTop: 0,
+        paddingBottom: insets.bottom,
       }}
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
     >
@@ -142,12 +159,17 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[
-            styles.headerGradient, 
+            styles.headerGradient,
             { paddingTop: insets.top + Spacing.xl },
-            language === "ar" && { alignItems: "flex-end" }
+            language === "ar" && { alignItems: "flex-end" },
           ]}
         >
-          <View style={[styles.avatarContainer, language === "ar" && { alignSelf: "flex-end" }]}>
+          <View
+            style={[
+              styles.avatarContainer,
+              language === "ar" && { alignSelf: "flex-end" },
+            ]}
+          >
             <View style={styles.avatar}>
               <Feather name="user" size={32} color={theme.primary} />
             </View>
@@ -157,11 +179,23 @@ export function DrawerContent(props: DrawerContentComponentProps) {
               </View>
             ) : null}
           </View>
-          <ThemedText type="h4" style={[styles.userName, language === "ar" && { textAlign: "right" }]}>
+          <ThemedText
+            type="h4"
+            style={[
+              styles.userName,
+              language === "ar" && { textAlign: "right" },
+            ]}
+          >
             {user?.fullName || "مرحباً بك"}
           </ThemedText>
           {user?.phoneNumber ? (
-            <ThemedText type="small" style={[styles.userInfo, language === "ar" && { textAlign: "right" }]}>
+            <ThemedText
+              type="small"
+              style={[
+                styles.userInfo,
+                language === "ar" && { textAlign: "right" },
+              ]}
+            >
               {user.phoneNumber}
             </ThemedText>
           ) : null}
@@ -170,7 +204,18 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
       <View style={styles.content}>
         <Animated.View entering={FadeInLeft.delay(50).duration(400)}>
-          <ThemedText type="caption" style={[styles.sectionTitle, { color: theme.textSecondary }, language === "ar" && { textAlign: "right", marginRight: Spacing.sm, marginLeft: 0 }]}>
+          <ThemedText
+            type="caption"
+            style={[
+              styles.sectionTitle,
+              { color: theme.textSecondary },
+              language === "ar" && {
+                textAlign: "right",
+                marginRight: Spacing.sm,
+                marginLeft: 0,
+              },
+            ]}
+          >
             {t("menu")}
           </ThemedText>
         </Animated.View>
@@ -191,7 +236,18 @@ export function DrawerContent(props: DrawerContentComponentProps) {
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
         <Animated.View entering={FadeInLeft.delay(200).duration(400)}>
-          <ThemedText type="caption" style={[styles.sectionTitle, { color: theme.textSecondary }, language === "ar" && { textAlign: "right", marginRight: Spacing.sm, marginLeft: 0 }]}>
+          <ThemedText
+            type="caption"
+            style={[
+              styles.sectionTitle,
+              { color: theme.textSecondary },
+              language === "ar" && {
+                textAlign: "right",
+                marginRight: Spacing.sm,
+                marginLeft: 0,
+              },
+            ]}
+          >
             {t("careerJoinTitle")}
           </ThemedText>
         </Animated.View>
@@ -219,64 +275,134 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
         <Animated.View
           entering={FadeInLeft.delay(350).duration(400)}
-          style={[styles.settingCard, { backgroundColor: theme.backgroundSecondary }]}
+          style={[
+            styles.settingCard,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
         >
-          <View style={[styles.settingItem, language === "ar" && { flexDirection: "row-reverse" }]}>
-            <View style={[styles.iconCircle, { backgroundColor: theme.primary + "15" }]}>
+          <View
+            style={[
+              styles.settingItem,
+              language === "ar" && { flexDirection: "row-reverse" },
+            ]}
+          >
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.primary + "15" },
+              ]}
+            >
               <Feather name="globe" size={20} color={theme.primary} />
             </View>
-            <ThemedText type="body" style={[styles.settingLabel, language === "ar" && { marginLeft: 0, marginRight: Spacing.md, textAlign: "right" }]}>
+            <ThemedText
+              type="body"
+              style={[
+                styles.settingLabel,
+                language === "ar" && {
+                  marginLeft: 0,
+                  marginRight: Spacing.md,
+                  textAlign: "right",
+                },
+              ]}
+            >
               {t("language")}
             </ThemedText>
             <Pressable
               onPress={handleLanguageToggle}
-              style={[styles.langButton, { backgroundColor: theme.primary + "20" }]}
+              style={[
+                styles.langButton,
+                { backgroundColor: theme.primary + "20" },
+              ]}
             >
-              <ThemedText type="small" style={{ color: theme.primary, fontWeight: "600" }}>
+              <ThemedText
+                type="small"
+                style={{ color: theme.primary, fontWeight: "600" }}
+              >
                 {language === "ar" ? "EN" : "عربي"}
               </ThemedText>
             </Pressable>
           </View>
 
-          <View style={[styles.settingDivider, { backgroundColor: theme.border }, language === "ar" && { marginLeft: 0, marginRight: 52 }]} />
+          <View
+            style={[
+              styles.settingDivider,
+              { backgroundColor: theme.border },
+              language === "ar" && { marginLeft: 0, marginRight: 52 },
+            ]}
+          />
 
-          <Pressable 
+          <Pressable
             onPress={handleThemeToggle}
-            style={[styles.settingItem, language === "ar" && { flexDirection: "row-reverse" }]}
+            style={[
+              styles.settingItem,
+              language === "ar" && { flexDirection: "row-reverse" },
+            ]}
           >
-            <View style={[styles.iconCircle, { backgroundColor: theme.primary + "15" }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: theme.primary + "15" },
+              ]}
+            >
               <Feather
                 name={isDark ? "moon" : "sun"}
                 size={20}
                 color={theme.primary}
               />
             </View>
-            <ThemedText type="body" style={[styles.settingLabel, language === "ar" && { marginLeft: 0, marginRight: Spacing.md, textAlign: "right" }]}>
+            <ThemedText
+              type="body"
+              style={[
+                styles.settingLabel,
+                language === "ar" && {
+                  marginLeft: 0,
+                  marginRight: Spacing.md,
+                  textAlign: "right",
+                },
+              ]}
+            >
               {getThemeLabel()}
             </ThemedText>
-            <View style={[styles.langButton, { backgroundColor: theme.primary + "20" }]}>
-               <Feather name="repeat" size={14} color={theme.primary} />
+            <View
+              style={[
+                styles.langButton,
+                { backgroundColor: theme.primary + "20" },
+              ]}
+            >
+              <Feather name="repeat" size={14} color={theme.primary} />
             </View>
           </Pressable>
         </Animated.View>
-        
+
         <View style={{ height: Spacing.xl }} />
-        
+
         <Animated.View
           entering={FadeInUp.delay(500).duration(400)}
           style={styles.footer}
         >
           <Pressable
             onPress={handleLogout}
-            style={[styles.logoutButton, { borderColor: theme.error }, language === "ar" && { flexDirection: "row-reverse" }]}
+            style={[
+              styles.logoutButton,
+              { borderColor: theme.error },
+              language === "ar" && { flexDirection: "row-reverse" },
+            ]}
           >
             <Feather name="log-out" size={20} color={theme.error} />
-            <ThemedText type="body" style={[{ color: theme.error, fontWeight: "500" }, language === "ar" ? { marginRight: Spacing.sm } : { marginLeft: Spacing.sm }]}>
+            <ThemedText
+              type="body"
+              style={[
+                { color: theme.error, fontWeight: "500" },
+                language === "ar"
+                  ? { marginRight: Spacing.sm }
+                  : { marginLeft: Spacing.sm },
+              ]}
+            >
               {t("logout")}
             </ThemedText>
           </Pressable>
         </Animated.View>
-        
+
         <View style={{ height: Spacing["2xl"] }} />
       </View>
     </DrawerContentScrollView>

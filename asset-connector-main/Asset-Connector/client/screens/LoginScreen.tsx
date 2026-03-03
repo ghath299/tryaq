@@ -49,28 +49,28 @@ export default function LoginScreen() {
     pulseScale.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
+        withTiming(1, { duration: 1500 }),
       ),
       -1,
-      true
+      true,
     );
 
     orb1Y.value = withRepeat(
       withSequence(
         withTiming(-20, { duration: 3000 }),
-        withTiming(20, { duration: 3000 })
+        withTiming(20, { duration: 3000 }),
       ),
       -1,
-      true
+      true,
     );
 
     orb2X.value = withRepeat(
       withSequence(
         withTiming(-15, { duration: 2500 }),
-        withTiming(15, { duration: 2500 })
+        withTiming(15, { duration: 2500 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
@@ -116,7 +116,8 @@ export default function LoginScreen() {
     buttonScale.value = withSpring(1, Animation.spring.gentle);
   };
 
-  const isFormValid = fullName.trim().length > 0 && phoneNumber.trim().length >= 10;
+  const isFormValid =
+    fullName.trim().length > 0 && phoneNumber.trim().length >= 10;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
@@ -140,12 +141,19 @@ export default function LoginScreen() {
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingTop: insets.top + Spacing["2xl"], paddingBottom: insets.bottom + Spacing.xl, justifyContent: "center" },
+            {
+              paddingTop: insets.top + Spacing["2xl"],
+              paddingBottom: insets.bottom + Spacing.xl,
+              justifyContent: "center",
+            },
           ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.header}>
+          <Animated.View
+            entering={FadeInDown.delay(100).duration(600)}
+            style={styles.header}
+          >
             <Animated.View style={pulseAnimatedStyle}>
               <LinearGradient
                 colors={[theme.primary, theme.primaryDark]}
@@ -159,7 +167,12 @@ export default function LoginScreen() {
               مرحباً بك
             </ThemedText>
 
-            <View style={[styles.appNamePill, { backgroundColor: theme.primary + "15" }]}>
+            <View
+              style={[
+                styles.appNamePill,
+                { backgroundColor: theme.primary + "15" },
+              ]}
+            >
               <LinearGradient
                 colors={[theme.primary, theme.primaryDark]}
                 start={{ x: 0, y: 0 }}
@@ -172,14 +185,23 @@ export default function LoginScreen() {
               </LinearGradient>
             </View>
 
-            <ThemedText type="body" style={[styles.subtitle, { color: theme.textSecondary }]}>
+            <ThemedText
+              type="body"
+              style={[styles.subtitle, { color: theme.textSecondary }]}
+            >
               أدخل بياناتك للمتابعة
             </ThemedText>
           </Animated.View>
 
-          <Animated.View entering={FadeInUp.delay(300).duration(500)} style={styles.form}>
+          <Animated.View
+            entering={FadeInUp.delay(300).duration(500)}
+            style={styles.form}
+          >
             <View style={styles.inputGroup}>
-              <ThemedText type="caption" style={[styles.label, { color: theme.textSecondary }]}>
+              <ThemedText
+                type="caption"
+                style={[styles.label, { color: theme.textSecondary }]}
+              >
                 الاسم الثلاثي (بالعربية)
               </ThemedText>
               <View
@@ -191,7 +213,11 @@ export default function LoginScreen() {
                   },
                 ]}
               >
-                <Feather name="user" size={20} color={fullName ? theme.primary : theme.textSecondary} />
+                <Feather
+                  name="user"
+                  size={20}
+                  color={fullName ? theme.primary : theme.textSecondary}
+                />
                 <TextInput
                   style={[styles.input, { color: theme.text }]}
                   placeholder="مثال: أحمد محمد علي"
@@ -205,7 +231,10 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText type="caption" style={[styles.label, { color: theme.textSecondary }]}>
+              <ThemedText
+                type="caption"
+                style={[styles.label, { color: theme.textSecondary }]}
+              >
                 رقم الهاتف
               </ThemedText>
               <View
@@ -218,9 +247,17 @@ export default function LoginScreen() {
                   },
                 ]}
               >
-                <Feather name="phone" size={20} color={phoneNumber ? theme.primary : theme.textSecondary} />
+                <Feather
+                  name="phone"
+                  size={20}
+                  color={phoneNumber ? theme.primary : theme.textSecondary}
+                />
                 <TextInput
-                  style={[styles.input, styles.phoneInput, { color: theme.text }]}
+                  style={[
+                    styles.input,
+                    styles.phoneInput,
+                    { color: theme.text },
+                  ]}
                   placeholder="07XXXXXXXXX"
                   placeholderTextColor={theme.textSecondary}
                   value={phoneNumber}
@@ -264,8 +301,14 @@ export default function LoginScreen() {
             </Animated.View>
           </Animated.View>
 
-          <Animated.View entering={FadeIn.delay(700).duration(400)} style={styles.footer}>
-            <ThemedText type="caption" style={[styles.footerText, { color: theme.textSecondary }]}>
+          <Animated.View
+            entering={FadeIn.delay(700).duration(400)}
+            style={styles.footer}
+          >
+            <ThemedText
+              type="caption"
+              style={[styles.footerText, { color: theme.textSecondary }]}
+            >
               بمتابعتك، أنت توافق على شروط الاستخدام وسياسة الخصوصية
             </ThemedText>
           </Animated.View>

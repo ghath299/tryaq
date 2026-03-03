@@ -6,57 +6,94 @@ import { createServer } from "node:http";
 
 // server/mockData.ts
 var medicines = [
-  { id: "1", nameAr: "\u0628\u0627\u0631\u0627\u0633\u064A\u062A\u0627\u0645\u0648\u0644", nameEn: "Paracetamol" },
-  { id: "2", nameAr: "\u0623\u0645\u0648\u0643\u0633\u064A\u0633\u064A\u0644\u064A\u0646", nameEn: "Amoxicillin" },
-  { id: "3", nameAr: "\u0623\u0648\u0645\u064A\u0628\u0631\u0627\u0632\u0648\u0644", nameEn: "Omeprazole" },
-  { id: "4", nameAr: "\u0645\u064A\u062A\u0641\u0648\u0631\u0645\u064A\u0646", nameEn: "Metformin" },
-  { id: "5", nameAr: "\u0623\u062A\u0648\u0631\u0641\u0627\u0633\u062A\u0627\u062A\u064A\u0646", nameEn: "Atorvastatin" }
+  {
+    id: "1",
+    nameAr:
+      "\u0628\u0627\u0631\u0627\u0633\u064A\u062A\u0627\u0645\u0648\u0644",
+    nameEn: "Paracetamol",
+  },
+  {
+    id: "2",
+    nameAr:
+      "\u0623\u0645\u0648\u0643\u0633\u064A\u0633\u064A\u0644\u064A\u0646",
+    nameEn: "Amoxicillin",
+  },
+  {
+    id: "3",
+    nameAr: "\u0623\u0648\u0645\u064A\u0628\u0631\u0627\u0632\u0648\u0644",
+    nameEn: "Omeprazole",
+  },
+  {
+    id: "4",
+    nameAr: "\u0645\u064A\u062A\u0641\u0648\u0631\u0645\u064A\u0646",
+    nameEn: "Metformin",
+  },
+  {
+    id: "5",
+    nameAr:
+      "\u0623\u062A\u0648\u0631\u0641\u0627\u0633\u062A\u0627\u062A\u064A\u0646",
+    nameEn: "Atorvastatin",
+  },
 ];
 var pharmacies = [
   {
     id: "1",
-    nameAr: "\u0635\u064A\u062F\u0644\u064A\u0629 \u0627\u0644\u0634\u0641\u0627\u0621",
+    nameAr:
+      "\u0635\u064A\u062F\u0644\u064A\u0629 \u0627\u0644\u0634\u0641\u0627\u0621",
     nameEn: "Al-Shifa Pharmacy",
     governorate: "Baghdad",
     governorateAr: "\u0628\u063A\u062F\u0627\u062F",
-    phone: "+9647701112222"
+    phone: "+9647701112222",
   },
   {
     id: "2",
-    nameAr: "\u0635\u064A\u062F\u0644\u064A\u0629 \u0627\u0644\u062D\u064A\u0627\u0629",
+    nameAr:
+      "\u0635\u064A\u062F\u0644\u064A\u0629 \u0627\u0644\u062D\u064A\u0627\u0629",
     nameEn: "Al-Hayat Pharmacy",
     governorate: "Baghdad",
     governorateAr: "\u0628\u063A\u062F\u0627\u062F",
-    phone: "+9647702223333"
+    phone: "+9647702223333",
   },
   {
     id: "3",
-    nameAr: "\u0635\u064A\u062F\u0644\u064A\u0629 \u0627\u0644\u0646\u0648\u0631",
+    nameAr:
+      "\u0635\u064A\u062F\u0644\u064A\u0629 \u0627\u0644\u0646\u0648\u0631",
     nameEn: "Al-Nour Pharmacy",
     governorate: "Basra",
     governorateAr: "\u0627\u0644\u0628\u0635\u0631\u0629",
-    phone: "+9647703334444"
-  }
+    phone: "+9647703334444",
+  },
 ];
 var availabilityByMedicineId = {
-  "1": ["1", "2", "3"],
-  "2": ["1", "3"],
-  "3": ["2"],
-  "4": ["1", "2"],
-  "5": ["3"]
+  1: ["1", "2", "3"],
+  2: ["1", "3"],
+  3: ["2"],
+  4: ["1", "2"],
+  5: ["3"],
 };
 var chatsByPharmacyId = {
-  "1": [
-    { id: "m1", text: "\u0623\u0647\u0644\u0627\u064B \u0648\u0633\u0647\u0644\u0627\u064B\u060C \u0643\u064A\u0641 \u0646\u0643\u062F\u0631 \u0646\u0633\u0627\u0639\u062F\u0643\u061F", sender: "pharmacy", createdAt: (/* @__PURE__ */ new Date()).toISOString() }
-  ]
+  1: [
+    {
+      id: "m1",
+      text: "\u0623\u0647\u0644\u0627\u064B \u0648\u0633\u0647\u0644\u0627\u064B\u060C \u0643\u064A\u0641 \u0646\u0643\u062F\u0631 \u0646\u0633\u0627\u0639\u062F\u0643\u061F",
+      sender: "pharmacy",
+      createdAt: /* @__PURE__ */ new Date().toISOString(),
+    },
+  ],
 };
 
 // server/routes.ts
 async function registerRoutes(app2) {
   app2.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS",
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, Accept",
+    );
     if (req.method === "OPTIONS") return res.sendStatus(200);
     next();
   });
@@ -64,13 +101,16 @@ async function registerRoutes(app2) {
     const { phoneNumber } = req.params;
     const mockRoles = {
       "07801111111": "doctor",
-      "07802222222": "pharmacist"
+      "07802222222": "pharmacist",
     };
     const role = mockRoles[phoneNumber] || "patient";
     res.json({
       phoneNumber,
       role,
-      message: role === "patient" ? "Default patient account" : `${role} account found`
+      message:
+        role === "patient"
+          ? "Default patient account"
+          : `${role} account found`,
     });
   });
   app2.post("/api/analyze", (_req, res) => {
@@ -78,17 +118,26 @@ async function registerRoutes(app2) {
       res.json({
         name: "Paracetamol",
         confidence: 0.985,
-        extractedText: "Panadol Advance 500mg Tablets, Paracetamol, GSK"
+        extractedText: "Panadol Advance 500mg Tablets, Paracetamol, GSK",
       });
     }, 800);
   });
   app2.get("/api/medicines", (req, res) => {
-    const query = String(req.query.query || "").trim().toLowerCase();
+    const query = String(req.query.query || "")
+      .trim()
+      .toLowerCase();
     const page = Math.max(1, Number(req.query.page || 1));
-    const pageSize = Math.max(1, Math.min(20, Number(req.query.pageSize || 10)));
-    const filtered = query ? medicines.filter(
-      (medicine) => medicine.nameAr.toLowerCase().includes(query) || medicine.nameEn.toLowerCase().includes(query)
-    ) : medicines;
+    const pageSize = Math.max(
+      1,
+      Math.min(20, Number(req.query.pageSize || 10)),
+    );
+    const filtered = query
+      ? medicines.filter(
+          (medicine) =>
+            medicine.nameAr.toLowerCase().includes(query) ||
+            medicine.nameEn.toLowerCase().includes(query),
+        )
+      : medicines;
     const start = (page - 1) * pageSize;
     const paged = filtered.slice(start, start + pageSize);
     res.json({
@@ -96,32 +145,52 @@ async function registerRoutes(app2) {
       page,
       pageSize,
       total: filtered.length,
-      hasNextPage: start + pageSize < filtered.length
+      hasNextPage: start + pageSize < filtered.length,
     });
   });
   app2.get("/api/pharmacies", (req, res) => {
-    const governorate = String(req.query.governorate || "").trim().toLowerCase();
-    const items = governorate ? pharmacies.filter((pharmacy) => pharmacy.governorate.toLowerCase() === governorate) : pharmacies;
+    const governorate = String(req.query.governorate || "")
+      .trim()
+      .toLowerCase();
+    const items = governorate
+      ? pharmacies.filter(
+          (pharmacy) => pharmacy.governorate.toLowerCase() === governorate,
+        )
+      : pharmacies;
     res.json({ items });
   });
   app2.get("/api/availability", (req, res) => {
     const medicineId = String(req.query.medicineId || "");
-    const governorate = String(req.query.governorate || "").trim().toLowerCase();
+    const governorate = String(req.query.governorate || "")
+      .trim()
+      .toLowerCase();
     const pharmacyIds = availabilityByMedicineId[medicineId] || [];
     const items = pharmacies.filter(
-      (pharmacy) => pharmacyIds.includes(pharmacy.id) && (!governorate || pharmacy.governorate.toLowerCase() === governorate)
+      (pharmacy) =>
+        pharmacyIds.includes(pharmacy.id) &&
+        (!governorate || pharmacy.governorate.toLowerCase() === governorate),
     );
     res.json({ items });
   });
   app2.get("/api/chats/:pharmacyId/messages", (req, res) => {
     const pharmacyId = req.params.pharmacyId;
-    const allMessages = [...chatsByPharmacyId[pharmacyId] || []].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    const allMessages = [...(chatsByPharmacyId[pharmacyId] || [])].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
     const limitParam = Number(req.query.limit || 0);
-    const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(100, limitParam) : 0;
-    const before = req.query.before ? new Date(String(req.query.before)).getTime() : null;
-    const filtered = before ? allMessages.filter((item) => new Date(item.createdAt).getTime() < before) : allMessages;
+    const limit =
+      Number.isFinite(limitParam) && limitParam > 0
+        ? Math.min(100, limitParam)
+        : 0;
+    const before = req.query.before
+      ? new Date(String(req.query.before)).getTime()
+      : null;
+    const filtered = before
+      ? allMessages.filter(
+          (item) => new Date(item.createdAt).getTime() < before,
+        )
+      : allMessages;
     if (!limit) {
       return res.json({ items: filtered, hasMore: false, nextBefore: null });
     }
@@ -137,14 +206,16 @@ async function registerRoutes(app2) {
       text: req.body?.text,
       imageUrl: req.body?.imageUrl,
       sender: "patient",
-      createdAt: (/* @__PURE__ */ new Date()).toISOString()
+      createdAt: /* @__PURE__ */ new Date().toISOString(),
     };
     if (!chatsByPharmacyId[pharmacyId]) chatsByPharmacyId[pharmacyId] = [];
     chatsByPharmacyId[pharmacyId].push(message);
     res.status(201).json({ item: message });
   });
   app2.post("/api/uploads/chat-image", (_req, res) => {
-    res.status(201).json({ imageUrl: `https://placehold.co/600x400/png?text=chat+image+${Date.now()}` });
+    res.status(201).json({
+      imageUrl: `https://placehold.co/600x400/png?text=chat+image+${Date.now()}`,
+    });
   });
   const httpServer = createServer(app2);
   return httpServer;
@@ -158,8 +229,14 @@ var log = console.log;
 function setupCors(app2) {
   app2.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS",
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, Accept",
+    );
     if (req.method === "OPTIONS") {
       return res.sendStatus(200);
     }
@@ -171,8 +248,8 @@ function setupBodyParsing(app2) {
     express.json({
       verify: (req, _res, buf) => {
         req.rawBody = buf;
-      }
-    })
+      },
+    }),
   );
   app2.use(express.urlencoded({ extended: false }));
 }
@@ -182,7 +259,7 @@ function setupRequestLogging(app2) {
     const reqPath = req.path;
     let capturedJsonResponse = void 0;
     const originalResJson = res.json;
-    res.json = function(bodyJson, ...args) {
+    res.json = function (bodyJson, ...args) {
       capturedJsonResponse = bodyJson;
       return originalResJson.apply(res, [bodyJson, ...args]);
     };
@@ -216,10 +293,12 @@ function serveExpoManifest(platform, res) {
     process.cwd(),
     "static-build",
     platform,
-    "manifest.json"
+    "manifest.json",
   );
   if (!fs.existsSync(manifestPath)) {
-    return res.status(404).json({ error: `Manifest not found for platform: ${platform}` });
+    return res
+      .status(404)
+      .json({ error: `Manifest not found for platform: ${platform}` });
   }
   res.setHeader("expo-protocol-version", "1");
   res.setHeader("expo-sfv-version", "0");
@@ -227,12 +306,7 @@ function serveExpoManifest(platform, res) {
   const manifest = fs.readFileSync(manifestPath, "utf-8");
   res.send(manifest);
 }
-function serveLandingPage({
-  req,
-  res,
-  landingPageTemplate,
-  appName
-}) {
+function serveLandingPage({ req, res, landingPageTemplate, appName }) {
   const forwardedProto = req.header("x-forwarded-proto");
   const protocol = forwardedProto || req.protocol || "https";
   const forwardedHost = req.header("x-forwarded-host");
@@ -241,7 +315,10 @@ function serveLandingPage({
   const expsUrl = `${host}`;
   log(`baseUrl`, baseUrl);
   log(`expsUrl`, expsUrl);
-  const html = landingPageTemplate.replace(/BASE_URL_PLACEHOLDER/g, baseUrl).replace(/EXPS_URL_PLACEHOLDER/g, expsUrl).replace(/APP_NAME_PLACEHOLDER/g, appName);
+  const html = landingPageTemplate
+    .replace(/BASE_URL_PLACEHOLDER/g, baseUrl)
+    .replace(/EXPS_URL_PLACEHOLDER/g, expsUrl)
+    .replace(/APP_NAME_PLACEHOLDER/g, appName);
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "no-cache");
   res.status(200).send(html);
@@ -251,7 +328,7 @@ function configureExpoAndLanding(app2) {
     process.cwd(),
     "server",
     "templates",
-    "landing-page.html"
+    "landing-page.html",
   );
   const landingPageTemplate = fs.readFileSync(templatePath, "utf-8");
   const appName = getAppName();
@@ -272,7 +349,7 @@ function configureExpoAndLanding(app2) {
         req,
         res,
         landingPageTemplate,
-        appName
+        appName,
       });
     }
     next();
@@ -305,10 +382,10 @@ function setupErrorHandler(app2) {
     {
       port,
       host: "0.0.0.0",
-      reusePort: true
+      reusePort: true,
     },
     () => {
       log(`Express API server running on port ${port}`);
-    }
+    },
   );
 })();

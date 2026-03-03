@@ -27,10 +27,10 @@ export function HeaderTitle({ title, showIcon = true }: HeaderTitleProps) {
     pulse.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
+        withTiming(1, { duration: 1500 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 

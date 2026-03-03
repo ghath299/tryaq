@@ -62,7 +62,9 @@ export default function DoctorDetailScreen() {
 
   if (!doctor) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
+      >
         <ThemedText>{t("error")}</ThemedText>
       </View>
     );
@@ -77,7 +79,10 @@ export default function DoctorDetailScreen() {
   const doctorSource = require("../assets/placeholders/doctor.png");
 
   const handleBookAppointment = () => {
-    navigation.navigate("BookAppointment" as never, { doctorId: doctor.id } as never);
+    navigation.navigate(
+      "BookAppointment" as never,
+      { doctorId: doctor.id } as never,
+    );
   };
 
   const heroHeight = Math.round(W * 0.65);
@@ -101,16 +106,25 @@ export default function DoctorDetailScreen() {
       >
         <Animated.View entering={FadeIn.duration(300)}>
           <LinearGradient
-            colors={isDark ? [theme.primary + "30", theme.backgroundRoot] : [theme.primary + "25", theme.backgroundRoot]}
+            colors={
+              isDark
+                ? [theme.primary + "30", theme.backgroundRoot]
+                : [theme.primary + "25", theme.backgroundRoot]
+            }
             style={{ height: heroHeight }}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(100).duration(400)} style={styles.profileSection}>
+        <Animated.View
+          entering={FadeInUp.delay(100).duration(400)}
+          style={styles.profileSection}
+        >
           <View style={[styles.avatarContainer, shadow]}>
-            <View style={[styles.avatarRing, { borderColor: theme.backgroundRoot }]}>
+            <View
+              style={[styles.avatarRing, { borderColor: theme.backgroundRoot }]}
+            >
               <Image
                 source={doctorSource}
                 style={styles.avatarImage}
@@ -118,31 +132,74 @@ export default function DoctorDetailScreen() {
               />
             </View>
             {doctor.isVerified && (
-              <View style={[styles.verifiedBadge, { backgroundColor: theme.primary, borderColor: theme.backgroundRoot }]}>
+              <View
+                style={[
+                  styles.verifiedBadge,
+                  {
+                    backgroundColor: theme.primary,
+                    borderColor: theme.backgroundRoot,
+                  },
+                ]}
+              >
                 <Feather name="check" size={12} color="#FFF" />
               </View>
             )}
           </View>
 
           <View style={styles.nameBlock}>
-            <ThemedText type="h2" style={[styles.nameText, isRTL && { textAlign: "right" }]}>
+            <ThemedText
+              type="h2"
+              style={[styles.nameText, isRTL && { textAlign: "right" }]}
+            >
               {name}
             </ThemedText>
 
-            <ThemedText type="body" style={[styles.specialtyText, { color: theme.primary }]}>
+            <ThemedText
+              type="body"
+              style={[styles.specialtyText, { color: theme.primary }]}
+            >
               {specialty}
             </ThemedText>
 
-            <View style={[styles.ratingRow, isRTL && { flexDirection: "row-reverse" }]}>
-              <View style={[styles.ratingChip, { backgroundColor: theme.warning + "18" }]}>
+            <View
+              style={[
+                styles.ratingRow,
+                isRTL && { flexDirection: "row-reverse" },
+              ]}
+            >
+              <View
+                style={[
+                  styles.ratingChip,
+                  { backgroundColor: theme.warning + "18" },
+                ]}
+              >
                 <Feather name="star" size={14} color={theme.warning} />
-                <ThemedText type="small" style={{ fontWeight: "700", marginLeft: 4, color: theme.warning }}>
+                <ThemedText
+                  type="small"
+                  style={{
+                    fontWeight: "700",
+                    marginLeft: 4,
+                    color: theme.warning,
+                  }}
+                >
                   {doctor.rating}
                 </ThemedText>
               </View>
-              <View style={[styles.locationChip, { backgroundColor: theme.primary + "12" }]}>
+              <View
+                style={[
+                  styles.locationChip,
+                  { backgroundColor: theme.primary + "12" },
+                ]}
+              >
                 <Feather name="map-pin" size={12} color={theme.primary} />
-                <ThemedText type="caption" style={{ color: theme.primary, marginLeft: 4, fontWeight: "500" }}>
+                <ThemedText
+                  type="caption"
+                  style={{
+                    color: theme.primary,
+                    marginLeft: 4,
+                    fontWeight: "500",
+                  }}
+                >
                   {province} - {district}
                 </ThemedText>
               </View>
@@ -154,34 +211,96 @@ export default function DoctorDetailScreen() {
               style={[styles.wazeBtn, { backgroundColor: theme.primary }]}
             >
               <Feather name="navigation" size={16} color="#FFF" />
-              <ThemedText type="small" style={{ color: "#FFF", fontWeight: "700", marginLeft: 8 }}>
+              <ThemedText
+                type="small"
+                style={{ color: "#FFF", fontWeight: "700", marginLeft: 8 }}
+              >
                 {TXT.route}
               </ThemedText>
             </TouchableOpacity>
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(200).duration(300)} style={styles.content}>
-          <View style={[styles.sectionHeader, isRTL && { flexDirection: "row-reverse" }]}>
-            <View style={[styles.sectionIcon, { backgroundColor: theme.primary + "15" }]}>
+        <Animated.View
+          entering={FadeInUp.delay(200).duration(300)}
+          style={styles.content}
+        >
+          <View
+            style={[
+              styles.sectionHeader,
+              isRTL && { flexDirection: "row-reverse" },
+            ]}
+          >
+            <View
+              style={[
+                styles.sectionIcon,
+                { backgroundColor: theme.primary + "15" },
+              ]}
+            >
               <Feather name="info" size={20} color={theme.primary} />
             </View>
-            <ThemedText type="h4" style={{ fontWeight: "600", [isRTL ? "marginRight" : "marginLeft"]: Spacing.md }}>
+            <ThemedText
+              type="h4"
+              style={{
+                fontWeight: "600",
+                [isRTL ? "marginRight" : "marginLeft"]: Spacing.md,
+              }}
+            >
               {TXT.clinicInfo}
             </ThemedText>
           </View>
 
-          <View style={[styles.infoCard, { backgroundColor: isDark ? theme.card : theme.backgroundDefault }, shadow]}>
-            <View style={[styles.infoRow, isRTL && { flexDirection: "row-reverse" }]}>
-              <View style={[styles.infoIcon, { backgroundColor: theme.primary + "12" }]}>
+          <View
+            style={[
+              styles.infoCard,
+              {
+                backgroundColor: isDark ? theme.card : theme.backgroundDefault,
+              },
+              shadow,
+            ]}
+          >
+            <View
+              style={[
+                styles.infoRow,
+                isRTL && { flexDirection: "row-reverse" },
+              ]}
+            >
+              <View
+                style={[
+                  styles.infoIcon,
+                  { backgroundColor: theme.primary + "12" },
+                ]}
+              >
                 <Feather name="map-pin" size={18} color={theme.primary} />
               </View>
-              <View style={[styles.infoContent, isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {}]}>
-                <ThemedText type="caption" style={{ color: theme.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              <View
+                style={[
+                  styles.infoContent,
+                  isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {},
+                ]}
+              >
+                <ThemedText
+                  type="caption"
+                  style={{
+                    color: theme.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {TXT.clinic}
                 </ThemedText>
-                <ThemedText style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}>{clinicAddress}</ThemedText>
-                <ThemedText type="caption" style={[{ color: theme.textSecondary, marginTop: 2 }, isRTL && { textAlign: "right" }]}>
+                <ThemedText
+                  style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}
+                >
+                  {clinicAddress}
+                </ThemedText>
+                <ThemedText
+                  type="caption"
+                  style={[
+                    { color: theme.textSecondary, marginTop: 2 },
+                    isRTL && { textAlign: "right" },
+                  ]}
+                >
                   {province} - {district}
                 </ThemedText>
               </View>
@@ -189,16 +308,48 @@ export default function DoctorDetailScreen() {
 
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-            <View style={[styles.infoRow, isRTL && { flexDirection: "row-reverse" }]}>
-              <View style={[styles.infoIcon, { backgroundColor: theme.primary + "12" }]}>
+            <View
+              style={[
+                styles.infoRow,
+                isRTL && { flexDirection: "row-reverse" },
+              ]}
+            >
+              <View
+                style={[
+                  styles.infoIcon,
+                  { backgroundColor: theme.primary + "12" },
+                ]}
+              >
                 <Feather name="clock" size={18} color={theme.primary} />
               </View>
-              <View style={[styles.infoContent, isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {}]}>
-                <ThemedText type="caption" style={{ color: theme.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              <View
+                style={[
+                  styles.infoContent,
+                  isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {},
+                ]}
+              >
+                <ThemedText
+                  type="caption"
+                  style={{
+                    color: theme.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {TXT.workingHours}
                 </ThemedText>
-                <ThemedText style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}>{doctor.workingHours}</ThemedText>
-                <ThemedText type="caption" style={[{ color: theme.textSecondary, marginTop: 2 }, isRTL && { textAlign: "right" }]}>
+                <ThemedText
+                  style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}
+                >
+                  {doctor.workingHours}
+                </ThemedText>
+                <ThemedText
+                  type="caption"
+                  style={[
+                    { color: theme.textSecondary, marginTop: 2 },
+                    isRTL && { textAlign: "right" },
+                  ]}
+                >
                   {doctor.workingDays.join(" - ")}
                 </ThemedText>
               </View>
@@ -206,15 +357,39 @@ export default function DoctorDetailScreen() {
 
             <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
-            <View style={[styles.infoRow, isRTL && { flexDirection: "row-reverse" }]}>
-              <View style={[styles.infoIcon, { backgroundColor: theme.primary + "12" }]}>
+            <View
+              style={[
+                styles.infoRow,
+                isRTL && { flexDirection: "row-reverse" },
+              ]}
+            >
+              <View
+                style={[
+                  styles.infoIcon,
+                  { backgroundColor: theme.primary + "12" },
+                ]}
+              >
                 <Feather name="navigation" size={18} color={theme.primary} />
               </View>
-              <View style={[styles.infoContent, isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {}]}>
-                <ThemedText type="caption" style={{ color: theme.textSecondary, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              <View
+                style={[
+                  styles.infoContent,
+                  isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {},
+                ]}
+              >
+                <ThemedText
+                  type="caption"
+                  style={{
+                    color: theme.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {TXT.distance}
                 </ThemedText>
-                <ThemedText style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}>
+                <ThemedText
+                  style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}
+                >
                   {doctor.distance} {TXT.km}
                 </ThemedText>
               </View>
@@ -230,7 +405,9 @@ export default function DoctorDetailScreen() {
           {
             backgroundColor: theme.backgroundRoot,
             paddingBottom: insets.bottom + Spacing.lg,
-            borderTopColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+            borderTopColor: isDark
+              ? "rgba(255,255,255,0.08)"
+              : "rgba(0,0,0,0.06)",
           },
         ]}
       >

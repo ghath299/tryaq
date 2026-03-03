@@ -82,10 +82,7 @@ function prepareDirectories(timestamp) {
 function clearMetroCache() {
   console.log("Clearing Metro cache...");
 
-  const cacheDirs = [
-    ".metro-cache",
-    "node_modules/.cache/metro",
-  ];
+  const cacheDirs = [".metro-cache", "node_modules/.cache/metro"];
 
   for (const dir of cacheDirs) {
     if (fs.existsSync(dir)) {

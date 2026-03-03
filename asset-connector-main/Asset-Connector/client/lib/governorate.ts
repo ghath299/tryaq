@@ -18,13 +18,21 @@ const governorateCenters: Record<string, { lat: number; lng: number }> = {
 
 const toRad = (value: number) => (value * Math.PI) / 180;
 
-const distanceInKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+const distanceInKm = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) => {
   const earthRadius = 6371;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
   return 2 * earthRadius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
@@ -33,12 +41,17 @@ export const normalizeGovernorate = (name?: string | null) => {
   if (!name) return null;
   const value = name.trim().toLowerCase();
   const province = provinces.find(
-    (item) => item.nameEn.toLowerCase() === value || item.nameAr.toLowerCase() === value,
+    (item) =>
+      item.nameEn.toLowerCase() === value ||
+      item.nameAr.toLowerCase() === value,
   );
   return province?.nameEn ?? null;
 };
 
-export const getClosestGovernorateFromCoords = (latitude: number, longitude: number) => {
+export const getClosestGovernorateFromCoords = (
+  latitude: number,
+  longitude: number,
+) => {
   let closest = "Baghdad";
   let closestDistance = Number.POSITIVE_INFINITY;
 

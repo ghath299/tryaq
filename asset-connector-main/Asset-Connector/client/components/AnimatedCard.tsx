@@ -40,7 +40,14 @@ export function AnimatedCard({
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { scale: scale.value },
-      { translateY: interpolate(elevation.value, [0, 1], [0, -4], Extrapolation.CLAMP) },
+      {
+        translateY: interpolate(
+          elevation.value,
+          [0, 1],
+          [0, -4],
+          Extrapolation.CLAMP,
+        ),
+      },
     ],
   }));
 
@@ -82,11 +89,16 @@ export function AnimatedCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled}
-        entering={FadeInDown.delay(index * Animation.stagger.normal).duration(Animation.duration.slow).springify()}
+        entering={FadeInDown.delay(index * Animation.stagger.normal)
+          .duration(Animation.duration.slow)
+          .springify()}
         style={[styles.card, shadowStyle, animatedStyle, style]}
       >
         <LinearGradient
-          colors={[theme.gradient?.start || "#5EDFFF", theme.gradient?.end || "#1F6AE1"]}
+          colors={[
+            theme.gradient?.start || "#5EDFFF",
+            theme.gradient?.end || "#1F6AE1",
+          ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientBackground}
@@ -103,7 +115,9 @@ export function AnimatedCard({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      entering={FadeInDown.delay(index * Animation.stagger.normal).duration(Animation.duration.slow).springify()}
+      entering={FadeInDown.delay(index * Animation.stagger.normal)
+        .duration(Animation.duration.slow)
+        .springify()}
       style={[
         styles.card,
         {

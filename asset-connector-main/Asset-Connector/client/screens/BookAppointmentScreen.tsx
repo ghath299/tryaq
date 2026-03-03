@@ -70,14 +70,20 @@ export default function BookAppointmentScreen() {
           <ThemedText type="h3" style={styles.title}>
             {t("bookAppointment")}
           </ThemedText>
-          <ThemedText type="body" style={{ color: theme.textSecondary, marginBottom: Spacing.xl }}>
+          <ThemedText
+            type="body"
+            style={{ color: theme.textSecondary, marginBottom: Spacing.xl }}
+          >
             {doctorName}
           </ThemedText>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(200).duration(400)}>
           <View style={styles.inputGroup}>
-            <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
+            <ThemedText
+              type="small"
+              style={[styles.label, { color: theme.textSecondary }]}
+            >
               {t("fullName")} *
             </ThemedText>
             <TextInput
@@ -98,7 +104,10 @@ export default function BookAppointmentScreen() {
 
         <Animated.View entering={FadeInUp.delay(250).duration(400)}>
           <View style={styles.inputGroup}>
-            <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
+            <ThemedText
+              type="small"
+              style={[styles.label, { color: theme.textSecondary }]}
+            >
               {t("age")} ({language === "ar" ? "اختياري" : "optional"})
             </ThemedText>
             <TextInput
@@ -120,7 +129,10 @@ export default function BookAppointmentScreen() {
 
         <Animated.View entering={FadeInUp.delay(300).duration(400)}>
           <View style={styles.inputGroup}>
-            <ThemedText type="small" style={[styles.label, { color: theme.textSecondary }]}>
+            <ThemedText
+              type="small"
+              style={[styles.label, { color: theme.textSecondary }]}
+            >
               {t("notes")} ({language === "ar" ? "اختياري" : "optional"})
             </ThemedText>
             <TextInput

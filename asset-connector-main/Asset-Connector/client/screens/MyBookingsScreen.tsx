@@ -18,8 +18,15 @@ export default function MyBookingsScreen() {
   const { theme } = useTheme();
   const { language, t } = useApp();
 
-  const renderBooking = ({ item, index }: { item: (typeof bookings)[0]; index: number }) => {
-    const doctorName = language === "ar" ? item.doctorNameAr : item.doctorNameEn;
+  const renderBooking = ({
+    item,
+    index,
+  }: {
+    item: (typeof bookings)[0];
+    index: number;
+  }) => {
+    const doctorName =
+      language === "ar" ? item.doctorNameAr : item.doctorNameEn;
     const specialty = language === "ar" ? item.specialtyAr : item.specialtyEn;
 
     const getStatusColor = () => {
@@ -38,10 +45,15 @@ export default function MyBookingsScreen() {
     return (
       <Animated.View entering={FadeInUp.delay(index * 50).duration(300)}>
         <Pressable
-          style={[styles.bookingCard, { backgroundColor: theme.backgroundDefault }]}
+          style={[
+            styles.bookingCard,
+            { backgroundColor: theme.backgroundDefault },
+          ]}
         >
           <View style={styles.bookingHeader}>
-            <View style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}>
+            <View
+              style={[styles.avatar, { backgroundColor: theme.primary + "20" }]}
+            >
               <Feather name="user" size={24} color={theme.primary} />
             </View>
             <View style={styles.bookingInfo}>
@@ -52,7 +64,12 @@ export default function MyBookingsScreen() {
                 {specialty}
               </ThemedText>
             </View>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor() + "20" }]}>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getStatusColor() + "20" },
+              ]}
+            >
               <ThemedText type="caption" style={{ color: getStatusColor() }}>
                 {item.status}
               </ThemedText>
@@ -62,13 +79,19 @@ export default function MyBookingsScreen() {
           <View style={styles.bookingDetails}>
             <View style={styles.detailItem}>
               <Feather name="calendar" size={14} color={theme.textSecondary} />
-              <ThemedText type="small" style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}>
+              <ThemedText
+                type="small"
+                style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}
+              >
                 {item.date}
               </ThemedText>
             </View>
             <View style={styles.detailItem}>
               <Feather name="clock" size={14} color={theme.textSecondary} />
-              <ThemedText type="small" style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}>
+              <ThemedText
+                type="small"
+                style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}
+              >
                 {item.time}
               </ThemedText>
             </View>

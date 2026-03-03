@@ -1,7 +1,13 @@
 import React, { useState, useMemo } from "react";
-import { View, StyleSheet, FlatList, ScrollView, Platform, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  Platform,
+  Pressable,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -60,7 +66,10 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
             end={{ x: 1, y: 1 }}
             style={styles.chipGradient}
           >
-            <ThemedText type="small" style={{ color: "#FFFFFF", fontWeight: "500" }}>
+            <ThemedText
+              type="small"
+              style={{ color: "#FFFFFF", fontWeight: "500" }}
+            >
               {label}
             </ThemedText>
           </LinearGradient>
@@ -68,7 +77,10 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
           <View
             style={[
               styles.chip,
-              { backgroundColor: theme.backgroundSecondary, borderColor: theme.border },
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderColor: theme.border,
+              },
             ]}
           >
             <ThemedText type="small" style={{ color: theme.text }}>
@@ -99,10 +111,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
   const district = language === "ar" ? doctor.districtAr : doctor.districtEn;
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const handlePressIn = () => {
@@ -132,7 +141,11 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
   });
 
   return (
-    <Animated.View entering={FadeInUp.delay(index * 60).duration(400).springify()}>
+    <Animated.View
+      entering={FadeInUp.delay(index * 60)
+        .duration(400)
+        .springify()}
+    >
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -146,55 +159,139 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
       >
         <LinearGradient
           colors={[theme.primary + "25", theme.primaryDark + "15"]}
-          style={[styles.doctorAvatar, language === "ar" && { marginRight: 0, marginLeft: Spacing.lg }]}
+          style={[
+            styles.doctorAvatar,
+            language === "ar" && { marginRight: 0, marginLeft: Spacing.lg },
+          ]}
         >
           <Feather name="user" size={28} color={theme.primary} />
         </LinearGradient>
 
         <View style={styles.doctorInfo}>
-          <View style={[styles.doctorHeader, language === "ar" && { flexDirection: "row-reverse" }]}>
-            <ThemedText type="h4" style={[styles.doctorName, language === "ar" && { textAlign: "right" }]} numberOfLines={1}>
+          <View
+            style={[
+              styles.doctorHeader,
+              language === "ar" && { flexDirection: "row-reverse" },
+            ]}
+          >
+            <ThemedText
+              type="h4"
+              style={[
+                styles.doctorName,
+                language === "ar" && { textAlign: "right" },
+              ]}
+              numberOfLines={1}
+            >
               {name}
             </ThemedText>
             {doctor.isVerified ? (
-              <View style={[styles.verifiedIcon, { backgroundColor: theme.primary }, language === "ar" && { marginLeft: 0, marginRight: Spacing.xs }]}>
+              <View
+                style={[
+                  styles.verifiedIcon,
+                  { backgroundColor: theme.primary },
+                  language === "ar" && {
+                    marginLeft: 0,
+                    marginRight: Spacing.xs,
+                  },
+                ]}
+              >
                 <Feather name="check" size={10} color="#FFFFFF" />
               </View>
             ) : null}
           </View>
 
-          <ThemedText type="small" style={[{ color: theme.primaryDark, fontWeight: "500" }, language === "ar" && { textAlign: "right" }]}>
+          <ThemedText
+            type="small"
+            style={[
+              { color: theme.primaryDark, fontWeight: "500" },
+              language === "ar" && { textAlign: "right" },
+            ]}
+          >
             {specialty}
           </ThemedText>
 
-          <View style={[styles.doctorMeta, language === "ar" && { alignItems: "flex-end" }]}>
-            <View style={[styles.metaItem, language === "ar" && { flexDirection: "row-reverse" }]}>
+          <View
+            style={[
+              styles.doctorMeta,
+              language === "ar" && { alignItems: "flex-end" },
+            ]}
+          >
+            <View
+              style={[
+                styles.metaItem,
+                language === "ar" && { flexDirection: "row-reverse" },
+              ]}
+            >
               <Feather name="map-pin" size={12} color={theme.textSecondary} />
-              <ThemedText type="caption" style={[{ color: theme.textSecondary, marginLeft: 4 }, language === "ar" && { marginLeft: 0, marginRight: 4 }]}>
+              <ThemedText
+                type="caption"
+                style={[
+                  { color: theme.textSecondary, marginLeft: 4 },
+                  language === "ar" && { marginLeft: 0, marginRight: 4 },
+                ]}
+              >
                 {province} - {district}
               </ThemedText>
             </View>
           </View>
 
-          <View style={[styles.doctorFooter, language === "ar" && { flexDirection: "row-reverse" }]}>
-            <View style={[styles.ratingContainer, language === "ar" && { flexDirection: "row-reverse" }]}>
+          <View
+            style={[
+              styles.doctorFooter,
+              language === "ar" && { flexDirection: "row-reverse" },
+            ]}
+          >
+            <View
+              style={[
+                styles.ratingContainer,
+                language === "ar" && { flexDirection: "row-reverse" },
+              ]}
+            >
               <Feather name="star" size={14} color="#FFB800" />
-              <ThemedText type="small" style={[{ fontWeight: "600", marginLeft: 4 }, language === "ar" && { marginLeft: 0, marginRight: 4 }]}>
+              <ThemedText
+                type="small"
+                style={[
+                  { fontWeight: "600", marginLeft: 4 },
+                  language === "ar" && { marginLeft: 0, marginRight: 4 },
+                ]}
+              >
                 {doctor.rating}
               </ThemedText>
             </View>
 
-            <View style={[styles.distanceChip, { backgroundColor: theme.primary + "15" }, language === "ar" && { flexDirection: "row-reverse" }]}>
+            <View
+              style={[
+                styles.distanceChip,
+                { backgroundColor: theme.primary + "15" },
+                language === "ar" && { flexDirection: "row-reverse" },
+              ]}
+            >
               <Feather name="navigation" size={12} color={theme.primary} />
-              <ThemedText type="caption" style={[{ color: theme.primary, marginLeft: 4, fontWeight: "500" }, language === "ar" && { marginLeft: 0, marginRight: 4 }]}>
+              <ThemedText
+                type="caption"
+                style={[
+                  { color: theme.primary, marginLeft: 4, fontWeight: "500" },
+                  language === "ar" && { marginLeft: 0, marginRight: 4 },
+                ]}
+              >
                 {doctor.distance} {t("km")}
               </ThemedText>
             </View>
           </View>
         </View>
 
-        <View style={[styles.arrowContainer, { backgroundColor: theme.primary + "10" }, language === "ar" && { marginLeft: 0, marginRight: Spacing.sm }]}>
-          <Feather name={language === "ar" ? "chevron-left" : "chevron-right"} size={20} color={theme.primary} />
+        <View
+          style={[
+            styles.arrowContainer,
+            { backgroundColor: theme.primary + "10" },
+            language === "ar" && { marginLeft: 0, marginRight: Spacing.sm },
+          ]}
+        >
+          <Feather
+            name={language === "ar" ? "chevron-left" : "chevron-right"}
+            size={20}
+            color={theme.primary}
+          />
         </View>
       </AnimatedPressable>
     </Animated.View>
@@ -203,14 +300,15 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
 
 export default function DoctorsScreen() {
   const insets = useSafeAreaInsets();
-  const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
   const { language, t } = useApp();
   const navigation = useNavigation<any>();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(
+    null,
+  );
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
 
   const filteredDoctors = useMemo(() => {
@@ -221,16 +319,20 @@ export default function DoctorsScreen() {
       results = results.filter(
         (doctor) =>
           doctor.nameAr.toLowerCase().includes(query) ||
-          doctor.nameEn.toLowerCase().includes(query)
+          doctor.nameEn.toLowerCase().includes(query),
       );
     }
 
     if (selectedSpecialty) {
-      results = results.filter((doctor) => doctor.specialtyId === selectedSpecialty);
+      results = results.filter(
+        (doctor) => doctor.specialtyId === selectedSpecialty,
+      );
     }
 
     if (selectedProvince) {
-      results = results.filter((doctor) => doctor.provinceId === selectedProvince);
+      results = results.filter(
+        (doctor) => doctor.provinceId === selectedProvince,
+      );
     }
 
     return results;
@@ -266,8 +368,14 @@ export default function DoctorsScreen() {
         />
       </View>
 
-      <Animated.View entering={FadeIn.duration(400)} style={styles.filtersContainer}>
-        <ThemedText type="caption" style={[styles.filterLabel, { color: theme.textSecondary }]}>
+      <Animated.View
+        entering={FadeIn.duration(400)}
+        style={styles.filtersContainer}
+      >
+        <ThemedText
+          type="caption"
+          style={[styles.filterLabel, { color: theme.textSecondary }]}
+        >
           {t("selectSpecialty")}
         </ThemedText>
         <ScrollView
@@ -282,7 +390,7 @@ export default function DoctorsScreen() {
               selected={selectedSpecialty === specialty.id}
               onPress={() =>
                 setSelectedSpecialty(
-                  selectedSpecialty === specialty.id ? null : specialty.id
+                  selectedSpecialty === specialty.id ? null : specialty.id,
                 )
               }
               index={index}
@@ -290,7 +398,10 @@ export default function DoctorsScreen() {
           ))}
         </ScrollView>
 
-        <ThemedText type="caption" style={[styles.filterLabel, { color: theme.textSecondary }]}>
+        <ThemedText
+          type="caption"
+          style={[styles.filterLabel, { color: theme.textSecondary }]}
+        >
           {t("selectProvince")}
         </ThemedText>
         <ScrollView
@@ -305,7 +416,7 @@ export default function DoctorsScreen() {
               selected={selectedProvince === province.id}
               onPress={() =>
                 setSelectedProvince(
-                  selectedProvince === province.id ? null : province.id
+                  selectedProvince === province.id ? null : province.id,
                 )
               }
               index={index}

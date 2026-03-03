@@ -5,7 +5,6 @@ import Animated, {
   useSharedValue,
   withDelay,
   withSpring,
-  withTiming,
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
@@ -33,7 +32,7 @@ export function ScrollFadeIn({
     const totalDelay = delay + index * Animation.stagger.normal;
     progress.value = withDelay(
       totalDelay,
-      withSpring(1, Animation.spring.gentle)
+      withSpring(1, Animation.spring.gentle),
     );
   }, []);
 
@@ -57,7 +56,7 @@ export function ScrollFadeIn({
       progress.value,
       [0, 1],
       [0, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
 
     if ("translateY" in translation) {
@@ -69,7 +68,7 @@ export function ScrollFadeIn({
               progress.value,
               [0, 1],
               [translation.translateY ?? 0, 0],
-              Extrapolation.CLAMP
+              Extrapolation.CLAMP,
             ),
           },
         ],
@@ -83,7 +82,7 @@ export function ScrollFadeIn({
               progress.value,
               [0, 1],
               [translation.translateX ?? 0, 0],
-              Extrapolation.CLAMP
+              Extrapolation.CLAMP,
             ),
           },
         ],
@@ -112,7 +111,12 @@ export function StaggeredList({
   return (
     <Animated.View style={containerStyle}>
       {React.Children.map(children, (child, index) => (
-        <ScrollFadeIn key={index} index={index} direction={direction} style={itemStyle}>
+        <ScrollFadeIn
+          key={index}
+          index={index}
+          direction={direction}
+          style={itemStyle}
+        >
           {child}
         </ScrollFadeIn>
       ))}

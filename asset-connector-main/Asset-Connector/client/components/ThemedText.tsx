@@ -1,4 +1,4 @@
-import { Text, type TextProps, I18nManager } from "react-native";
+import { Text, type TextProps } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
 import { Typography } from "@/constants/theme";
@@ -6,7 +6,16 @@ import { Typography } from "@/constants/theme";
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: "hero" | "h1" | "h2" | "h3" | "h4" | "body" | "small" | "caption" | "link";
+  type?:
+    | "hero"
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "body"
+    | "small"
+    | "caption"
+    | "link";
 };
 
 export function ThemedText({
@@ -67,13 +76,13 @@ export function ThemedText({
   };
 
   return (
-    <Text 
+    <Text
       style={[
-        { color: getColor(), fontFamily: getFontFamily() }, 
-        getTypeStyle(), 
-        style
-      ]} 
-      {...rest} 
+        { color: getColor(), fontFamily: getFontFamily() },
+        getTypeStyle(),
+        style,
+      ]}
+      {...rest}
     />
   );
 }

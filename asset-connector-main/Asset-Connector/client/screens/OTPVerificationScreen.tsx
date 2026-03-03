@@ -51,10 +51,10 @@ export default function OTPVerificationScreen() {
     pulseScale.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
+        withTiming(1, { duration: 1500 }),
       ),
       -1,
-      true
+      true,
     );
 
     const timer = setInterval(() => {
@@ -84,7 +84,7 @@ export default function OTPVerificationScreen() {
   const handleOtpChange = (value: string, index: number) => {
     setError("");
     const newOtp = [...otp];
-    
+
     if (value.length > 1) {
       const digits = value.replace(/\D/g, "").slice(0, OTP_LENGTH - index);
       digits.split("").forEach((digit, i) => {
@@ -98,7 +98,7 @@ export default function OTPVerificationScreen() {
     } else {
       newOtp[index] = value.replace(/\D/g, "");
       setOtp(newOtp);
-      
+
       if (value && index < OTP_LENGTH - 1) {
         inputRefs.current[index + 1]?.focus();
       }
@@ -115,7 +115,7 @@ export default function OTPVerificationScreen() {
 
   const handleVerify = async () => {
     const code = otp.join("");
-    
+
     // MANDATORY Mock logic for Preview/Development
     if (__DEV__ || Platform.OS === "web") {
       if (code.length === OTP_LENGTH) {
@@ -126,7 +126,7 @@ export default function OTPVerificationScreen() {
           // Accepting any 6-digit code in preview
           await verifyOTP(code);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        } catch (e) {
+        } catch {
           setError("حدث خطأ");
         } finally {
           setIsVerifying(false);
@@ -141,7 +141,7 @@ export default function OTPVerificationScreen() {
         withTiming(-10, { duration: 50 }),
         withTiming(10, { duration: 50 }),
         withTiming(-10, { duration: 50 }),
-        withTiming(0, { duration: 50 })
+        withTiming(0, { duration: 50 }),
       );
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
@@ -158,7 +158,7 @@ export default function OTPVerificationScreen() {
         setError("الرمز غير صحيح");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-    } catch (error) {
+    } catch {
       setError("حدث خطأ، حاول مرة أخرى");
     } finally {
       setIsVerifying(false);
@@ -197,10 +197,16 @@ export default function OTPVerificationScreen() {
         <View
           style={[
             styles.content,
-            { paddingTop: insets.top + Spacing["2xl"], paddingBottom: insets.bottom + Spacing.xl },
+            {
+              paddingTop: insets.top + Spacing["2xl"],
+              paddingBottom: insets.bottom + Spacing.xl,
+            },
           ]}
         >
-          <Animated.View entering={FadeInDown.delay(100).duration(600)} style={styles.header}>
+          <Animated.View
+            entering={FadeInDown.delay(100).duration(600)}
+            style={styles.header}
+          >
             <Animated.View style={pulseAnimatedStyle}>
               <LinearGradient
                 colors={[theme.primary, theme.primaryDark]}
@@ -214,21 +220,43 @@ export default function OTPVerificationScreen() {
               التحقق من الرقم
             </ThemedText>
 
-            <ThemedText type="body" style={[styles.subtitle, { color: theme.textSecondary }]}>
+            <ThemedText
+              type="body"
+              style={[styles.subtitle, { color: theme.textSecondary }]}
+            >
               أدخل الرمز المرسل إلى
             </ThemedText>
 
-            <View style={[styles.phoneBadge, { backgroundColor: theme.primary + "15" }]}>
+            <View
+              style={[
+                styles.phoneBadge,
+                { backgroundColor: theme.primary + "15" },
+              ]}
+            >
               <Feather name="phone" size={16} color={theme.primary} />
-              <ThemedText type="body" style={{ color: theme.primary, fontWeight: "600" }}>
+              <ThemedText
+                type="body"
+                style={{ color: theme.primary, fontWeight: "600" }}
+              >
                 {pendingPhone || "07XXXXXXXXX"}
               </ThemedText>
             </View>
 
-            <Animated.View entering={FadeIn.delay(400)} style={styles.sentMessageContainer}>
-              <View style={[styles.sentMessage, { backgroundColor: "#4CD964" + "15" }]}>
+            <Animated.View
+              entering={FadeIn.delay(400)}
+              style={styles.sentMessageContainer}
+            >
+              <View
+                style={[
+                  styles.sentMessage,
+                  { backgroundColor: "#4CD964" + "15" },
+                ]}
+              >
                 <Feather name="check-circle" size={14} color="#4CD964" />
-                <ThemedText type="small" style={{ color: "#4CD964", marginRight: Spacing.xs }}>
+                <ThemedText
+                  type="small"
+                  style={{ color: "#4CD964", marginRight: Spacing.xs }}
+                >
                   تم إرسال رمز التحقق
                 </ThemedText>
               </View>
@@ -245,12 +273,18 @@ export default function OTPVerificationScreen() {
                 entering={FadeIn.delay(400 + index * 50).duration(300)}
               >
                 <TextInput
-                  ref={(ref) => { inputRefs.current[index] = ref; }}
+                  ref={(ref) => {
+                    inputRefs.current[index] = ref;
+                  }}
                   style={[
                     styles.otpInput,
                     {
                       backgroundColor: theme.backgroundDefault,
-                      borderColor: digit ? theme.primary : error ? "#FF3B30" : theme.border,
+                      borderColor: digit
+                        ? theme.primary
+                        : error
+                          ? "#FF3B30"
+                          : theme.border,
                       color: theme.text,
                     },
                   ]}
@@ -268,7 +302,10 @@ export default function OTPVerificationScreen() {
           </Animated.View>
 
           {error ? (
-            <Animated.View entering={FadeIn.duration(200)} style={styles.errorContainer}>
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              style={styles.errorContainer}
+            >
               <Feather name="alert-circle" size={16} color="#FF3B30" />
               <ThemedText type="caption" style={{ color: "#FF3B30" }}>
                 {error}
@@ -276,14 +313,20 @@ export default function OTPVerificationScreen() {
             </Animated.View>
           ) : null}
 
-          <Animated.View entering={FadeIn.delay(500).duration(400)} style={styles.resendContainer}>
+          <Animated.View
+            entering={FadeIn.delay(500).duration(400)}
+            style={styles.resendContainer}
+          >
             {resendTimer > 0 ? (
               <ThemedText type="body" style={{ color: theme.textSecondary }}>
                 إعادة الإرسال بعد {resendTimer} ثانية
               </ThemedText>
             ) : (
               <Pressable onPress={handleResend} style={styles.resendButton}>
-                <ThemedText type="body" style={{ color: theme.primary, fontWeight: "600" }}>
+                <ThemedText
+                  type="body"
+                  style={{ color: theme.primary, fontWeight: "600" }}
+                >
                   إعادة إرسال الرمز
                 </ThemedText>
               </Pressable>
@@ -291,19 +334,35 @@ export default function OTPVerificationScreen() {
           </Animated.View>
 
           <View style={styles.methodsContainer}>
-            <ThemedText type="caption" style={[styles.methodsLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              type="caption"
+              style={[styles.methodsLabel, { color: theme.textSecondary }]}
+            >
               لم تستلم الرمز؟ جرّب:
             </ThemedText>
             <View style={styles.methodsRow}>
-              <Pressable style={[styles.methodChip, { backgroundColor: "#25D36615" }]}>
+              <Pressable
+                style={[styles.methodChip, { backgroundColor: "#25D36615" }]}
+              >
                 <Feather name="message-circle" size={16} color="#25D366" />
-                <ThemedText type="caption" style={{ color: "#25D366", fontWeight: "500" }}>
+                <ThemedText
+                  type="caption"
+                  style={{ color: "#25D366", fontWeight: "500" }}
+                >
                   WhatsApp
                 </ThemedText>
               </Pressable>
-              <Pressable style={[styles.methodChip, { backgroundColor: theme.primary + "15" }]}>
+              <Pressable
+                style={[
+                  styles.methodChip,
+                  { backgroundColor: theme.primary + "15" },
+                ]}
+              >
                 <Feather name="smartphone" size={16} color={theme.primary} />
-                <ThemedText type="caption" style={{ color: theme.primary, fontWeight: "500" }}>
+                <ThemedText
+                  type="caption"
+                  style={{ color: theme.primary, fontWeight: "500" }}
+                >
                   SMS
                 </ThemedText>
               </Pressable>

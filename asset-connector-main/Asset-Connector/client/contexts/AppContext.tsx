@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { I18nManager, Platform } from "react-native";
 import * as Updates from "expo-updates";
@@ -137,7 +143,8 @@ const translations: Record<Language, Record<string, string>> = {
     gallery: "Gallery",
     chooseSource: "Choose Image Source",
     permissionRequired: "Permission Required",
-    cameraPermissionMessage: "We need camera and photo library permissions to scan medicines.",
+    cameraPermissionMessage:
+      "We need camera and photo library permissions to scan medicines.",
     medicineName: "Medicine Name",
     company: "Company",
     usage: "Usage",
@@ -171,7 +178,9 @@ const translations: Record<Language, Record<string, string>> = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(I18nManager.isRTL ? "ar" : "en");
+  const [language, setLanguageState] = useState<Language>(
+    I18nManager.isRTL ? "ar" : "en",
+  );
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -194,11 +203,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           I18nManager.allowRTL(shouldBeRTL);
           I18nManager.forceRTL(shouldBeRTL);
           if (Platform.OS !== "web" && !__DEV__) {
-             try {
-               Updates.reloadAsync();
-             } catch (e) {
-               console.error("Reload failed", e);
-             }
+            try {
+              Updates.reloadAsync();
+            } catch (e) {
+              console.error("Reload failed", e);
+            }
           }
         }
       }
@@ -215,14 +224,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = async (lang: Language) => {
     if (language === lang) return;
-    
+
     setLanguageState(lang);
     await AsyncStorage.setItem("language", lang);
-    
+
     const isAr = lang === "ar";
     I18nManager.allowRTL(isAr);
     I18nManager.forceRTL(isAr);
-    
+
     // On native, we must reload to apply RTL changes properly
     if (Platform.OS !== "web" && !__DEV__) {
       setTimeout(() => {

@@ -11,8 +11,14 @@ import {
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS",
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, Accept",
+    );
     if (req.method === "OPTIONS") return res.sendStatus(200);
     next();
   });
@@ -27,7 +33,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({
       phoneNumber,
       role,
-      message: role === "patient" ? "Default patient account" : `${role} account found`,
+      message:
+        role === "patient"
+          ? "Default patient account"
+          : `${role} account found`,
     });
   });
 
@@ -42,14 +51,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/medicines", (req, res) => {
-    const query = String(req.query.query || "").trim().toLowerCase();
+    const query = String(req.query.query || "")
+      .trim()
+      .toLowerCase();
     const page = Math.max(1, Number(req.query.page || 1));
-    const pageSize = Math.max(1, Math.min(20, Number(req.query.pageSize || 10)));
+    const pageSize = Math.max(
+      1,
+      Math.min(20, Number(req.query.pageSize || 10)),
+    );
 
     const filtered = query
       ? medicines.filter(
           (medicine) =>
-            medicine.nameAr.toLowerCase().includes(query) || medicine.nameEn.toLowerCase().includes(query),
+            medicine.nameAr.toLowerCase().includes(query) ||
+            medicine.nameEn.toLowerCase().includes(query),
         )
       : medicines;
 
@@ -66,16 +81,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/pharmacies", (req, res) => {
-    const governorate = String(req.query.governorate || "").trim().toLowerCase();
+    const governorate = String(req.query.governorate || "")
+      .trim()
+      .toLowerCase();
     const items = governorate
-      ? pharmacies.filter((pharmacy) => pharmacy.governorate.toLowerCase() === governorate)
+      ? pharmacies.filter(
+          (pharmacy) => pharmacy.governorate.toLowerCase() === governorate,
+        )
       : pharmacies;
     res.json({ items });
   });
 
   app.get("/api/availability", (req, res) => {
     const medicineId = String(req.query.medicineId || "");
-    const governorate = String(req.query.governorate || "").trim().toLowerCase();
+    const governorate = String(req.query.governorate || "")
+      .trim()
+      .toLowerCase();
     const pharmacyIds = availabilityByMedicineId[medicineId] || [];
 
     const items = pharmacies.filter(
@@ -90,15 +111,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/chats/:pharmacyId/messages", (req, res) => {
     const pharmacyId = req.params.pharmacyId;
     const allMessages = [...(chatsByPharmacyId[pharmacyId] || [])].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
 
     const limitParam = Number(req.query.limit || 0);
-    const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(100, limitParam) : 0;
-    const before = req.query.before ? new Date(String(req.query.before)).getTime() : null;
+    const limit =
+      Number.isFinite(limitParam) && limitParam > 0
+        ? Math.min(100, limitParam)
+        : 0;
+    const before = req.query.before
+      ? new Date(String(req.query.before)).getTime()
+      : null;
 
     const filtered = before
-      ? allMessages.filter((item) => new Date(item.createdAt).getTime() < before)
+      ? allMessages.filter(
+          (item) => new Date(item.createdAt).getTime() < before,
+        )
       : allMessages;
 
     if (!limit) {
@@ -129,7 +158,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/uploads/chat-image", (_req, res) => {
-    res.status(201).json({ imageUrl: `https://placehold.co/600x400/png?text=chat+image+${Date.now()}` });
+    res.status(201).json({
+      imageUrl: `https://placehold.co/600x400/png?text=chat+image+${Date.now()}`,
+    });
   });
 
   const httpServer = createServer(app);

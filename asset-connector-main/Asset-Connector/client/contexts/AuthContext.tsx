@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
 import { getApiUrl } from "@/lib/query-client";
 
 export type UserRole = "patient" | "doctor" | "pharmacist" | null;
@@ -36,7 +41,9 @@ const AUTH_STORAGE_KEY = "@smart_health_auth";
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authStep, setAuthStep] = useState<"login" | "location" | "otp" | "complete">("login");
+  const [authStep, setAuthStep] = useState<
+    "login" | "location" | "otp" | "complete"
+  >("login");
   const [pendingPhone, setPendingPhone] = useState("");
 
   useEffect(() => {
@@ -88,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const setLocationGranted = async () => {
     console.log("[AuthContext] setLocationGranted called");
-    setUser(currentUser => {
+    setUser((currentUser) => {
       if (currentUser) {
         const updatedUser = { ...currentUser, locationGranted: true };
         saveAuthState(updatedUser);
@@ -96,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return currentUser;
     });
-    
+
     setTimeout(() => {
       console.log("[AuthContext] Setting authStep to 'otp'");
       setAuthStep("otp");
@@ -106,37 +113,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserRole = async (phoneNumber: string): Promise<UserRole> => {
     try {
       const apiUrl = getApiUrl();
-      const response = await fetch(new URL(`/api/users/role/${phoneNumber}`, apiUrl).toString());
+      const response = await fetch(
+        new URL(`/api/users/role/${phoneNumber}`, apiUrl).toString(),
+      );
       if (response.ok) {
         const data = await response.json();
         return data.role || "patient";
       }
-    } catch (error) {
-      console.log("[AuthContext] Could not fetch role from server, defaulting to patient");
+    } catch {
+      console.log(
+        "[AuthContext] Could not fetch role from server, defaulting to patient",
+      );
     }
     return "patient";
   };
 
   const verifyOTP = async (code: string): Promise<boolean> => {
     if (code.length === 6) {
-      console.log("[AuthContext] OTP verified, fetching user role from server...");
-      
+      console.log(
+        "[AuthContext] OTP verified, fetching user role from server...",
+      );
+
       const role = await fetchUserRole(user?.phoneNumber || pendingPhone);
       console.log("[AuthContext] User role from server:", role);
-      
-      setUser(currentUser => {
+
+      setUser((currentUser) => {
         if (currentUser) {
-          const updatedUser = { 
-            ...currentUser, 
+          const updatedUser = {
+            ...currentUser,
             isVerified: true,
-            role: role
+            role: role,
           };
           saveAuthState(updatedUser);
           return updatedUser;
         }
         return currentUser;
       });
-      
+
       setAuthStep("complete");
       return true;
     }
@@ -150,10 +163,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
-  const isAuthenticated = 
-    user !== null && 
-    user.isVerified && 
-    user.locationGranted && 
+  const isAuthenticated =
+    user !== null &&
+    user.isVerified &&
+    user.locationGranted &&
     user.role !== null;
 
   return (

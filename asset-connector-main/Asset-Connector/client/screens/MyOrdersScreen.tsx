@@ -18,8 +18,15 @@ export default function MyOrdersScreen() {
   const { theme } = useTheme();
   const { language, t } = useApp();
 
-  const renderOrder = ({ item, index }: { item: (typeof orders)[0]; index: number }) => {
-    const pharmacyName = language === "ar" ? item.pharmacyNameAr : item.pharmacyNameEn;
+  const renderOrder = ({
+    item,
+    index,
+  }: {
+    item: (typeof orders)[0];
+    index: number;
+  }) => {
+    const pharmacyName =
+      language === "ar" ? item.pharmacyNameAr : item.pharmacyNameEn;
 
     const getStatusColor = () => {
       switch (item.status) {
@@ -37,10 +44,15 @@ export default function MyOrdersScreen() {
     return (
       <Animated.View entering={FadeInUp.delay(index * 50).duration(300)}>
         <Pressable
-          style={[styles.orderCard, { backgroundColor: theme.backgroundDefault }]}
+          style={[
+            styles.orderCard,
+            { backgroundColor: theme.backgroundDefault },
+          ]}
         >
           <View style={styles.orderHeader}>
-            <View style={[styles.icon, { backgroundColor: theme.primary + "20" }]}>
+            <View
+              style={[styles.icon, { backgroundColor: theme.primary + "20" }]}
+            >
               <Feather name="package" size={24} color={theme.primary} />
             </View>
             <View style={styles.orderInfo}>
@@ -51,7 +63,12 @@ export default function MyOrdersScreen() {
                 {item.medicines.length} {language === "ar" ? "عنصر" : "items"}
               </ThemedText>
             </View>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor() + "20" }]}>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getStatusColor() + "20" },
+              ]}
+            >
               <ThemedText type="caption" style={{ color: getStatusColor() }}>
                 {item.status}
               </ThemedText>
@@ -61,17 +78,25 @@ export default function MyOrdersScreen() {
           <View style={styles.orderDetails}>
             <View style={styles.detailItem}>
               <Feather name="calendar" size={14} color={theme.textSecondary} />
-              <ThemedText type="small" style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}>
+              <ThemedText
+                type="small"
+                style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}
+              >
                 {item.date}
               </ThemedText>
             </View>
             <View style={styles.detailItem}>
               <Feather
-                name={item.deliveryType === "delivery" ? "truck" : "shopping-bag"}
+                name={
+                  item.deliveryType === "delivery" ? "truck" : "shopping-bag"
+                }
                 size={14}
                 color={theme.textSecondary}
               />
-              <ThemedText type="small" style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}>
+              <ThemedText
+                type="small"
+                style={{ color: theme.textSecondary, marginLeft: Spacing.xs }}
+              >
                 {item.deliveryType === "delivery" ? t("delivery") : t("pickUp")}
               </ThemedText>
             </View>

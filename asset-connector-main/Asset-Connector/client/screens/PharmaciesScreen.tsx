@@ -1,7 +1,13 @@
 import React, { useState, useMemo } from "react";
-import { View, StyleSheet, FlatList, ScrollView, Pressable, Platform } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ScrollView,
+  Pressable,
+  Platform,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -60,7 +66,10 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
             end={{ x: 1, y: 1 }}
             style={styles.chipGradient}
           >
-            <ThemedText type="small" style={{ color: "#FFFFFF", fontWeight: "500" }}>
+            <ThemedText
+              type="small"
+              style={{ color: "#FFFFFF", fontWeight: "500" }}
+            >
               {label}
             </ThemedText>
           </LinearGradient>
@@ -68,7 +77,10 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
           <View
             style={[
               styles.chip,
-              { backgroundColor: theme.backgroundSecondary, borderColor: theme.border },
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderColor: theme.border,
+              },
             ]}
           >
             <ThemedText type="small" style={{ color: theme.text }}>
@@ -94,14 +106,13 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
   const translateY = useSharedValue(0);
 
   const name = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const province = language === "ar" ? pharmacy.provinceAr : pharmacy.provinceEn;
-  const district = language === "ar" ? pharmacy.districtAr : pharmacy.districtEn;
+  const province =
+    language === "ar" ? pharmacy.provinceAr : pharmacy.provinceEn;
+  const district =
+    language === "ar" ? pharmacy.districtAr : pharmacy.districtEn;
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const handlePressIn = () => {
@@ -131,7 +142,11 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
   });
 
   return (
-    <Animated.View entering={FadeInUp.delay(index * 60).duration(400).springify()}>
+    <Animated.View
+      entering={FadeInUp.delay(index * 60)
+        .duration(400)
+        .springify()}
+    >
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -157,7 +172,10 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
             </ThemedText>
             {pharmacy.workingHours.includes("24") ? (
               <View style={[styles.badge24h, { backgroundColor: "#4CD964" }]}>
-                <ThemedText type="caption" style={{ color: "#FFFFFF", fontWeight: "600" }}>
+                <ThemedText
+                  type="caption"
+                  style={{ color: "#FFFFFF", fontWeight: "600" }}
+                >
                   24h
                 </ThemedText>
               </View>
@@ -167,7 +185,10 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
           <View style={styles.pharmacyMeta}>
             <View style={styles.metaItem}>
               <Feather name="map-pin" size={12} color={theme.textSecondary} />
-              <ThemedText type="caption" style={{ color: theme.textSecondary, marginLeft: 4 }}>
+              <ThemedText
+                type="caption"
+                style={{ color: theme.textSecondary, marginLeft: 4 }}
+              >
                 {province} - {district}
               </ThemedText>
             </View>
@@ -175,17 +196,41 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
 
           <View style={styles.pharmacyFooter}>
             {pharmacy.hasDelivery ? (
-              <View style={[styles.deliveryChip, { backgroundColor: theme.primary + "15" }]}>
+              <View
+                style={[
+                  styles.deliveryChip,
+                  { backgroundColor: theme.primary + "15" },
+                ]}
+              >
                 <Feather name="truck" size={12} color={theme.primary} />
-                <ThemedText type="caption" style={{ color: theme.primary, marginLeft: 4, fontWeight: "500" }}>
+                <ThemedText
+                  type="caption"
+                  style={{
+                    color: theme.primary,
+                    marginLeft: 4,
+                    fontWeight: "500",
+                  }}
+                >
                   {t("delivery")}
                 </ThemedText>
               </View>
             ) : null}
 
-            <View style={[styles.distanceChip, { backgroundColor: theme.backgroundSecondary }]}>
-              <Feather name="navigation" size={12} color={theme.textSecondary} />
-              <ThemedText type="caption" style={{ color: theme.textSecondary, marginLeft: 4 }}>
+            <View
+              style={[
+                styles.distanceChip,
+                { backgroundColor: theme.backgroundSecondary },
+              ]}
+            >
+              <Feather
+                name="navigation"
+                size={12}
+                color={theme.textSecondary}
+              />
+              <ThemedText
+                type="caption"
+                style={{ color: theme.textSecondary, marginLeft: 4 }}
+              >
                 {pharmacy.distance} {t("km")}
               </ThemedText>
             </View>
@@ -202,7 +247,6 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
 
 export default function PharmaciesScreen() {
   const insets = useSafeAreaInsets();
-  const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
   const { language, t } = useApp();
@@ -219,12 +263,14 @@ export default function PharmaciesScreen() {
       results = results.filter(
         (pharmacy) =>
           pharmacy.nameAr.toLowerCase().includes(query) ||
-          pharmacy.nameEn.toLowerCase().includes(query)
+          pharmacy.nameEn.toLowerCase().includes(query),
       );
     }
 
     if (selectedProvince) {
-      results = results.filter((pharmacy) => pharmacy.provinceId === selectedProvince);
+      results = results.filter(
+        (pharmacy) => pharmacy.provinceId === selectedProvince,
+      );
     }
 
     return results;
@@ -260,8 +306,14 @@ export default function PharmaciesScreen() {
         />
       </View>
 
-      <Animated.View entering={FadeIn.duration(400)} style={styles.filtersContainer}>
-        <ThemedText type="caption" style={[styles.filterLabel, { color: theme.textSecondary }]}>
+      <Animated.View
+        entering={FadeIn.duration(400)}
+        style={styles.filtersContainer}
+      >
+        <ThemedText
+          type="caption"
+          style={[styles.filterLabel, { color: theme.textSecondary }]}
+        >
           {t("selectProvince")}
         </ThemedText>
         <ScrollView
@@ -276,7 +328,7 @@ export default function PharmaciesScreen() {
               selected={selectedProvince === province.id}
               onPress={() =>
                 setSelectedProvince(
-                  selectedProvince === province.id ? null : province.id
+                  selectedProvince === province.id ? null : province.id,
                 )
               }
               index={index}

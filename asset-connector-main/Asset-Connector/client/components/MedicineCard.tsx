@@ -72,9 +72,7 @@ export function MedicineCard({
         ]}
       >
         <View style={styles.header}>
-          <View
-            style={[styles.icon, { backgroundColor: theme.accent + "20" }]}
-          >
+          <View style={[styles.icon, { backgroundColor: theme.accent + "20" }]}>
             <Feather name="package" size={24} color={theme.accent} />
           </View>
           <View style={styles.headerInfo}>

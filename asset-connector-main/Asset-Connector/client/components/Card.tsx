@@ -38,10 +38,7 @@ export function Card({
   const translateY = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   const handlePressIn = () => {
@@ -92,12 +89,21 @@ export function Card({
           style={styles.gradientContent}
         >
           {title ? (
-            <ThemedText type="h4" style={[styles.cardTitle, { color: "#FFFFFF" }]}>
+            <ThemedText
+              type="h4"
+              style={[styles.cardTitle, { color: "#FFFFFF" }]}
+            >
               {title}
             </ThemedText>
           ) : null}
           {description ? (
-            <ThemedText type="small" style={[styles.cardDescription, { color: "rgba(255,255,255,0.85)" }]}>
+            <ThemedText
+              type="small"
+              style={[
+                styles.cardDescription,
+                { color: "rgba(255,255,255,0.85)" },
+              ]}
+            >
               {description}
             </ThemedText>
           ) : null}
@@ -128,7 +134,10 @@ export function Card({
         </ThemedText>
       ) : null}
       {description ? (
-        <ThemedText type="small" style={[styles.cardDescription, { color: theme.textSecondary }]}>
+        <ThemedText
+          type="small"
+          style={[styles.cardDescription, { color: theme.textSecondary }]}
+        >
           {description}
         </ThemedText>
       ) : null}

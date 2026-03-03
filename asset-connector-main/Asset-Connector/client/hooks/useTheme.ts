@@ -1,5 +1,11 @@
 import { Colors } from "@/constants/theme";
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "react-native";
 
@@ -34,7 +40,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const loadTheme = async () => {
     try {
       const savedTheme = await AsyncStorage.getItem("themeMode");
-      if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "system") {
+      if (
+        savedTheme === "light" ||
+        savedTheme === "dark" ||
+        savedTheme === "system"
+      ) {
         setThemeModeState(savedTheme as ThemeMode);
       }
     } catch (error) {
@@ -49,7 +59,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const theme = isDark ? Colors.dark : Colors.light;
 
-  return React.createElement(ThemeContext.Provider, { value: { theme, isDark, themeMode, setThemeMode } }, children);
+  return React.createElement(
+    ThemeContext.Provider,
+    { value: { theme, isDark, themeMode, setThemeMode } },
+    children,
+  );
 }
 
 export function useTheme() {

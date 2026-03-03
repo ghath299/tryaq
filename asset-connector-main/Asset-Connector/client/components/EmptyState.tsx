@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Image, ImageSourcePropType } from "react-native";
+import { StyleSheet, Image, ImageSourcePropType } from "react-native";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -25,10 +25,7 @@ export function EmptyState({
   const { theme } = useTheme();
 
   return (
-    <Animated.View
-      entering={FadeIn.duration(400)}
-      style={styles.container}
-    >
+    <Animated.View entering={FadeIn.duration(400)} style={styles.container}>
       <Animated.View entering={FadeInUp.delay(100).duration(400)}>
         <Image source={image} style={styles.image} resizeMode="contain" />
       </Animated.View>

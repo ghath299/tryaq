@@ -1,15 +1,9 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { Dimensions, Platform } from "react-native";
-
 import PatientTabNavigator from "@/navigation/PatientTabNavigator";
 import { DrawerContent } from "@/components/DrawerContent";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { useScreenOptions } from "@/hooks/useScreenOptions";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.85, 340);
 
 export type DrawerParamList = {
   PatientTabs: undefined;

@@ -10,10 +10,7 @@ import Animated, {
   useSharedValue,
   withSpring,
   withSequence,
-  withTiming,
-  interpolate,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
 
 import HomeScreen from "@/screens/HomeScreen";
 import DoctorsScreen from "@/screens/DoctorsScreen";
@@ -22,7 +19,7 @@ import PharmaciesScreen from "@/screens/PharmaciesScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+import { Spacing, Animation } from "@/constants/theme";
 
 export type PatientTabParamList = {
   HomeTab: undefined;
@@ -47,7 +44,7 @@ function DrawerButton() {
   const handlePress = () => {
     scale.value = withSequence(
       withSpring(0.9, Animation.spring.snappy),
-      withSpring(1, Animation.spring.gentle)
+      withSpring(1, Animation.spring.gentle),
     );
     navigation.dispatch(DrawerActions.openDrawer());
   };
@@ -59,7 +56,7 @@ function DrawerButton() {
       onPress={handlePress}
       style={[
         isRTL ? { marginRight: Spacing.lg } : { marginLeft: Spacing.lg },
-        animatedStyle
+        animatedStyle,
       ]}
     >
       <Feather name="menu" size={24} color={theme.text} />
@@ -85,17 +82,16 @@ function AnimatedTabIcon({ name, color, size, focused }: AnimatedTabIconProps) {
   }, [focused]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value },
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   return (
     <Animated.View style={[styles.tabIconContainer, animatedStyle]}>
       <Feather name={name} size={size} color={color} />
       {focused ? (
-        <View style={[styles.activeIndicator, { backgroundColor: theme.primary }]} />
+        <View
+          style={[styles.activeIndicator, { backgroundColor: theme.primary }]}
+        />
       ) : null}
     </Animated.View>
   );
@@ -137,7 +133,12 @@ export default function PatientTabNavigator() {
               style={StyleSheet.absoluteFill}
             />
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.backgroundRoot + "F5" }]} />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: theme.backgroundRoot + "F5" },
+              ]}
+            />
           ),
         headerLeft: () => (language === "ar" ? null : <DrawerButton />),
         headerRight: () => (language === "ar" ? <DrawerButton /> : null),
@@ -151,7 +152,12 @@ export default function PatientTabNavigator() {
           title: t("home"),
           headerTitle: () => <HeaderTitle title={t("appName")} />,
           tabBarIcon: ({ color, size, focused }) => (
-            <AnimatedTabIcon name="home" size={size} color={color} focused={focused} />
+            <AnimatedTabIcon
+              name="home"
+              size={size}
+              color={color}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -162,7 +168,12 @@ export default function PatientTabNavigator() {
           title: t("doctors"),
           headerTitle: t("doctors"),
           tabBarIcon: ({ color, size, focused }) => (
-            <AnimatedTabIcon name="user-check" size={size} color={color} focused={focused} />
+            <AnimatedTabIcon
+              name="user-check"
+              size={size}
+              color={color}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -173,7 +184,12 @@ export default function PatientTabNavigator() {
           title: t("medicines"),
           headerTitle: t("medicines"),
           tabBarIcon: ({ color, size, focused }) => (
-            <AnimatedTabIcon name="package" size={size} color={color} focused={focused} />
+            <AnimatedTabIcon
+              name="package"
+              size={size}
+              color={color}
+              focused={focused}
+            />
           ),
         }}
       />
@@ -184,7 +200,12 @@ export default function PatientTabNavigator() {
           title: t("pharmacies"),
           headerTitle: t("pharmacies"),
           tabBarIcon: ({ color, size, focused }) => (
-            <AnimatedTabIcon name="plus-square" size={size} color={color} focused={focused} />
+            <AnimatedTabIcon
+              name="plus-square"
+              size={size}
+              color={color}
+              focused={focused}
+            />
           ),
         }}
       />

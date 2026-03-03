@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -19,12 +25,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
-import Animated, { 
-  FadeIn, 
-  FadeInUp, 
-  useAnimatedStyle, 
-  useSharedValue, 
-  withSpring 
+import Animated, {
+  FadeIn,
+  FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -39,7 +45,10 @@ import { getApiUrl } from "@/lib/query-client";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-type PharmacyDetailRouteProp = RouteProp<{ PharmacyDetail: { pharmacyId: string } }, "PharmacyDetail">;
+type PharmacyDetailRouteProp = RouteProp<
+  { PharmacyDetail: { pharmacyId: string } },
+  "PharmacyDetail"
+>;
 
 type ChatMessage = {
   id: string;
@@ -74,8 +83,11 @@ export default function PharmacyDetailScreen() {
   const chatListRef = useRef<FlatList<ChatMessage>>(null);
 
   const pharmacyId = route.params?.pharmacyId;
-  const pharmacy = useMemo(() => pharmacies.find((p) => p.id === pharmacyId), [pharmacyId]);
-  
+  const pharmacy = useMemo(
+    () => pharmacies.find((p) => p.id === pharmacyId),
+    [pharmacyId],
+  );
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -102,14 +114,18 @@ export default function PharmacyDetailScreen() {
     });
   }, []);
 
-  const mergeMessages = useCallback((current: ChatMessage[], incoming: ChatMessage[]) => {
-    const map = new Map<string, ChatMessage>();
-    [...current, ...incoming].forEach((msg) => map.set(msg.id, msg));
+  const mergeMessages = useCallback(
+    (current: ChatMessage[], incoming: ChatMessage[]) => {
+      const map = new Map<string, ChatMessage>();
+      [...current, ...incoming].forEach((msg) => map.set(msg.id, msg));
 
-    return [...map.values()].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-  }, []);
+      return [...map.values()].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+    },
+    [],
+  );
 
   const fetchMessages = useCallback(
     async (before?: string | null) => {
@@ -119,7 +135,8 @@ export default function PharmacyDetailScreen() {
       const url = `${apiUrl}/api/chats/${pharmacyId}/messages?${params.toString()}`;
       try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`Failed to fetch chat messages: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`Failed to fetch chat messages: ${response.status}`);
         return (await response.json()) as MessagesResponse;
       } catch (err) {
         console.error("PharmacyDetailScreen: GET error", err);
@@ -151,17 +168,29 @@ export default function PharmacyDetailScreen() {
 
   if (!pharmacy) {
     return (
-      <View style={[styles.container, { backgroundColor: theme.backgroundRoot, justifyContent: 'center', alignItems: 'center' }]}> 
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: theme.backgroundRoot,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
         <ThemedText type="body">{t("error")}</ThemedText>
       </View>
     );
   }
 
   const name = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const province = language === "ar" ? pharmacy.provinceAr : pharmacy.provinceEn;
+  const province =
+    language === "ar" ? pharmacy.provinceAr : pharmacy.provinceEn;
 
-  const callPhone = () => Linking.openURL(`tel:${pharmacy.phone.replace(/\s+/g, "")}`);
-  const openWhatsApp = () => Linking.openURL(`https://wa.me/${pharmacy.phone.replace(/\D/g, "")}`);
+  const callPhone = () =>
+    Linking.openURL(`tel:${pharmacy.phone.replace(/\s+/g, "")}`);
+  const openWhatsApp = () =>
+    Linking.openURL(`https://wa.me/${pharmacy.phone.replace(/\D/g, "")}`);
   const copyPhone = async () => {
     const clipboard = (globalThis as any)?.navigator?.clipboard;
     if (Platform.OS === "web" && clipboard) {
@@ -179,7 +208,10 @@ export default function PharmacyDetailScreen() {
     await sendOptimisticMessage({ text });
   };
 
-  const sendOptimisticMessage = async (payload: { text?: string; imageUrl?: string }) => {
+  const sendOptimisticMessage = async (payload: {
+    text?: string;
+    imageUrl?: string;
+  }) => {
     const optimisticId = `local-${Date.now()}`;
     const optimisticMessage: ChatMessage = {
       id: optimisticId,
@@ -194,10 +226,14 @@ export default function PharmacyDetailScreen() {
       const url = `${apiUrl}/api/chats/${pharmacyId}/messages`;
       const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error(`Failed to send message: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`Failed to send message: ${response.status}`);
       const data = await response.json();
       const confirmedMessage = data.item as ChatMessage;
       setMessages((prev) => {
@@ -205,16 +241,20 @@ export default function PharmacyDetailScreen() {
         return mergeMessages(next, [{ ...confirmedMessage, status: "sent" }]);
       });
       scrollToBottom();
-    } catch (error) {
+    } catch {
       setMessages((prev) =>
-        prev.map((item) => (item.id === optimisticId ? { ...item, status: "failed" } : item)),
+        prev.map((item) =>
+          item.id === optimisticId ? { ...item, status: "failed" } : item,
+        ),
       );
     }
   };
 
   const handleSendImage = async () => {
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-    const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status: cameraStatus } =
+      await ImagePicker.requestCameraPermissionsAsync();
+    const { status: libraryStatus } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (cameraStatus !== "granted" && libraryStatus !== "granted") {
       Alert.alert("خطأ", "يلزم السماح بالوصول إلى الكاميرا أو المعرض.");
       return;
@@ -223,15 +263,23 @@ export default function PharmacyDetailScreen() {
       {
         text: "Camera",
         onPress: async () => {
-          const result = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.8 });
-          if (!result.canceled && result.assets?.[0]?.uri) await uploadImageFromUri(result.assets[0].uri);
+          const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            quality: 0.8,
+          });
+          if (!result.canceled && result.assets?.[0]?.uri)
+            await uploadImageFromUri(result.assets[0].uri);
         },
       },
       {
         text: "Gallery",
         onPress: async () => {
-          const result = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.8 });
-          if (!result.canceled && result.assets?.[0]?.uri) await uploadImageFromUri(result.assets[0].uri);
+          const result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            quality: 0.8,
+          });
+          if (!result.canceled && result.assets?.[0]?.uri)
+            await uploadImageFromUri(result.assets[0].uri);
         },
       },
       { text: "إلغاء", style: "cancel" },
@@ -240,16 +288,34 @@ export default function PharmacyDetailScreen() {
 
   const uploadImageFromUri = async (uri: string) => {
     try {
-      const resized = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: 900 } }], { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG });
+      const resized = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 900 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
+      );
       await sendOptimisticMessage({ imageUrl: resized.uri });
       const formData = new FormData();
       const filename = resized.uri.split("/").pop() || `chat-${Date.now()}.jpg`;
       // @ts-ignore
-      formData.append("image", { uri: resized.uri, type: "image/jpeg", name: filename });
-      const response = await fetch(`${apiUrl}/api/uploads/chat-image`, { method: "POST", headers: { Accept: "application/json" }, body: formData });
+      formData.append("image", {
+        uri: resized.uri,
+        type: "image/jpeg",
+        name: filename,
+      });
+      const response = await fetch(`${apiUrl}/api/uploads/chat-image`, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
       if (!response.ok) throw new Error("Upload failed");
       const data = await response.json();
-      setMessages((prev) => prev.map(m => m.imageUrl === resized.uri ? { ...m, imageUrl: data.imageUrl, status: "sent" } : m));
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.imageUrl === resized.uri
+            ? { ...m, imageUrl: data.imageUrl, status: "sent" }
+            : m,
+        ),
+      );
     } catch (error) {
       Alert.alert("خطأ", "فشل رفع الصورة.");
     }
@@ -271,52 +337,109 @@ export default function PharmacyDetailScreen() {
     }
   };
 
-  const sortedMessages = useMemo(() => [...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()), [messages]);
+  const sortedMessages = useMemo(
+    () =>
+      [...messages].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ),
+    [messages],
+  );
 
   const renderHeader = () => (
     <Animated.View entering={FadeIn.duration(600)} style={styles.header}>
       <Animated.View style={[styles.mapContainer, animatedMapStyle]}>
         <MapViewComponent lat={pharmacy.lat} lng={pharmacy.lng} title={name} />
-        <Pressable 
-          style={[styles.mapToggleBtn, { backgroundColor: theme.backgroundSecondary }]} 
+        <Pressable
+          style={[
+            styles.mapToggleBtn,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
           onPress={toggleMap}
         >
-          <Feather name={isMapExpanded ? "minimize-2" : "maximize-2"} size={18} color={theme.primary} />
+          <Feather
+            name={isMapExpanded ? "minimize-2" : "maximize-2"}
+            size={18}
+            color={theme.primary}
+          />
         </Pressable>
       </Animated.View>
 
       <View style={styles.content}>
         <View style={styles.pharmacyHeaderInfo}>
-          <ThemedText type="h2" style={styles.pharmacyNameText}>{name}</ThemedText>
+          <ThemedText type="h2" style={styles.pharmacyNameText}>
+            {name}
+          </ThemedText>
           <View style={styles.provinceRow}>
             <Feather name="map-pin" size={14} color={theme.primary} />
-            <ThemedText type="body" style={{ color: theme.textSecondary }}>{province}</ThemedText>
+            <ThemedText type="body" style={{ color: theme.textSecondary }}>
+              {province}
+            </ThemedText>
           </View>
         </View>
 
         <View style={styles.actionGrid}>
-          <Pressable style={[styles.gridActionBtn, { backgroundColor: theme.primary }]} onPress={callPhone}>
+          <Pressable
+            style={[styles.gridActionBtn, { backgroundColor: theme.primary }]}
+            onPress={callPhone}
+          >
             <Feather name="phone-call" size={18} color="#FFF" />
-            <ThemedText type="small" style={{ color: "#FFF", fontWeight: "600" }}>اتصال</ThemedText>
+            <ThemedText
+              type="small"
+              style={{ color: "#FFF", fontWeight: "600" }}
+            >
+              اتصال
+            </ThemedText>
           </Pressable>
-          <Pressable style={[styles.gridActionBtn, { backgroundColor: "#25D366" }]} onPress={openWhatsApp}>
+          <Pressable
+            style={[styles.gridActionBtn, { backgroundColor: "#25D366" }]}
+            onPress={openWhatsApp}
+          >
             <Feather name="message-circle" size={18} color="#FFF" />
-            <ThemedText type="small" style={{ color: "#FFF", fontWeight: "600" }}>واتساب</ThemedText>
+            <ThemedText
+              type="small"
+              style={{ color: "#FFF", fontWeight: "600" }}
+            >
+              واتساب
+            </ThemedText>
           </Pressable>
-          <Pressable style={[styles.gridActionBtn, { backgroundColor: theme.backgroundSecondary, borderWidth: 1, borderColor: theme.border }]} onPress={copyPhone}>
+          <Pressable
+            style={[
+              styles.gridActionBtn,
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderWidth: 1,
+                borderColor: theme.border,
+              },
+            ]}
+            onPress={copyPhone}
+          >
             <Feather name="copy" size={18} color={theme.text} />
-            <ThemedText type="small" style={{ fontWeight: "600" }}>نسخ الرقم</ThemedText>
+            <ThemedText type="small" style={{ fontWeight: "600" }}>
+              نسخ الرقم
+            </ThemedText>
           </Pressable>
         </View>
 
-        <View style={[styles.chatHeaderSection, { borderBottomColor: theme.border }]}> 
+        <View
+          style={[
+            styles.chatHeaderSection,
+            { borderBottomColor: theme.border },
+          ]}
+        >
           <View style={styles.chatTitleRow}>
             <View style={[styles.dot, { backgroundColor: "#4CD964" }]} />
             <ThemedText type="h4">المحادثة المباشرة</ThemedText>
           </View>
           {hasMoreMessages && (
-            <Pressable style={styles.inlineLoadMore} onPress={handleLoadMore} disabled={isLoadingMore}>
-              <ThemedText type="caption" style={{ color: theme.primary }}>{isLoadingMore ? "جاري التحميل..." : "رسائل أقدم"}</ThemedText>
+            <Pressable
+              style={styles.inlineLoadMore}
+              onPress={handleLoadMore}
+              disabled={isLoadingMore}
+            >
+              <ThemedText type="caption" style={{ color: theme.primary }}>
+                {isLoadingMore ? "جاري التحميل..." : "رسائل أقدم"}
+              </ThemedText>
             </Pressable>
           )}
         </View>
@@ -325,9 +448,11 @@ export default function PharmacyDetailScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
-      <KeyboardAvoidingView 
-        style={styles.container} 
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
+    >
+      <KeyboardAvoidingView
+        style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={headerHeight}
       >
@@ -338,42 +463,101 @@ export default function PharmacyDetailScreen() {
           ListHeaderComponent={renderHeader}
           contentContainerStyle={styles.chatListContent}
           onContentSizeChange={scrollToBottom}
-          ListEmptyComponent={isLoadingMessages ? (
-            <ActivityIndicator color={theme.primary} style={{ marginTop: 40 }} />
-          ) : (
-            <View style={styles.emptyChat}>
-              <Feather name="message-square" size={40} color={theme.border} />
-              <ThemedText type="caption" style={{ color: theme.textSecondary, marginTop: Spacing.sm }}>ابدأ المحادثة مع الصيدلية</ThemedText>
-            </View>
-          )}
+          ListEmptyComponent={
+            isLoadingMessages ? (
+              <ActivityIndicator
+                color={theme.primary}
+                style={{ marginTop: 40 }}
+              />
+            ) : (
+              <View style={styles.emptyChat}>
+                <Feather name="message-square" size={40} color={theme.border} />
+                <ThemedText
+                  type="caption"
+                  style={{ color: theme.textSecondary, marginTop: Spacing.sm }}
+                >
+                  ابدأ المحادثة مع الصيدلية
+                </ThemedText>
+              </View>
+            )
+          }
           renderItem={({ item }) => (
             <Animated.View
               entering={FadeInUp.duration(400)}
               style={[
                 styles.messageContainer,
-                { alignItems: item.sender === "patient" ? "flex-end" : "flex-start" }
+                {
+                  alignItems:
+                    item.sender === "patient" ? "flex-end" : "flex-start",
+                },
               ]}
             >
               <View
                 style={[
                   styles.messageBubble,
                   {
-                    backgroundColor: item.sender === "patient" ? theme.primary : theme.backgroundSecondary,
-                    borderBottomRightRadius: item.sender === "patient" ? 4 : BorderRadius.lg,
-                    borderBottomLeftRadius: item.sender === "pharmacy" ? 4 : BorderRadius.lg,
+                    backgroundColor:
+                      item.sender === "patient"
+                        ? theme.primary
+                        : theme.backgroundSecondary,
+                    borderBottomRightRadius:
+                      item.sender === "patient" ? 4 : BorderRadius.lg,
+                    borderBottomLeftRadius:
+                      item.sender === "pharmacy" ? 4 : BorderRadius.lg,
                   },
                 ]}
               >
                 {item.text ? (
-                  <ThemedText type="body" style={{ color: item.sender === "patient" ? "#FFF" : theme.text }}>{item.text}</ThemedText>
+                  <ThemedText
+                    type="body"
+                    style={{
+                      color: item.sender === "patient" ? "#FFF" : theme.text,
+                    }}
+                  >
+                    {item.text}
+                  </ThemedText>
                 ) : null}
-                {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.messageImage} resizeMode="cover" /> : null}
+                {item.imageUrl ? (
+                  <Image
+                    source={{ uri: item.imageUrl }}
+                    style={styles.messageImage}
+                    resizeMode="cover"
+                  />
+                ) : null}
                 <View style={styles.messageMeta}>
-                  <ThemedText type="caption" style={[styles.messageTime, { color: item.sender === "patient" ? "rgba(255,255,255,0.7)" : theme.textSecondary }]}>
-                    {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <ThemedText
+                    type="caption"
+                    style={[
+                      styles.messageTime,
+                      {
+                        color:
+                          item.sender === "patient"
+                            ? "rgba(255,255,255,0.7)"
+                            : theme.textSecondary,
+                      },
+                    ]}
+                  >
+                    {new Date(item.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </ThemedText>
                   {item.sender === "patient" && (
-                    <Feather name={item.status === "failed" ? "alert-circle" : item.status === "sending" ? "clock" : "check"} size={10} color={item.status === "failed" ? "#FF3B30" : "rgba(255,255,255,0.7)"} />
+                    <Feather
+                      name={
+                        item.status === "failed"
+                          ? "alert-circle"
+                          : item.status === "sending"
+                            ? "clock"
+                            : "check"
+                      }
+                      size={10}
+                      color={
+                        item.status === "failed"
+                          ? "#FF3B30"
+                          : "rgba(255,255,255,0.7)"
+                      }
+                    />
                   )}
                 </View>
               </View>
@@ -381,16 +565,44 @@ export default function PharmacyDetailScreen() {
           )}
         />
 
-        <View style={[styles.chatInputWrapper, { paddingBottom: insets.bottom + Spacing.sm, backgroundColor: theme.backgroundRoot }]}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quickActionsScroll} contentContainerStyle={styles.quickActionsContent}>
+        <View
+          style={[
+            styles.chatInputWrapper,
+            {
+              paddingBottom: insets.bottom + Spacing.sm,
+              backgroundColor: theme.backgroundRoot,
+            },
+          ]}
+        >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.quickActionsScroll}
+            contentContainerStyle={styles.quickActionsContent}
+          >
             {QUICK_ACTIONS.map((action) => (
-              <Pressable key={action} style={[styles.quickActionChip, { backgroundColor: theme.backgroundSecondary }]} onPress={() => setMessageText(action)}>
-                <ThemedText type="caption" style={{ color: theme.text }}>{action}</ThemedText>
+              <Pressable
+                key={action}
+                style={[
+                  styles.quickActionChip,
+                  { backgroundColor: theme.backgroundSecondary },
+                ]}
+                onPress={() => setMessageText(action)}
+              >
+                <ThemedText type="caption" style={{ color: theme.text }}>
+                  {action}
+                </ThemedText>
               </Pressable>
             ))}
           </ScrollView>
           <View style={styles.composerContainer}>
-            <Pressable onPress={handleSendImage} style={[styles.attachBtn, { backgroundColor: theme.backgroundSecondary }]}>
+            <Pressable
+              onPress={handleSendImage}
+              style={[
+                styles.attachBtn,
+                { backgroundColor: theme.backgroundSecondary },
+              ]}
+            >
               <Feather name="image" size={20} color={theme.primary} />
             </Pressable>
             <TextInput
@@ -398,10 +610,27 @@ export default function PharmacyDetailScreen() {
               onChangeText={setMessageText}
               placeholder="اكتب رسالة..."
               multiline
-              style={[styles.composerInput, { backgroundColor: theme.backgroundSecondary, color: theme.text }]}
+              style={[
+                styles.composerInput,
+                {
+                  backgroundColor: theme.backgroundSecondary,
+                  color: theme.text,
+                },
+              ]}
               placeholderTextColor={theme.textSecondary}
             />
-            <Pressable onPress={handleSendText} disabled={!messageText.trim()} style={[styles.sendBtn, { backgroundColor: messageText.trim() ? theme.primary : theme.border }]}>
+            <Pressable
+              onPress={handleSendText}
+              disabled={!messageText.trim()}
+              style={[
+                styles.sendBtn,
+                {
+                  backgroundColor: messageText.trim()
+                    ? theme.primary
+                    : theme.border,
+                },
+              ]}
+            >
               <Feather name="send" size={18} color="#FFF" />
             </Pressable>
           </View>
@@ -413,32 +642,130 @@ export default function PharmacyDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { width: '100%' },
-  mapContainer: { height: 220, width: '100%', marginBottom: Spacing.md, position: 'relative' },
-  mapToggleBtn: { position: 'absolute', bottom: 12, right: 12, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4 },
+  header: { width: "100%" },
+  mapContainer: {
+    height: 220,
+    width: "100%",
+    marginBottom: Spacing.md,
+    position: "relative",
+  },
+  mapToggleBtn: {
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
   content: { paddingHorizontal: Spacing.lg },
-  pharmacyHeaderInfo: { marginBottom: Spacing.lg, alignItems: 'center' },
-  pharmacyNameText: { fontWeight: '800', textAlign: 'center', marginBottom: 4 },
-  provinceRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6 },
-  actionGrid: { flexDirection: 'row-reverse', gap: Spacing.sm, marginBottom: Spacing.xl, flexWrap: 'wrap' },
-  gridActionBtn: { minWidth: '30%', flex: 1, height: 44, borderRadius: BorderRadius.lg, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: Spacing.xs },
-  chatHeaderSection: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', paddingBottom: Spacing.sm, borderBottomWidth: 1, marginBottom: Spacing.md },
-  chatTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 8 },
+  pharmacyHeaderInfo: { marginBottom: Spacing.lg, alignItems: "center" },
+  pharmacyNameText: { fontWeight: "800", textAlign: "center", marginBottom: 4 },
+  provinceRow: { flexDirection: "row-reverse", alignItems: "center", gap: 6 },
+  actionGrid: {
+    flexDirection: "row-reverse",
+    gap: Spacing.sm,
+    marginBottom: Spacing.xl,
+    flexWrap: "wrap",
+  },
+  gridActionBtn: {
+    minWidth: "30%",
+    flex: 1,
+    height: 44,
+    borderRadius: BorderRadius.lg,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.xs,
+  },
+  chatHeaderSection: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    marginBottom: Spacing.md,
+  },
+  chatTitleRow: { flexDirection: "row-reverse", alignItems: "center", gap: 8 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   inlineLoadMore: { padding: 4 },
   chatListContent: { paddingHorizontal: Spacing.lg, paddingBottom: 140 },
-  messageContainer: { marginBottom: Spacing.md, width: '100%' },
-  messageBubble: { padding: Spacing.md, borderRadius: BorderRadius.lg, maxWidth: "80%", gap: 4 },
-  messageImage: { width: 200, height: 150, borderRadius: BorderRadius.sm, marginTop: 4 },
-  messageMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 4, marginTop: 2 },
+  messageContainer: { marginBottom: Spacing.md, width: "100%" },
+  messageBubble: {
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    maxWidth: "80%",
+    gap: 4,
+  },
+  messageImage: {
+    width: 200,
+    height: 150,
+    borderRadius: BorderRadius.sm,
+    marginTop: 4,
+  },
+  messageMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 4,
+    marginTop: 2,
+  },
   messageTime: { fontSize: 10 },
-  emptyChat: { alignItems: 'center', marginTop: 40 },
-  chatInputWrapper: { position: "absolute", left: 0, right: 0, bottom: 0, borderTopWidth: 1, borderTopColor: "rgba(0,0,0,0.05)" },
+  emptyChat: { alignItems: "center", marginTop: 40 },
+  chatInputWrapper: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+  },
   quickActionsScroll: { maxHeight: 50 },
-  quickActionsContent: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, gap: Spacing.sm, flexDirection: 'row-reverse' },
-  quickActionChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: BorderRadius.full },
-  composerContainer: { flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm, gap: Spacing.sm },
-  attachBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  composerInput: { flex: 1, borderRadius: 22, paddingHorizontal: 16, paddingVertical: 8, maxHeight: 100, textAlign: 'right', fontSize: 15 },
-  sendBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  quickActionsContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    gap: Spacing.sm,
+    flexDirection: "row-reverse",
+  },
+  quickActionChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.full,
+  },
+  composerContainer: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  attachBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  composerInput: {
+    flex: 1,
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    maxHeight: 100,
+    textAlign: "right",
+    fontSize: 15,
+  },
+  sendBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

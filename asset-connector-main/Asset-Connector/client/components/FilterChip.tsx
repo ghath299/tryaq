@@ -49,11 +49,7 @@ export function FilterChip({
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={[
-        styles.chip,
-        { backgroundColor, borderColor },
-        animatedStyle,
-      ]}
+      style={[styles.chip, { backgroundColor, borderColor }, animatedStyle]}
     >
       <ThemedText type="small" style={[styles.label, { color: textColor }]}>
         {label}

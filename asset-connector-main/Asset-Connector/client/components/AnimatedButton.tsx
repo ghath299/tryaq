@@ -1,12 +1,17 @@
 import React, { ReactNode, useState } from "react";
-import { StyleSheet, Pressable, ViewStyle, StyleProp, View } from "react-native";
+import {
+  StyleSheet,
+  Pressable,
+  ViewStyle,
+  StyleProp,
+  View,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withSequence,
   withTiming,
-  interpolateColor,
   runOnJS,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,7 +34,6 @@ interface AnimatedButtonProps {
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 export function AnimatedButton({
   onPress,
@@ -66,12 +70,12 @@ export function AnimatedButton({
     if (pulse && !disabled) {
       pulseValue.value = withSequence(
         withTiming(1.02, { duration: 800 }),
-        withTiming(1, { duration: 800 })
+        withTiming(1, { duration: 800 }),
       );
       const interval = setInterval(() => {
         pulseValue.value = withSequence(
           withTiming(1.02, { duration: 800 }),
-          withTiming(1, { duration: 800 })
+          withTiming(1, { duration: 800 }),
         );
       }, 1600);
       return () => clearInterval(interval);
