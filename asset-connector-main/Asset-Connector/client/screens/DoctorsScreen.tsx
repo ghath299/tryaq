@@ -58,7 +58,11 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
 
   return (
     <Animated.View entering={FadeInRight.delay(index * 40).duration(300)}>
-      <AnimatedPressable onPress={handlePress} style={animatedStyle}>
+      <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
+        onPress={handlePress}
+        style={animatedStyle}
+      >
         {selected ? (
           <LinearGradient
             colors={[theme.primary, theme.primaryDark]}

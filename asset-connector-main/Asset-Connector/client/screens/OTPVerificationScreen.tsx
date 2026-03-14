@@ -322,7 +322,11 @@ export default function OTPVerificationScreen() {
                 إعادة الإرسال بعد {resendTimer} ثانية
               </ThemedText>
             ) : (
-              <Pressable onPress={handleResend} style={styles.resendButton}>
+              <Pressable
+                android_ripple={{ color: "transparent" }}
+                onPress={handleResend}
+                style={styles.resendButton}
+              >
                 <ThemedText
                   type="body"
                   style={{ color: theme.primary, fontWeight: "600" }}

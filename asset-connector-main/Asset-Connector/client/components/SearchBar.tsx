@@ -73,7 +73,11 @@ export function SearchBar({
         returnKeyType="search"
       />
       {value.length > 0 ? (
-        <AnimatedPressable onPress={handleClear} style={styles.clearButton}>
+        <AnimatedPressable
+          android_ripple={{ color: "transparent" }}
+          onPress={handleClear}
+          style={styles.clearButton}
+        >
           <Feather name="x-circle" size={18} color={theme.textSecondary} />
         </AnimatedPressable>
       ) : null}

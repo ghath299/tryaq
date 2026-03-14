@@ -74,7 +74,11 @@ function SectionHeader({
     >
       <ThemedText type="h3">{title}</ThemedText>
       {onViewAll ? (
-        <AnimatedPressable onPress={handlePress} style={animatedStyle}>
+        <AnimatedPressable
+          android_ripple={{ color: "transparent" }}
+          onPress={handlePress}
+          style={animatedStyle}
+        >
           <View style={styles.viewAllButton}>
             <ThemedText
               type="small"

@@ -310,7 +310,11 @@ function AISearchSection({
             </LinearGradient>
           </View>
 
-          <Pressable onPress={handleUpload} style={styles.scanArea}>
+          <Pressable
+            android_ripple={{ color: "transparent" }}
+            onPress={handleUpload}
+            style={styles.scanArea}
+          >
             <Animated.View style={[styles.glowRing, glowStyle]}>
               <LinearGradient
                 colors={[
