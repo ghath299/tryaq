@@ -17,7 +17,11 @@ import { AppProvider } from "@/contexts/AppContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/hooks/useTheme";
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+setTimeout(() => {
+  SplashScreen.hideAsync().catch(() => {});
+}, 5000);
 
 function AppContent() {
   const [fontsLoaded, fontError] = Font.useFonts({
@@ -28,7 +32,7 @@ function AppContent() {
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded, fontError]);
 
@@ -46,8 +50,17 @@ function AppContent() {
 }
 
 export default function App() {
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      onError={(error) => {
+        console.error("App ErrorBoundary caught:", error);
+        SplashScreen.hideAsync().catch(() => {});
+      }}
+    >
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <ThemeProvider>
@@ -55,9 +68,7 @@ export default function App() {
               <SafeAreaProvider>
                 <GestureHandlerRootView style={styles.root}>
                   <KeyboardProvider>
-                    {/* 🔥 تم تعديل الستاتس بار هنا */}
                     <StatusBar style="light" backgroundColor="#000" />
-
                     <AppContent />
                   </KeyboardProvider>
                 </GestureHandlerRootView>
