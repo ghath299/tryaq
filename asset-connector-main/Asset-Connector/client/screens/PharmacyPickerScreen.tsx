@@ -252,6 +252,7 @@ export default function PharmacyPickerScreen() {
               ]}
             >
               <Pressable
+                android_ripple={{ color: "transparent" }}
                 style={[styles.actionBtn, { backgroundColor: theme.primary }]}
                 onPress={() => handleOpenWaze(item.lat, item.lng)}
               >
@@ -268,6 +269,7 @@ export default function PharmacyPickerScreen() {
                 </ThemedText>
               </Pressable>
               <Pressable
+                android_ripple={{ color: "transparent" }}
                 style={[
                   styles.actionBtn,
                   {
@@ -355,6 +357,7 @@ export default function PharmacyPickerScreen() {
 
         <View style={styles.sortRow}>
           <Pressable
+            android_ripple={{ color: "transparent" }}
             style={[
               styles.sortBtn,
               {
@@ -385,6 +388,7 @@ export default function PharmacyPickerScreen() {
             </ThemedText>
           </Pressable>
           <Pressable
+            android_ripple={{ color: "transparent" }}
             style={[
               styles.sortBtn,
               {

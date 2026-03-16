@@ -120,6 +120,7 @@ export default function LocationPermissionScreen() {
 
         <View style={styles.buttonContainer}>
           <Pressable
+            android_ripple={{ color: "transparent" }}
             onPress={handleRequestPermission}
             disabled={isRequesting}
             style={styles.button}
@@ -140,6 +141,7 @@ export default function LocationPermissionScreen() {
           </Pressable>
 
           <Pressable
+            android_ripple={{ color: "transparent" }}
             onPress={() => setShowGovernorates(true)}
             style={[styles.manualButton, { borderColor: theme.border }]}
           >
@@ -148,6 +150,7 @@ export default function LocationPermissionScreen() {
 
           {Platform.OS !== "web" ? (
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={() => Linking.openSettings()}
               style={styles.settingsLink}
             >
@@ -161,6 +164,7 @@ export default function LocationPermissionScreen() {
 
       <Modal transparent visible={showGovernorates} animationType="fade">
         <Pressable
+          android_ripple={{ color: "transparent" }}
           style={styles.modalOverlay}
           onPress={() => setShowGovernorates(false)}
         >
@@ -178,6 +182,7 @@ export default function LocationPermissionScreen() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <Pressable
+                  android_ripple={{ color: "transparent" }}
                   style={[styles.row, { borderBottomColor: theme.border }]}
                   onPress={async () => {
                     await completeWithGovernorate(item.nameEn);

@@ -46,6 +46,7 @@ export function FilterChip({
 
   return (
     <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

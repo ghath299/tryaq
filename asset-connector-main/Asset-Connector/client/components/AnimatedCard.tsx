@@ -85,6 +85,7 @@ export function AnimatedCard({
   if (variant === "gradient") {
     return (
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={disabled ? undefined : onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -111,6 +112,7 @@ export function AnimatedCard({
 
   return (
     <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
       onPress={disabled ? undefined : onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

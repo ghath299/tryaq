@@ -151,6 +151,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
         .springify()}
     >
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}

@@ -65,6 +65,7 @@ function DrawerButton() {
 
   return (
     <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
       onPress={handlePress}
       style={[{ marginLeft: Spacing.lg }, animatedStyle]}
     >
@@ -74,6 +75,7 @@ function DrawerButton() {
 }
 
 function AuthNavigator() {
+  const { theme } = useTheme();
   const { authStep } = useAuth();
 
   console.log("[AuthNavigator] Rendering with authStep:", authStep);
@@ -84,6 +86,9 @@ function AuthNavigator() {
         headerShown: false,
         animation: "fade",
         animationDuration: 200,
+        contentStyle: {
+          backgroundColor: theme.backgroundRoot,
+        },
       }}
     >
       {authStep === "login" && (

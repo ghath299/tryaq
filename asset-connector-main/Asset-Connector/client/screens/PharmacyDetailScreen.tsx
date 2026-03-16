@@ -351,6 +351,7 @@ export default function PharmacyDetailScreen() {
       <Animated.View style={[styles.mapContainer, animatedMapStyle]}>
         <MapViewComponent lat={pharmacy.lat} lng={pharmacy.lng} title={name} />
         <Pressable
+          android_ripple={{ color: "transparent" }}
           style={[
             styles.mapToggleBtn,
             { backgroundColor: theme.backgroundSecondary },
@@ -380,6 +381,7 @@ export default function PharmacyDetailScreen() {
 
         <View style={styles.actionGrid}>
           <Pressable
+            android_ripple={{ color: "transparent" }}
             style={[styles.gridActionBtn, { backgroundColor: theme.primary }]}
             onPress={callPhone}
           >
@@ -392,6 +394,7 @@ export default function PharmacyDetailScreen() {
             </ThemedText>
           </Pressable>
           <Pressable
+            android_ripple={{ color: "transparent" }}
             style={[styles.gridActionBtn, { backgroundColor: "#25D366" }]}
             onPress={openWhatsApp}
           >
@@ -404,6 +407,7 @@ export default function PharmacyDetailScreen() {
             </ThemedText>
           </Pressable>
           <Pressable
+            android_ripple={{ color: "transparent" }}
             style={[
               styles.gridActionBtn,
               {
@@ -433,6 +437,7 @@ export default function PharmacyDetailScreen() {
           </View>
           {hasMoreMessages && (
             <Pressable
+              android_ripple={{ color: "transparent" }}
               style={styles.inlineLoadMore}
               onPress={handleLoadMore}
               disabled={isLoadingMore}
@@ -582,6 +587,7 @@ export default function PharmacyDetailScreen() {
           >
             {QUICK_ACTIONS.map((action) => (
               <Pressable
+                android_ripple={{ color: "transparent" }}
                 key={action}
                 style={[
                   styles.quickActionChip,
@@ -597,6 +603,7 @@ export default function PharmacyDetailScreen() {
           </ScrollView>
           <View style={styles.composerContainer}>
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={handleSendImage}
               style={[
                 styles.attachBtn,
@@ -620,6 +627,7 @@ export default function PharmacyDetailScreen() {
               placeholderTextColor={theme.textSecondary}
             />
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={handleSendText}
               disabled={!messageText.trim()}
               style={[

@@ -148,6 +148,7 @@ export default function MedicinePharmaciesScreen() {
           placeholder="ابحث عن دواء / Search medicine"
         />
         <Pressable
+          android_ripple={{ color: "transparent" }}
           style={[styles.governorateButton, { borderColor: theme.border }]}
           onPress={() => setShowGovernorates(true)}
         >
@@ -161,6 +162,7 @@ export default function MedicinePharmaciesScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Pressable
+              android_ripple={{ color: "transparent" }}
               style={[styles.row, { borderBottomColor: theme.border }]}
               onPress={() => handleSelectMedicine(item)}
             >
@@ -194,6 +196,7 @@ export default function MedicinePharmaciesScreen() {
           onEndReachedThreshold={0.5}
           renderItem={({ item }) => (
             <Pressable
+              android_ripple={{ color: "transparent" }}
               style={[
                 styles.card,
                 { backgroundColor: theme.backgroundDefault },
@@ -225,6 +228,7 @@ export default function MedicinePharmaciesScreen() {
 
       <Modal transparent visible={showGovernorates} animationType="fade">
         <Pressable
+          android_ripple={{ color: "transparent" }}
           style={styles.modalOverlay}
           onPress={() => setShowGovernorates(false)}
         >
@@ -239,6 +243,7 @@ export default function MedicinePharmaciesScreen() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <Pressable
+                  android_ripple={{ color: "transparent" }}
                   style={[styles.row, { borderBottomColor: theme.border }]}
                   onPress={async () => {
                     await saveGovernorate(item.nameEn);

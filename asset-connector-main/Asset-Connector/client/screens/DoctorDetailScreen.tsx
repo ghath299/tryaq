@@ -206,7 +206,7 @@ export default function DoctorDetailScreen() {
             </View>
 
             <TouchableOpacity
-              activeOpacity={0.8}
+              activeOpacity={1}
               onPress={() => openWaze(doctor.lat, doctor.lng)}
               style={[styles.wazeBtn, { backgroundColor: theme.primary }]}
             >

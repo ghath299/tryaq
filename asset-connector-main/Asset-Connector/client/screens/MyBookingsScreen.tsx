@@ -45,6 +45,7 @@ export default function MyBookingsScreen() {
     return (
       <Animated.View entering={FadeInUp.delay(index * 50).duration(300)}>
         <Pressable
+          android_ripple={{ color: "transparent" }}
           style={[
             styles.bookingCard,
             { backgroundColor: theme.backgroundDefault },

@@ -37,6 +37,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
     <View style={styles.container}>
       {__DEV__ ? (
         <Pressable
+          android_ripple={{ color: "transparent" }}
           onPress={() => setIsModalVisible(true)}
           style={({ pressed }) => [
             styles.topButton,
@@ -53,6 +54,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
         <Text style={styles.message}>Please reload the app to continue.</Text>
 
         <Pressable
+          android_ripple={{ color: "transparent" }}
           onPress={handleRestart}
           style={({ pressed }) => [
             styles.button,
@@ -78,6 +80,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Error Details</Text>
                 <Pressable
+                  android_ripple={{ color: "transparent" }}
                   onPress={() => setIsModalVisible(false)}
                   style={({ pressed }) => [
                     styles.closeButton,

@@ -346,6 +346,7 @@ export default function OTPVerificationScreen() {
             </ThemedText>
             <View style={styles.methodsRow}>
               <Pressable
+                android_ripple={{ color: "transparent" }}
                 style={[styles.methodChip, { backgroundColor: "#25D36615" }]}
               >
                 <Feather name="message-circle" size={16} color="#25D366" />
@@ -357,6 +358,7 @@ export default function OTPVerificationScreen() {
                 </ThemedText>
               </Pressable>
               <Pressable
+                android_ripple={{ color: "transparent" }}
                 style={[
                   styles.methodChip,
                   { backgroundColor: theme.primary + "15" },
@@ -375,6 +377,7 @@ export default function OTPVerificationScreen() {
 
           <View style={styles.buttonContainer}>
             <AnimatedPressable
+              android_ripple={{ color: "transparent" }}
               onPress={handleVerify}
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}

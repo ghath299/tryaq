@@ -81,6 +81,7 @@ function MedicineCardNew({ medicine, onPress, index }: MedicineCardNewProps) {
         .springify()}
     >
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -410,6 +411,7 @@ function AISearchSection({
               </ThemedText>
             </View>
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setAiResult(null);
@@ -533,6 +535,7 @@ function AISearchSection({
 
           <View style={[styles.resultActions, { borderTopColor: "#333333" }]}>
             <AnimatedPressable
+              android_ripple={{ color: "transparent" }}
               onPress={handleUpload}
               style={[
                 styles.secondaryActionButton,
@@ -549,6 +552,7 @@ function AISearchSection({
             </AnimatedPressable>
 
             <AnimatedPressable
+              android_ripple={{ color: "transparent" }}
               onPress={() =>
                 onResultPress(aiResult.name || aiResult.extractedText)
               }
@@ -664,6 +668,7 @@ export default function MedicinesScreen() {
             ]}
           >
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setSearchMode("text");
@@ -688,6 +693,7 @@ export default function MedicinesScreen() {
               </ThemedText>
             </Pressable>
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setSearchMode("ai");

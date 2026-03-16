@@ -150,6 +150,7 @@ function PromotedDoctorCard({
         .springify()}
     >
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -258,6 +259,7 @@ function PromotedPharmacyCard({
         .springify()}
     >
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -567,6 +569,7 @@ export default function HomeScreen() {
                   .springify()}
               >
                 <Pressable
+                  android_ripple={{ color: "transparent" }}
                   style={[
                     styles.eventCard,
                     { backgroundColor: theme.backgroundDefault },

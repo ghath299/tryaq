@@ -175,6 +175,7 @@ export function AnimatedButton({
   if (variantStyles.gradient) {
     return (
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -205,6 +206,7 @@ export function AnimatedButton({
 
   return (
     <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

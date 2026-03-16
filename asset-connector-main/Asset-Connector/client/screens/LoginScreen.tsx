@@ -270,6 +270,7 @@ export default function LoginScreen() {
 
             <Animated.View entering={FadeIn.delay(500).duration(400)}>
               <AnimatedPressable
+                android_ripple={{ color: "transparent" }}
                 onPress={handleSubmit}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}

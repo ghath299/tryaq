@@ -65,6 +65,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
         .springify()}
     >
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -308,6 +309,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
               {t("language")}
             </ThemedText>
             <Pressable
+              android_ripple={{ color: "transparent" }}
               onPress={handleLanguageToggle}
               style={[
                 styles.langButton,
@@ -332,6 +334,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           />
 
           <Pressable
+            android_ripple={{ color: "transparent" }}
             onPress={handleThemeToggle}
             style={[
               styles.settingItem,
@@ -381,6 +384,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           style={styles.footer}
         >
           <Pressable
+            android_ripple={{ color: "transparent" }}
             onPress={handleLogout}
             style={[
               styles.logoutButton,

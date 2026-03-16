@@ -34,6 +34,9 @@ export default function DrawerNavigator() {
         overlayColor: "rgba(0,0,0,0.5)",
         swipeEnabled: true,
         swipeEdgeWidth: 50,
+        sceneStyle: {
+          backgroundColor: theme.backgroundRoot,
+        },
       }}
     >
       <Drawer.Screen name="PatientTabs" component={PatientTabNavigator} />

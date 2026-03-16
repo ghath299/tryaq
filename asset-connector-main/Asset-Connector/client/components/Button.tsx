@@ -75,6 +75,7 @@ export function Button({
   if (variant === "primary") {
     return (
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -107,6 +108,7 @@ export function Button({
   if (variant === "secondary") {
     return (
       <AnimatedPressable
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -134,6 +136,7 @@ export function Button({
 
   return (
     <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

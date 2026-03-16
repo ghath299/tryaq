@@ -53,6 +53,7 @@ function DrawerButton() {
 
   return (
     <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
       onPress={handlePress}
       style={[
         isRTL ? { marginRight: Spacing.lg } : { marginLeft: Spacing.lg },
@@ -143,6 +144,9 @@ export default function PatientTabNavigator() {
         headerLeft: () => (language === "ar" ? null : <DrawerButton />),
         headerRight: () => (language === "ar" ? <DrawerButton /> : null),
         animation: "shift",
+        sceneStyle: {
+          backgroundColor: theme.backgroundRoot,
+        },
       }}
     >
       <Tab.Screen
