@@ -25,7 +25,6 @@ export default function DrawerNavigator() {
       <StatusBar style="auto" />
 
       <Drawer.Navigator
-        key={language}
         drawerContent={(props) => <DrawerContent {...props} />}
         detachInactiveScreens={false}
         screenOptions={{

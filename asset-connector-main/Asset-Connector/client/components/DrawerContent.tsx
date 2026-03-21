@@ -117,9 +117,11 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
   const handleLanguageToggle = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const newLang = language === "ar" ? "en" : "ar";
-    setLanguage(newLang);
-    // Navigation will reset via the key in DrawerNavigator
+    navigation.closeDrawer();
+    setTimeout(() => {
+      const newLang = language === "ar" ? "en" : "ar";
+      setLanguage(newLang);
+    }, 300);
   };
 
   const handleLogout = async () => {
