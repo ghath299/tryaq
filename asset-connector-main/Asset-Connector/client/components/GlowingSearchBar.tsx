@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, TextInput, StyleSheet, Platform } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -7,7 +7,6 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
-  interpolate,
 } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,6 +14,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+
+const isAndroid = Platform.OS === "android";
 
 interface GlowingSearchBarProps {
   value: string;
@@ -33,86 +34,61 @@ export function GlowingSearchBar({
   const { language, t } = useApp();
   const [isFocused, setIsFocused] = useState(false);
 
-  const glowOpacity = useSharedValue(0.3);
   const scale = useSharedValue(1);
-  const borderProgress = useSharedValue(0);
-
-  useEffect(() => {
-    glowOpacity.value = withRepeat(
-      withSequence(
-        withTiming(0.5, { duration: 1500 }),
-        withTiming(0.3, { duration: 1500 }),
-      ),
-      -1,
-      true,
-    );
-  }, []);
 
   const handleFocus = () => {
     setIsFocused(true);
-    scale.value = withSpring(1.02, Animation.spring.gentle);
-    borderProgress.value = withTiming(1, {
-      duration: Animation.duration.normal,
-    });
+    if (!isAndroid) {
+      scale.value = withSpring(1.02, Animation.spring.gentle);
+    }
   };
 
   const handleBlur = () => {
     setIsFocused(false);
-    scale.value = withSpring(1, Animation.spring.gentle);
-    borderProgress.value = withTiming(0, {
-      duration: Animation.duration.normal,
-    });
+    if (!isAndroid) {
+      scale.value = withSpring(1, Animation.spring.gentle);
+    }
   };
 
   const containerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  const glowStyle = useAnimatedStyle(() => ({
-    opacity: isFocused ? 0.6 : glowOpacity.value,
-  }));
-
-  const borderStyle = useAnimatedStyle(() => ({
-    borderWidth: interpolate(borderProgress.value, [0, 1], [0, 2]),
-    borderColor: theme.primary,
-  }));
-
   return (
-    <Animated.View style={[styles.wrapper, containerStyle]}>
-      <Animated.View style={[styles.glowContainer, glowStyle]}>
-        <LinearGradient
-          colors={[
-            theme.primary + "40",
-            theme.primaryDark + "20",
-            "transparent",
-          ]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.glow}
-        />
-      </Animated.View>
+    <Animated.View style={[styles.wrapper, !isAndroid && containerStyle]}>
+      {!isAndroid && (
+        <View style={[styles.glowContainer, { opacity: isFocused ? 0.6 : 0.3 }]}>
+          <LinearGradient
+            colors={[
+              theme.primary + "40",
+              theme.primaryDark + "20",
+              "transparent",
+            ]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.glow}
+          />
+        </View>
+      )}
 
-      <Animated.View
+      <View
         style={[
           styles.container,
           {
             backgroundColor: theme.backgroundDefault,
           },
-          Platform.select({
-            ios: {
-              shadowColor: theme.primary,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: isFocused ? 0.3 : 0.15,
-              shadowRadius: isFocused ? 16 : 8,
-            },
-            android: {
-              elevation: 0,
-              borderWidth: 1,
-              borderColor: isFocused ? theme.primary : theme.border,
-            },
-            default: {},
-          }),
-          borderStyle,
+          isAndroid
+            ? {
+                elevation: 0,
+                borderWidth: 1,
+                borderColor: isFocused ? theme.primary : theme.border,
+              }
+            : {
+                shadowColor: theme.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: isFocused ? 0.3 : 0.15,
+                shadowRadius: isFocused ? 16 : 8,
+              },
         ]}
       >
         <View style={styles.iconContainer}>
@@ -139,16 +115,16 @@ export function GlowingSearchBar({
           autoFocus={autoFocus}
         />
         {value.length > 0 ? (
-          <Animated.View style={styles.clearButton}>
+          <View style={styles.clearButton}>
             <Feather
               name="x-circle"
               size={20}
               color={theme.textSecondary}
               onPress={() => onChangeText("")}
             />
-          </Animated.View>
+          </View>
         ) : null}
-      </Animated.View>
+      </View>
     </Animated.View>
   );
 }
