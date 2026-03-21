@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useLayoutEffect } from "react"; // ✅ أضفنا useLayoutEffect
 import {
   View,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   Pressable,
   Platform,
 } from "react-native";
+import { StatusBar } from "expo-status-bar"; // ✅ أضفنا الـ StatusBar
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
@@ -260,6 +261,16 @@ export default function PharmaciesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
 
+  // ✅ الجزء المسؤول عن حل مشكلة اللون الأبيض في الهيدر
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.backgroundRoot },
+      headerTintColor: theme.text,
+      headerTitleStyle: { color: theme.text },
+      headerShadowVisible: false,
+    });
+  }, [navigation, theme]);
+
   const filteredPharmacies = useMemo(() => {
     let results = pharmacies;
 
@@ -295,6 +306,9 @@ export default function PharmaciesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      {/* ✅ جعل أيقونات النظام (الساعة والبطارية) تتبع الثيم */}
+      <StatusBar style="auto" />
+
       <View
         style={[
           styles.searchContainer,

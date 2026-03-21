@@ -53,7 +53,8 @@ function DrawerButton() {
 
   return (
     <AnimatedPressable
-      android_ripple={{ color: "transparent" }}
+      // ✅ تمويه التحديد بلون الخلفية
+      android_ripple={{ color: theme.backgroundRoot }}
       onPress={handlePress}
       style={[
         isRTL ? { marginRight: Spacing.lg } : { marginLeft: Spacing.lg },
@@ -106,7 +107,9 @@ export default function PatientTabNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
+      detachInactiveScreens={false}
       screenOptions={{
+        lazy: false,
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
@@ -143,7 +146,9 @@ export default function PatientTabNavigator() {
           ),
         headerLeft: () => (language === "ar" ? null : <DrawerButton />),
         headerRight: () => (language === "ar" ? <DrawerButton /> : null),
-        animation: "shift",
+
+        animation: "fade",
+        freezeOnBlur: true,
         sceneStyle: {
           backgroundColor: theme.backgroundRoot,
         },

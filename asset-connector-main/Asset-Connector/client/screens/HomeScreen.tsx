@@ -20,8 +20,7 @@ import Animated, {
   withSequence,
   withRepeat,
   FadeInUp,
-  FadeIn,
-} from "react-native-reanimated";
+} from "react-native-reanimated"; // ❌ شلنا FadeIn من هنا لأنه يسبب الرمشة
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
@@ -75,7 +74,8 @@ function SectionHeader({
       <ThemedText type="h3">{title}</ThemedText>
       {onViewAll ? (
         <AnimatedPressable
-          android_ripple={{ color: "transparent" }}
+          // ✅ تمويه التحديد بلون الخلفية للقضاء على المربع الرمادي
+          android_ripple={{ color: theme.backgroundRoot }}
           onPress={handlePress}
           style={animatedStyle}
         >
@@ -132,17 +132,6 @@ function PromotedDoctorCard({
     onPress();
   };
 
-  const shadowStyle = Platform.select({
-    ios: {
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-    },
-    android: { elevation: 4 },
-    default: {},
-  });
-
   return (
     <Animated.View
       entering={FadeInUp.delay(200 + index * 80)
@@ -150,14 +139,14 @@ function PromotedDoctorCard({
         .springify()}
     >
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        // ✅ تمويه التحديد بلون الخلفية
+        android_ripple={{ color: theme.backgroundRoot }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[
           styles.promotedCard,
           { backgroundColor: theme.backgroundDefault },
-          shadowStyle,
           animatedStyle,
         ]}
       >
@@ -241,17 +230,6 @@ function PromotedPharmacyCard({
     onPress();
   };
 
-  const shadowStyle = Platform.select({
-    ios: {
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-    },
-    android: { elevation: 4 },
-    default: {},
-  });
-
   return (
     <Animated.View
       entering={FadeInUp.delay(300 + index * 80)
@@ -259,14 +237,14 @@ function PromotedPharmacyCard({
         .springify()}
     >
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        // ✅ تمويه التحديد بلون الخلفية
+        android_ripple={{ color: theme.backgroundRoot }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[
           styles.promotedCard,
           { backgroundColor: theme.backgroundDefault },
-          shadowStyle,
           animatedStyle,
         ]}
       >
@@ -420,7 +398,6 @@ export default function HomeScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const sliderRef = useRef<FlatList>(null);
 
-  // ✅ هذا هو الحل: خلي لون الهيدر يتبع الثيم (بدل الأبيض)
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: theme.backgroundRoot },
@@ -451,15 +428,20 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
+      // ✅ السر الأول للقضاء على الرمشة: إجبار الخلفية على لون الثيم ومنع الـ OverScroll
       style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
       contentContainerStyle={{
-        // ملاحظة: لا نخليها headerHeight حتى ما يصير فراغ زايد
+        backgroundColor: theme.backgroundRoot,
         paddingTop: Spacing.md,
         paddingBottom: tabBarHeight + insets.bottom + Spacing.xl,
       }}
       showsVerticalScrollIndicator={false}
+      overScrollMode="never"
+      removeClippedSubviews={false}
     >
-      <Animated.View entering={FadeIn.duration(600)}>
+      {/* ❌ حذفنا الـ Animated.View entering={FadeIn} اللي كان يغلف المحتوى العلوي */}
+      {/* هو الجاني الحقيقي اللي كان يسبب الرمشة لأنه يخلي الشاشة شفافة وقت التحميل */}
+      <View>
         <FlatList
           ref={sliderRef}
           data={announcements}
@@ -497,7 +479,7 @@ export default function HomeScreen() {
             />
           ))}
         </View>
-      </Animated.View>
+      </View>
 
       <SectionHeader
         title={t("promotedDoctors")}
@@ -569,20 +551,11 @@ export default function HomeScreen() {
                   .springify()}
               >
                 <Pressable
-                  android_ripple={{ color: "transparent" }}
+                  // ✅ تمويه التحديد بلون الخلفية
+                  android_ripple={{ color: theme.backgroundRoot }}
                   style={[
                     styles.eventCard,
                     { backgroundColor: theme.backgroundDefault },
-                    Platform.select({
-                      ios: {
-                        shadowColor: theme.primary,
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 8,
-                      },
-                      android: { elevation: 2 },
-                      default: {},
-                    }),
                   ]}
                 >
                   <LinearGradient
@@ -631,15 +604,9 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  slider: {
-    marginBottom: Spacing.md,
-  },
-  sliderContent: {
-    paddingHorizontal: Spacing.lg,
-  },
+  container: { flex: 1 },
+  slider: { marginBottom: Spacing.md },
+  sliderContent: { paddingHorizontal: Spacing.lg },
   slide: {
     width: SLIDER_WIDTH,
     height: 180,
@@ -661,36 +628,17 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     backgroundColor: "#FFFFFF",
   },
-  slideContent: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: "70%",
-  },
-  slideTitle: {
-    color: "#FFFFFF",
-    marginBottom: Spacing.sm,
-    fontSize: 22,
-  },
-  slideDescription: {
-    color: "rgba(255,255,255,0.9)",
-    lineHeight: 22,
-  },
-  slideIcon: {
-    position: "absolute",
-    right: Spacing.xl,
-    bottom: Spacing.xl,
-  },
+  slideContent: { flex: 1, justifyContent: "center", maxWidth: "70%" },
+  slideTitle: { color: "#FFFFFF", marginBottom: Spacing.sm, fontSize: 22 },
+  slideDescription: { color: "rgba(255,255,255,0.9)", lineHeight: 22 },
+  slideIcon: { position: "absolute", right: Spacing.xl, bottom: Spacing.xl },
   dots: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: Spacing.lg,
   },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
+  dot: { height: 8, borderRadius: 4, marginHorizontal: 4 },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -699,14 +647,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     marginTop: Spacing.md,
   },
-  viewAllButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  horizontalList: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.sm,
-  },
+  viewAllButton: { flexDirection: "row", alignItems: "center" },
+  horizontalList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
   promotedCard: {
     width: 150,
     padding: Spacing.lg,
@@ -751,10 +693,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
     marginTop: Spacing.sm,
   },
-  eventsContainer: {
-    paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-  },
+  eventsContainer: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.lg },
   eventCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -770,10 +709,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: Spacing.md,
   },
-  eventInfo: {
-    flex: 1,
-    marginRight: Spacing.md,
-  },
+  eventInfo: { flex: 1, marginRight: Spacing.md },
   eventArrow: {
     width: 32,
     height: 32,

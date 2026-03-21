@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native"; // ✅ أضفنا DefaultTheme
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -19,9 +19,15 @@ import { ThemeProvider } from "@/hooks/useTheme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-setTimeout(() => {
-  SplashScreen.hideAsync().catch(() => {});
-}, 5000);
+// ✅ تعريف الثيم المخصص للقضاء على الرمشة البيضاء
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#000000", // ✅ جعل خلفية التنقل سودة تماماً
+    card: "#000000",
+  },
+};
 
 function AppContent() {
   const [fontsLoaded, fontError] = Font.useFonts({
@@ -41,8 +47,10 @@ function AppContent() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#000" }}>
-      <NavigationContainer>
+    // ✅ التأكد من أن الحاوية الأساسية سودة
+    <View style={{ flex: 1, backgroundColor: "#000000" }}>
+      {/* ✅ تمرير الثيم المخصص هنا هو الحل النهائي للرمشة */}
+      <NavigationContainer theme={MyTheme}>
         <RootStackNavigator />
       </NavigationContainer>
     </View>
@@ -68,7 +76,7 @@ export default function App() {
               <SafeAreaProvider>
                 <GestureHandlerRootView style={styles.root}>
                   <KeyboardProvider>
-                    <StatusBar style="light" backgroundColor="#000" />
+                    <StatusBar style="light" backgroundColor="#000000" />
                     <AppContent />
                   </KeyboardProvider>
                 </GestureHandlerRootView>
@@ -84,6 +92,6 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#000000", // ✅ ضمان أن الجذر دائماً أسود
   },
 });

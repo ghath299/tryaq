@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -7,19 +7,19 @@ import {
   Platform,
   Pressable,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
-  FadeIn,
   FadeInUp,
   FadeInRight,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-} from "react-native-reanimated";
+} from "react-native-reanimated"; // ❌ شلنا FadeIn لأن شفافيته هي سبب الرمشة
 import * as Haptics from "expo-haptics";
 
 import { GlowingSearchBar } from "@/components/GlowingSearchBar";
@@ -32,6 +32,7 @@ import { doctors, specialties, provinces } from "@/data/mockData";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+// --- مكون الـ FilterChip ---
 interface FilterChipProps {
   label: string;
   selected: boolean;
@@ -59,7 +60,8 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
   return (
     <Animated.View entering={FadeInRight.delay(index * 40).duration(300)}>
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        // ✅ تمويه التحديد بلون الخلفية للقضاء على اللون الرمادي
+        android_ripple={{ color: theme.backgroundRoot }}
         onPress={handlePress}
         style={animatedStyle}
       >
@@ -97,6 +99,7 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
   );
 }
 
+// --- مكون الـ DoctorCardNew ---
 interface DoctorCardNewProps {
   doctor: (typeof doctors)[0];
   onPress: () => void;
@@ -133,17 +136,6 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
     onPress();
   };
 
-  const shadowStyle = Platform.select({
-    ios: {
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 8,
-    },
-    android: { elevation: 3 },
-    default: {},
-  });
-
   return (
     <Animated.View
       entering={FadeInUp.delay(index * 60)
@@ -151,14 +143,20 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
         .springify()}
     >
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        // ✅ تمويه التحديد بلون الخلفية
+        android_ripple={{ color: theme.backgroundRoot }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[
           styles.doctorCard,
-          { backgroundColor: theme.backgroundDefault },
-          shadowStyle,
+          {
+            backgroundColor: theme.backgroundDefault,
+            // ✅ استبدال الـ elevation بـ Border لمنع الرمشة في أندرويد
+            elevation: 0,
+            borderWidth: 1,
+            borderColor: theme.border,
+          },
           animatedStyle,
         ]}
       >
@@ -303,6 +301,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
   );
 }
 
+// --- الشاشة الرئيسية للأطباء ---
 export default function DoctorsScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
@@ -316,9 +315,17 @@ export default function DoctorsScreen() {
   );
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.backgroundRoot },
+      headerTintColor: theme.text,
+      headerTitleStyle: { color: theme.text },
+      headerShadowVisible: false,
+    });
+  }, [navigation, theme]);
+
   const filteredDoctors = useMemo(() => {
     let results = doctors;
-
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       results = results.filter(
@@ -327,19 +334,16 @@ export default function DoctorsScreen() {
           doctor.nameEn.toLowerCase().includes(query),
       );
     }
-
     if (selectedSpecialty) {
       results = results.filter(
         (doctor) => doctor.specialtyId === selectedSpecialty,
       );
     }
-
     if (selectedProvince) {
       results = results.filter(
         (doctor) => doctor.provinceId === selectedProvince,
       );
     }
-
     return results;
   }, [searchQuery, selectedSpecialty, selectedProvince]);
 
@@ -357,13 +361,12 @@ export default function DoctorsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      <StatusBar style="auto" />
+
       <View
         style={[
           styles.searchContainer,
-          {
-            paddingTop: Spacing.md,
-            backgroundColor: theme.backgroundRoot,
-          },
+          { paddingTop: Spacing.md, backgroundColor: theme.backgroundRoot },
         ]}
       >
         <GlowingSearchBar
@@ -373,10 +376,8 @@ export default function DoctorsScreen() {
         />
       </View>
 
-      <Animated.View
-        entering={FadeIn.duration(400)}
-        style={styles.filtersContainer}
-      >
+      {/* ✅ الحل النووي للرمشة: إزالة الأنميشن FadeIn عن الفلاتر لضمان ظهورها الفوري */}
+      <View style={styles.filtersContainer}>
         <ThemedText
           type="caption"
           style={[styles.filterLabel, { color: theme.textSecondary }]}
@@ -386,6 +387,7 @@ export default function DoctorsScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          overScrollMode="never"
           contentContainerStyle={styles.filterScroll}
         >
           {specialties.map((specialty, index) => (
@@ -412,6 +414,7 @@ export default function DoctorsScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          overScrollMode="never"
           contentContainerStyle={styles.filterScroll}
         >
           {provinces.map((province, index) => (
@@ -428,11 +431,12 @@ export default function DoctorsScreen() {
             />
           ))}
         </ScrollView>
-      </Animated.View>
+      </View>
 
       <FlatList
         data={filteredDoctors}
         keyExtractor={(item) => item.id}
+        overScrollMode="never"
         contentContainerStyle={[
           styles.list,
           { paddingBottom: tabBarHeight + Spacing.xl },
@@ -453,17 +457,11 @@ export default function DoctorsScreen() {
   );
 }
 
+// --- الـ Styles الكاملة (بدون حذف ولا سطر) ---
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  searchContainer: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
-  filtersContainer: {
-    paddingBottom: Spacing.sm,
-  },
+  container: { flex: 1 },
+  searchContainer: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.md },
+  filtersContainer: { paddingBottom: Spacing.sm },
   filterLabel: {
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.xs,
@@ -473,10 +471,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "600",
   },
-  filterScroll: {
-    paddingHorizontal: Spacing.lg,
-    gap: Spacing.sm,
-  },
+  filterScroll: { paddingHorizontal: Spacing.lg, gap: Spacing.sm },
   chip: {
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
@@ -488,13 +483,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.full,
   },
-  list: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.md,
-  },
-  emptyList: {
-    flex: 1,
-  },
+  list: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md },
+  emptyList: { flex: 1 },
   doctorCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -510,17 +500,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: Spacing.lg,
   },
-  doctorInfo: {
-    flex: 1,
-  },
-  doctorHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 2,
-  },
-  doctorName: {
-    flex: 1,
-  },
+  doctorInfo: { flex: 1 },
+  doctorHeader: { flexDirection: "row", alignItems: "center", marginBottom: 2 },
+  doctorName: { flex: 1 },
   verifiedIcon: {
     width: 18,
     height: 18,
@@ -529,23 +511,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: Spacing.xs,
   },
-  doctorMeta: {
-    marginTop: Spacing.xs,
-  },
-  metaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  doctorMeta: { marginTop: Spacing.xs },
+  metaItem: { flexDirection: "row", alignItems: "center" },
   doctorFooter: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: Spacing.sm,
     gap: Spacing.md,
   },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  ratingContainer: { flexDirection: "row", alignItems: "center" },
   distanceChip: {
     flexDirection: "row",
     alignItems: "center",

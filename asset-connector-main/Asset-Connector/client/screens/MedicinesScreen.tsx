@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useLayoutEffect } from "react"; // ✅ أضفنا useLayoutEffect
 import {
   View,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
+import { StatusBar } from "expo-status-bar"; // ✅ أضفنا الـ StatusBar
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
@@ -612,6 +613,16 @@ export default function MedicinesScreen() {
   const [searchMode, setSearchMode] = useState<SearchMode>("text");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // ✅ حل مشكلة اللون الأبيض في الهيدر لشاشة العلاجات
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: theme.backgroundRoot },
+      headerTintColor: theme.text,
+      headerTitleStyle: { color: theme.text },
+      headerShadowVisible: false,
+    });
+  }, [navigation, theme]);
+
   const filteredMedicines = useMemo(() => {
     if (!searchQuery.trim()) return medicines;
     const query = searchQuery.toLowerCase();
@@ -645,6 +656,9 @@ export default function MedicinesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
+      {/* ✅ لإصلاح لون أيقونات النظام (الساعة والبطارية) */}
+      <StatusBar style="auto" />
+
       <View
         style={[
           styles.header,

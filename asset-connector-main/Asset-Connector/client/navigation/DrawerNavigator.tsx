@@ -4,6 +4,7 @@ import PatientTabNavigator from "@/navigation/PatientTabNavigator";
 import { DrawerContent } from "@/components/DrawerContent";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
+import { StatusBar } from "expo-status-bar"; // ✅ أضفنا الـ StatusBar للتحكم بالأيقونات العلوية
 
 export type DrawerParamList = {
   PatientTabs: undefined;
@@ -17,29 +18,32 @@ export default function DrawerNavigator() {
   const isRTL = language === "ar";
 
   return (
-    <Drawer.Navigator
-      key={language} // Force re-render on language change
-      drawerContent={(props) => <DrawerContent {...props} />}
-      screenOptions={{
-        headerShown: false,
-        drawerPosition: isRTL ? "right" : "left",
-        drawerStyle: {
-          width: 320,
-          backgroundColor: theme.backgroundRoot,
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-        },
-        drawerType: "front",
-        overlayColor: "rgba(0,0,0,0.5)",
-        swipeEnabled: true,
-        swipeEdgeWidth: 50,
-        sceneStyle: {
-          backgroundColor: theme.backgroundRoot,
-        },
-      }}
-    >
-      <Drawer.Screen name="PatientTabs" component={PatientTabNavigator} />
-    </Drawer.Navigator>
+    <>
+      {/* ✅ نضع الـ StatusBar هنا لضمان تناسق الألوان عند فتح القائمة */}
+      <StatusBar style="auto" />
+
+      <Drawer.Navigator
+        key={language} // لإعادة بناء القائمة عند تغيير اللغة
+        drawerContent={(props) => <DrawerContent {...props} />}
+        screenOptions={{
+          headerShown: false,
+          drawerPosition: isRTL ? "right" : "left", // ✅ يتبع اللغة بشكل صحيح
+          drawerStyle: {
+            width: 320,
+            backgroundColor: theme.backgroundRoot,
+            // ❌ حذفنا position: "absolute" والـ top/bottom لحل مشكلة اختفاء القائمة و"الشبح" باليسار
+          },
+          drawerType: "front",
+          overlayColor: "rgba(0,0,0,0.5)",
+          swipeEnabled: true,
+          swipeEdgeWidth: 50,
+          sceneStyle: {
+            backgroundColor: theme.backgroundRoot,
+          },
+        }}
+      >
+        <Drawer.Screen name="PatientTabs" component={PatientTabNavigator} />
+      </Drawer.Navigator>
+    </>
   );
 }
