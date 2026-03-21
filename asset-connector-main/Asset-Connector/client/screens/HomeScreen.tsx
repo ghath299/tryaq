@@ -663,6 +663,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderTopColor: "#909090",
     borderBottomColor: "#909090",
+    backgroundColor: "#F5F5F5",
   },
   viewAllButton: { flexDirection: "row", alignItems: "center" },
   horizontalList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
