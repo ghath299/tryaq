@@ -27,7 +27,7 @@ export const Colors = {
     },
     card: "#FFFFFF",
     cardShadow: "rgba(94,223,255,0.25)",
-    bannerBackground: "#4CAF50",
+    bannerBackground: "#D6D6D6",
   },
   dark: {
     primary: "#5EDFFF",
