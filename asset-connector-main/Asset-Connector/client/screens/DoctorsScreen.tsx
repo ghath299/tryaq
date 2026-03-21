@@ -4,7 +4,6 @@ import {
   StyleSheet,
   FlatList,
   ScrollView,
-  Platform,
   Pressable,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";

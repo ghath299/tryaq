@@ -16,7 +16,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
-  FadeIn,
   FadeInUp,
   useAnimatedStyle,
   useSharedValue,
@@ -82,7 +81,7 @@ function MedicineCardNew({ medicine, onPress, index }: MedicineCardNewProps) {
         .springify()}
     >
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        android_ripple={{ color: theme.backgroundRoot }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -313,7 +312,7 @@ function AISearchSection({
           </View>
 
           <Pressable
-            android_ripple={{ color: "transparent" }}
+            android_ripple={{ color: theme.backgroundRoot }}
             onPress={handleUpload}
             style={styles.scanArea}
           >
@@ -412,7 +411,7 @@ function AISearchSection({
               </ThemedText>
             </View>
             <Pressable
-              android_ripple={{ color: "transparent" }}
+              android_ripple={{ color: theme.backgroundRoot }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setAiResult(null);
@@ -536,7 +535,7 @@ function AISearchSection({
 
           <View style={[styles.resultActions, { borderTopColor: "#333333" }]}>
             <AnimatedPressable
-              android_ripple={{ color: "transparent" }}
+              android_ripple={{ color: theme.backgroundRoot }}
               onPress={handleUpload}
               style={[
                 styles.secondaryActionButton,
@@ -553,7 +552,7 @@ function AISearchSection({
             </AnimatedPressable>
 
             <AnimatedPressable
-              android_ripple={{ color: "transparent" }}
+              android_ripple={{ color: theme.backgroundRoot }}
               onPress={() =>
                 onResultPress(aiResult.name || aiResult.extractedText)
               }
@@ -668,10 +667,7 @@ export default function MedicinesScreen() {
           },
         ]}
       >
-        <Animated.View
-          entering={FadeIn.duration(400)}
-          style={styles.modeSelector}
-        >
+        <View style={styles.modeSelector}>
           <View
             style={[
               styles.segmentedControl,
@@ -682,7 +678,7 @@ export default function MedicinesScreen() {
             ]}
           >
             <Pressable
-              android_ripple={{ color: "transparent" }}
+              android_ripple={{ color: theme.backgroundRoot }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setSearchMode("text");
@@ -707,7 +703,7 @@ export default function MedicinesScreen() {
               </ThemedText>
             </Pressable>
             <Pressable
-              android_ripple={{ color: "transparent" }}
+              android_ripple={{ color: theme.backgroundRoot }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setSearchMode("ai");
@@ -732,19 +728,16 @@ export default function MedicinesScreen() {
               </ThemedText>
             </Pressable>
           </View>
-        </Animated.View>
+        </View>
 
         {searchMode === "text" && (
-          <Animated.View
-            entering={FadeIn.duration(300)}
-            style={styles.searchContainer}
-          >
+          <View style={styles.searchContainer}>
             <GlowingSearchBar
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder={t("medicineName")}
             />
-          </Animated.View>
+          </View>
         )}
       </View>
 

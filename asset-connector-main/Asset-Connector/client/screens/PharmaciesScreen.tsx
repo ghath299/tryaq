@@ -14,7 +14,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
-  FadeIn,
   FadeInUp,
   FadeInRight,
   useAnimatedStyle,
@@ -60,7 +59,7 @@ function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
   return (
     <Animated.View entering={FadeInRight.delay(index * 40).duration(300)}>
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        android_ripple={{ color: theme.backgroundRoot }}
         onPress={handlePress}
         style={animatedStyle}
       >
@@ -325,10 +324,7 @@ export default function PharmaciesScreen() {
         />
       </View>
 
-      <Animated.View
-        entering={FadeIn.duration(400)}
-        style={styles.filtersContainer}
-      >
+      <View style={styles.filtersContainer}>
         <ThemedText
           type="caption"
           style={[styles.filterLabel, { color: theme.textSecondary }]}
@@ -354,7 +350,7 @@ export default function PharmaciesScreen() {
             />
           ))}
         </ScrollView>
-      </Animated.View>
+      </View>
 
       <FlatList
         data={filteredPharmacies}
