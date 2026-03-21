@@ -503,7 +503,7 @@ export default function HomeScreen() {
         )}
       />
 
-      <View style={[styles.sectionDivider, { backgroundColor: theme.border }]} />
+      <View style={[styles.sectionDivider, { backgroundColor: theme.backgroundSecondary }]} />
 
       <SectionHeader
         title={t("promotedPharmacies")}
@@ -529,7 +529,7 @@ export default function HomeScreen() {
         )}
       />
 
-      <View style={[styles.sectionDivider, { backgroundColor: theme.border }]} />
+      <View style={[styles.sectionDivider, { backgroundColor: theme.backgroundSecondary }]} />
 
       <SectionHeader
         title={t("healthEvents")}
