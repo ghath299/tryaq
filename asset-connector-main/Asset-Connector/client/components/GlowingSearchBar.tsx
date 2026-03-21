@@ -106,7 +106,9 @@ export function GlowingSearchBar({
               shadowRadius: isFocused ? 16 : 8,
             },
             android: {
-              elevation: isFocused ? 8 : 4,
+              elevation: 0,
+              borderWidth: 1,
+              borderColor: isFocused ? theme.primary : theme.border,
             },
             default: {},
           }),
