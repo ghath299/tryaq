@@ -439,12 +439,8 @@ export default function HomeScreen() {
       overScrollMode="never"
       removeClippedSubviews={false}
     >
-      <SectionHeader
-        title={t("announcements")}
-        viewAllLabel={t("viewAll")}
-        index={3}
-      />
       <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground }]}>
+        <ThemedText type="h3" style={styles.announcementTitle}>{t("announcements")}</ThemedText>
         <FlatList
           ref={sliderRef}
           data={announcements}
@@ -612,6 +608,11 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: Spacing.sm,
     marginBottom: Spacing.sm,
+  },
+  announcementTitle: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.sm,
+    fontWeight: "600",
   },
   sectionDivider: {
     height: 1,
