@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { I18nManager, Platform } from "react-native";
+import { I18nManager, Platform, DevSettings } from "react-native";
 import * as Updates from "expo-updates";
 
 export type UserRole = "patient" | "doctor" | "pharmacist" | "admin" | null;
@@ -235,7 +235,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (Platform.OS !== "web") {
       setTimeout(() => {
         try {
-          Updates.reloadAsync();
+          if (__DEV__) {
+            DevSettings.reload();
+          } else {
+            Updates.reloadAsync();
+          }
         } catch (e) {
           console.error("Reload failed", e);
         }
