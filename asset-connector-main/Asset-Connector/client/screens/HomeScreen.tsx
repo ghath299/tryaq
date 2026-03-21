@@ -20,8 +20,6 @@ import Animated, {
   withSequence,
   withRepeat,
   FadeInUp,
-  interpolate,
-  Extrapolation,
   cancelAnimation,
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
@@ -484,33 +482,29 @@ function AnnouncementSlide({
   );
 }
 
+const TIP_CARD_WIDTH = SCREEN_WIDTH - Spacing.lg * 2;
+
 function HealthTipCard() {
   const { theme } = useTheme();
   const { language } = useApp();
   const isRTL = language === "ar";
-  const [currentTipIndex, setCurrentTipIndex] = useState(() => {
-    const today = new Date();
-    const dayOfYear = Math.floor(
-      (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000
-    );
-    return dayOfYear % HEALTH_TIPS.length;
-  });
-
-  const fadeAnim = useSharedValue(1);
-  const slideAnim = useSharedValue(0);
-  const progressAnim = useSharedValue(0);
+  const [activeTip, setActiveTip] = useState(0);
+  const tipListRef = useRef<FlatList>(null);
   const pulseAnim = useSharedValue(1);
-  const innerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const updateTip = useCallback(() => {
-    setCurrentTipIndex((prev) => (prev + 1) % HEALTH_TIPS.length);
-  }, []);
+  const handleViewableTips = useRef(({ viewableItems }: any) => {
+    if (viewableItems.length > 0) {
+      setActiveTip(viewableItems[0].index);
+    }
+  }).current;
+
+  const tipViewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
 
   useEffect(() => {
     pulseAnim.value = withRepeat(
       withSequence(
-        withTiming(1.08, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
+        withTiming(1.06, { duration: 1800 }),
+        withTiming(1, { duration: 1800 })
       ),
       -1,
       true
@@ -521,131 +515,110 @@ function HealthTipCard() {
   }, []);
 
   useEffect(() => {
-    progressAnim.value = 0;
-    fadeAnim.value = 1;
-    slideAnim.value = 0;
-
-    progressAnim.value = withTiming(1, { duration: 10000 });
-
-    const outerTimeout = setTimeout(() => {
-      fadeAnim.value = withTiming(0, { duration: 300 });
-      slideAnim.value = withTiming(-30, { duration: 300 });
-
-      innerTimeoutRef.current = setTimeout(() => {
-        updateTip();
-        slideAnim.value = 30;
-        fadeAnim.value = withTiming(1, { duration: 400 });
-        slideAnim.value = withSpring(0, Animation.spring.gentle);
-      }, 350);
+    const interval = setInterval(() => {
+      const next = (activeTip + 1) % HEALTH_TIPS.length;
+      tipListRef.current?.scrollToIndex({ index: next, animated: true });
+      setActiveTip(next);
     }, 10000);
-
-    return () => {
-      clearTimeout(outerTimeout);
-      if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
-      cancelAnimation(progressAnim);
-      cancelAnimation(fadeAnim);
-      cancelAnimation(slideAnim);
-    };
-  }, [currentTipIndex]);
-
-  const tip = HEALTH_TIPS[currentTipIndex];
-  const title = language === "ar" ? tip.titleAr : tip.titleEn;
-  const desc = language === "ar" ? tip.descAr : tip.descEn;
-
-  const cardAnimStyle = useAnimatedStyle(() => ({
-    opacity: fadeAnim.value,
-    transform: [{ translateY: slideAnim.value }],
-  }));
-
-  const progressStyle = useAnimatedStyle(() => ({
-    width: `${interpolate(progressAnim.value, [0, 1], [0, 100], Extrapolation.CLAMP)}%`,
-  }));
+    return () => clearInterval(interval);
+  }, [activeTip]);
 
   const pulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseAnim.value }],
   }));
 
+  const renderTipItem = useCallback(({ item }: { item: typeof HEALTH_TIPS[0] }) => {
+    const title = language === "ar" ? item.titleAr : item.titleEn;
+    const desc = language === "ar" ? item.descAr : item.descEn;
+
+    return (
+      <LinearGradient
+        colors={item.colors}
+        start={{ x: isRTL ? 1 : 0, y: 0 }}
+        end={{ x: isRTL ? 0 : 1, y: 1 }}
+        style={styles.tipCard}
+      >
+        <View style={[styles.tipCardInner, isRTL && { flexDirection: "row-reverse" }]}>
+          <Animated.View style={[
+            styles.tipIconContainer,
+            isRTL ? { marginLeft: Spacing.lg, marginRight: 0 } : null,
+            pulseStyle,
+          ]}>
+            <View style={styles.tipIconCircle}>
+              <Feather name={item.icon} size={32} color={item.colors[0]} />
+            </View>
+          </Animated.View>
+
+          <View style={styles.tipTextContent}>
+            <ThemedText
+              type="h3"
+              style={[styles.tipTitle, isRTL && { textAlign: "right" }]}
+              numberOfLines={2}
+            >
+              {title}
+            </ThemedText>
+            <ThemedText
+              type="body"
+              style={[styles.tipDesc, isRTL && { textAlign: "right" }]}
+              numberOfLines={3}
+            >
+              {desc}
+            </ThemedText>
+          </View>
+        </View>
+
+        <View style={[
+          styles.tipPattern,
+          isRTL && { right: undefined, left: 0 },
+        ]}>
+          <View style={[
+            styles.tipPatternCircle,
+            isRTL
+              ? { top: -20, left: -20, width: 100, height: 100 }
+              : { top: -20, right: -20, width: 100, height: 100 },
+          ]} />
+          <View style={[
+            styles.tipPatternCircle,
+            isRTL
+              ? { bottom: 10, left: 50, width: 50, height: 50 }
+              : { bottom: 10, right: 50, width: 50, height: 50 },
+          ]} />
+        </View>
+      </LinearGradient>
+    );
+  }, [language, isRTL, pulseStyle]);
+
   return (
     <View style={styles.tipContainer}>
-      <Animated.View style={cardAnimStyle}>
-        <LinearGradient
-          colors={tip.colors}
-          start={{ x: isRTL ? 1 : 0, y: 0 }}
-          end={{ x: isRTL ? 0 : 1, y: 1 }}
-          style={styles.tipCard}
-        >
-          <View style={[styles.tipCardInner, isRTL && { flexDirection: "row-reverse" }]}>
-            <Animated.View style={[
-              styles.tipIconContainer,
-              isRTL ? { marginLeft: Spacing.lg, marginRight: 0 } : null,
-              pulseStyle,
-            ]}>
-              <View style={styles.tipIconCircle}>
-                <Feather name={tip.icon} size={28} color={tip.colors[0]} />
-              </View>
-            </Animated.View>
-
-            <View style={styles.tipTextContent}>
-              <ThemedText
-                type="h3"
-                style={[styles.tipTitle, isRTL && { textAlign: "right" }]}
-                numberOfLines={2}
-              >
-                {title}
-              </ThemedText>
-              <ThemedText
-                type="small"
-                style={[styles.tipDesc, isRTL && { textAlign: "right" }]}
-                numberOfLines={3}
-              >
-                {desc}
-              </ThemedText>
-            </View>
-          </View>
-
-          <View style={styles.tipProgress}>
-            <Animated.View
-              style={[styles.tipProgressFill, progressStyle]}
-            />
-          </View>
-
-          <View style={styles.tipDotsRow}>
-            {HEALTH_TIPS.map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.tipDot,
-                  {
-                    backgroundColor:
-                      i === currentTipIndex
-                        ? "#FFFFFF"
-                        : "rgba(255,255,255,0.35)",
-                    width: i === currentTipIndex ? 16 : 6,
-                  },
-                ]}
-              />
-            ))}
-          </View>
-
-          <View style={[
-            styles.tipPattern,
-            isRTL && { right: undefined, left: 0 },
-          ]}>
-            <View style={[
-              styles.tipPatternCircle,
-              isRTL
-                ? { top: -20, left: -20, width: 80, height: 80 }
-                : { top: -20, right: -20, width: 80, height: 80 },
-            ]} />
-            <View style={[
-              styles.tipPatternCircle,
-              isRTL
-                ? { bottom: 10, left: 40, width: 40, height: 40 }
-                : { bottom: 10, right: 40, width: 40, height: 40 },
-            ]} />
-          </View>
-        </LinearGradient>
-      </Animated.View>
+      <FlatList
+        ref={tipListRef}
+        data={HEALTH_TIPS}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onViewableItemsChanged={handleViewableTips}
+        viewabilityConfig={tipViewabilityConfig}
+        keyExtractor={(item) => item.id}
+        renderItem={renderTipItem}
+        contentContainerStyle={styles.tipListContent}
+        decelerationRate="fast"
+        snapToInterval={TIP_CARD_WIDTH + Spacing.md}
+      />
+      <View style={styles.tipDotsRow}>
+        {HEALTH_TIPS.map((_, i) => (
+          <View
+            key={i}
+            style={[
+              styles.tipDot,
+              {
+                backgroundColor:
+                  i === activeTip ? theme.primary : theme.border,
+                width: i === activeTip ? 18 : 6,
+              },
+            ]}
+          />
+        ))}
+      </View>
     </View>
   );
 }
@@ -908,15 +881,21 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   tipContainer: {
-    paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.xl,
   },
+  tipListContent: {
+    paddingHorizontal: Spacing.lg,
+  },
   tipCard: {
+    width: TIP_CARD_WIDTH,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
+    paddingVertical: Spacing.xl + 4,
     overflow: "hidden",
     position: "relative",
-    minHeight: 160,
+    minHeight: 180,
+    marginRight: Spacing.md,
+    justifyContent: "center",
   },
   tipCardInner: {
     flexDirection: "row",
@@ -926,9 +905,9 @@ const styles = StyleSheet.create({
     marginRight: Spacing.lg,
   },
   tipIconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
@@ -943,27 +922,15 @@ const styles = StyleSheet.create({
   },
   tipTitle: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
     marginBottom: Spacing.sm,
-    lineHeight: 26,
+    lineHeight: 30,
   },
   tipDesc: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 13,
-    lineHeight: 20,
-  },
-  tipProgress: {
-    height: 3,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    borderRadius: 2,
-    marginTop: Spacing.lg,
-    overflow: "hidden",
-  },
-  tipProgressFill: {
-    height: "100%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 2,
+    color: "rgba(255,255,255,0.9)",
+    fontSize: 15,
+    lineHeight: 24,
   },
   tipDotsRow: {
     flexDirection: "row",
