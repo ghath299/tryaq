@@ -232,15 +232,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     I18nManager.allowRTL(isAr);
     I18nManager.forceRTL(isAr);
 
-    // On native, we must reload to apply RTL changes properly
-    if (Platform.OS !== "web" && !__DEV__) {
+    if (Platform.OS !== "web") {
       setTimeout(() => {
         try {
           Updates.reloadAsync();
         } catch (e) {
           console.error("Reload failed", e);
         }
-      }, 500);
+      }, 300);
     }
   };
 
