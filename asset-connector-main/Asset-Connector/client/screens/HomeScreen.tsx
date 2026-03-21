@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useLayoutEffect } from "react";
+import React, { useRef, useEffect, useState, useLayoutEffect, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -20,7 +20,10 @@ import Animated, {
   withSequence,
   withRepeat,
   FadeInUp,
-} from "react-native-reanimated"; // ❌ شلنا FadeIn من هنا لأنه يسبب الرمشة
+  interpolate,
+  Extrapolation,
+  cancelAnimation,
+} from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
@@ -29,6 +32,99 @@ import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius, Animation } from "@/constants/theme";
 import { doctors, pharmacies, announcements } from "@/data/mockData";
+
+const HEALTH_TIPS = [
+  {
+    id: "1",
+    icon: "droplet" as const,
+    titleAr: "اشرب 8 أكواب ماء يومياً",
+    titleEn: "Drink 8 glasses of water daily",
+    descAr: "الماء ضروري لصحة الجسم والبشرة ويساعد على تحسين وظائف الأعضاء",
+    descEn: "Water is essential for body and skin health and improves organ function",
+    colors: ["#00B4DB", "#0083B0"] as [string, string],
+  },
+  {
+    id: "2",
+    icon: "moon" as const,
+    titleAr: "نم 7-8 ساعات كل ليلة",
+    titleEn: "Sleep 7-8 hours every night",
+    descAr: "النوم الكافي يقوي المناعة ويحسن التركيز والصحة النفسية",
+    descEn: "Adequate sleep strengthens immunity and improves focus and mental health",
+    colors: ["#6C63FF", "#4834DF"] as [string, string],
+  },
+  {
+    id: "3",
+    icon: "heart" as const,
+    titleAr: "مارس الرياضة 30 دقيقة يومياً",
+    titleEn: "Exercise 30 minutes daily",
+    descAr: "النشاط البدني يقلل خطر أمراض القلب ويحسن المزاج والطاقة",
+    descEn: "Physical activity reduces heart disease risk and boosts mood and energy",
+    colors: ["#FF6B6B", "#EE5A24"] as [string, string],
+  },
+  {
+    id: "4",
+    icon: "sun" as const,
+    titleAr: "تعرض لأشعة الشمس صباحاً",
+    titleEn: "Get morning sunlight exposure",
+    descAr: "أشعة الشمس الصباحية تمنحك فيتامين D وتحسن النوم والمزاج",
+    descEn: "Morning sunlight provides vitamin D and improves sleep and mood",
+    colors: ["#F9A826", "#F39C12"] as [string, string],
+  },
+  {
+    id: "5",
+    icon: "smile" as const,
+    titleAr: "تناول الفواكه والخضروات يومياً",
+    titleEn: "Eat fruits and vegetables daily",
+    descAr: "الفواكه والخضروات غنية بالفيتامينات والمعادن الضرورية للجسم",
+    descEn: "Fruits and vegetables are rich in vitamins and minerals essential for the body",
+    colors: ["#00C851", "#007E33"] as [string, string],
+  },
+  {
+    id: "6",
+    icon: "wind" as const,
+    titleAr: "تنفس بعمق لتقليل التوتر",
+    titleEn: "Practice deep breathing to reduce stress",
+    descAr: "التنفس العميق يهدئ الأعصاب ويخفض ضغط الدم ويحسن التركيز",
+    descEn: "Deep breathing calms nerves, lowers blood pressure and improves focus",
+    colors: ["#A29BFE", "#6C5CE7"] as [string, string],
+  },
+  {
+    id: "7",
+    icon: "coffee" as const,
+    titleAr: "قلل من تناول الكافيين",
+    titleEn: "Reduce caffeine intake",
+    descAr: "الإفراط في الكافيين يسبب الأرق والقلق وزيادة ضربات القلب",
+    descEn: "Excess caffeine causes insomnia, anxiety and increased heart rate",
+    colors: ["#E17055", "#D63031"] as [string, string],
+  },
+  {
+    id: "8",
+    icon: "eye" as const,
+    titleAr: "أرح عينيك من الشاشات",
+    titleEn: "Rest your eyes from screens",
+    descAr: "اتبع قاعدة 20-20-20: كل 20 دقيقة انظر لمسافة 20 قدم لمدة 20 ثانية",
+    descEn: "Follow the 20-20-20 rule: every 20 min look 20 feet away for 20 seconds",
+    colors: ["#00CEC9", "#0984E3"] as [string, string],
+  },
+  {
+    id: "9",
+    icon: "users" as const,
+    titleAr: "حافظ على علاقاتك الاجتماعية",
+    titleEn: "Maintain your social relationships",
+    descAr: "العلاقات الاجتماعية الصحية تقلل التوتر وتحسن الصحة النفسية",
+    descEn: "Healthy social relationships reduce stress and improve mental health",
+    colors: ["#FD79A8", "#E84393"] as [string, string],
+  },
+  {
+    id: "10",
+    icon: "clipboard" as const,
+    titleAr: "قم بفحص طبي دوري",
+    titleEn: "Get regular health checkups",
+    descAr: "الفحوصات الدورية تساعد في الكشف المبكر عن الأمراض وعلاجها",
+    descEn: "Regular checkups help in early disease detection and treatment",
+    colors: ["#74B9FF", "#0984E3"] as [string, string],
+  },
+];
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const SLIDER_WIDTH = SCREEN_WIDTH - Spacing.lg * 2;
@@ -388,6 +484,172 @@ function AnnouncementSlide({
   );
 }
 
+function HealthTipCard() {
+  const { theme } = useTheme();
+  const { language } = useApp();
+  const isRTL = language === "ar";
+  const [currentTipIndex, setCurrentTipIndex] = useState(() => {
+    const today = new Date();
+    const dayOfYear = Math.floor(
+      (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000
+    );
+    return dayOfYear % HEALTH_TIPS.length;
+  });
+
+  const fadeAnim = useSharedValue(1);
+  const slideAnim = useSharedValue(0);
+  const progressAnim = useSharedValue(0);
+  const pulseAnim = useSharedValue(1);
+  const innerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const updateTip = useCallback(() => {
+    setCurrentTipIndex((prev) => (prev + 1) % HEALTH_TIPS.length);
+  }, []);
+
+  useEffect(() => {
+    pulseAnim.value = withRepeat(
+      withSequence(
+        withTiming(1.08, { duration: 1500 }),
+        withTiming(1, { duration: 1500 })
+      ),
+      -1,
+      true
+    );
+    return () => {
+      cancelAnimation(pulseAnim);
+    };
+  }, []);
+
+  useEffect(() => {
+    progressAnim.value = 0;
+    fadeAnim.value = 1;
+    slideAnim.value = 0;
+
+    progressAnim.value = withTiming(1, { duration: 10000 });
+
+    const outerTimeout = setTimeout(() => {
+      fadeAnim.value = withTiming(0, { duration: 300 });
+      slideAnim.value = withTiming(-30, { duration: 300 });
+
+      innerTimeoutRef.current = setTimeout(() => {
+        updateTip();
+        slideAnim.value = 30;
+        fadeAnim.value = withTiming(1, { duration: 400 });
+        slideAnim.value = withSpring(0, Animation.spring.gentle);
+      }, 350);
+    }, 10000);
+
+    return () => {
+      clearTimeout(outerTimeout);
+      if (innerTimeoutRef.current) clearTimeout(innerTimeoutRef.current);
+      cancelAnimation(progressAnim);
+      cancelAnimation(fadeAnim);
+      cancelAnimation(slideAnim);
+    };
+  }, [currentTipIndex]);
+
+  const tip = HEALTH_TIPS[currentTipIndex];
+  const title = language === "ar" ? tip.titleAr : tip.titleEn;
+  const desc = language === "ar" ? tip.descAr : tip.descEn;
+
+  const cardAnimStyle = useAnimatedStyle(() => ({
+    opacity: fadeAnim.value,
+    transform: [{ translateY: slideAnim.value }],
+  }));
+
+  const progressStyle = useAnimatedStyle(() => ({
+    width: `${interpolate(progressAnim.value, [0, 1], [0, 100], Extrapolation.CLAMP)}%`,
+  }));
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseAnim.value }],
+  }));
+
+  return (
+    <View style={styles.tipContainer}>
+      <Animated.View style={cardAnimStyle}>
+        <LinearGradient
+          colors={tip.colors}
+          start={{ x: isRTL ? 1 : 0, y: 0 }}
+          end={{ x: isRTL ? 0 : 1, y: 1 }}
+          style={styles.tipCard}
+        >
+          <View style={[styles.tipCardInner, isRTL && { flexDirection: "row-reverse" }]}>
+            <Animated.View style={[
+              styles.tipIconContainer,
+              isRTL ? { marginLeft: Spacing.lg, marginRight: 0 } : null,
+              pulseStyle,
+            ]}>
+              <View style={styles.tipIconCircle}>
+                <Feather name={tip.icon} size={28} color={tip.colors[0]} />
+              </View>
+            </Animated.View>
+
+            <View style={styles.tipTextContent}>
+              <ThemedText
+                type="h3"
+                style={[styles.tipTitle, isRTL && { textAlign: "right" }]}
+                numberOfLines={2}
+              >
+                {title}
+              </ThemedText>
+              <ThemedText
+                type="small"
+                style={[styles.tipDesc, isRTL && { textAlign: "right" }]}
+                numberOfLines={3}
+              >
+                {desc}
+              </ThemedText>
+            </View>
+          </View>
+
+          <View style={styles.tipProgress}>
+            <Animated.View
+              style={[styles.tipProgressFill, progressStyle]}
+            />
+          </View>
+
+          <View style={styles.tipDotsRow}>
+            {HEALTH_TIPS.map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.tipDot,
+                  {
+                    backgroundColor:
+                      i === currentTipIndex
+                        ? "#FFFFFF"
+                        : "rgba(255,255,255,0.35)",
+                    width: i === currentTipIndex ? 16 : 6,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+
+          <View style={[
+            styles.tipPattern,
+            isRTL && { right: undefined, left: 0 },
+          ]}>
+            <View style={[
+              styles.tipPatternCircle,
+              isRTL
+                ? { top: -20, left: -20, width: 80, height: 80 }
+                : { top: -20, right: -20, width: 80, height: 80 },
+            ]} />
+            <View style={[
+              styles.tipPatternCircle,
+              isRTL
+                ? { bottom: 10, left: 40, width: 40, height: 40 }
+                : { bottom: 10, right: 40, width: 40, height: 40 },
+            ]} />
+          </View>
+        </LinearGradient>
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
@@ -529,75 +791,11 @@ export default function HomeScreen() {
       />
 
       <SectionHeader
-        title={t("healthEvents")}
+        title={t("healthTips")}
         viewAllLabel={t("viewAll")}
         index={2}
       />
-      <View style={styles.eventsContainer}>
-        {announcements
-          .filter((a) => a.type === "event")
-          .map((event, index) => {
-            const eventTitle =
-              language === "ar" ? event.titleAr : event.titleEn;
-            const eventDesc =
-              language === "ar" ? event.descriptionAr : event.descriptionEn;
-
-            return (
-              <Animated.View
-                key={event.id}
-                entering={FadeInUp.delay(400 + index * 80)
-                  .duration(400)
-                  .springify()}
-              >
-                <Pressable
-                  // ✅ تمويه التحديد بلون الخلفية
-                  android_ripple={{ color: theme.backgroundRoot }}
-                  style={[
-                    styles.eventCard,
-                    { backgroundColor: theme.backgroundDefault },
-                  ]}
-                >
-                  <LinearGradient
-                    colors={[theme.primary + "20", theme.primaryDark + "10"]}
-                    style={styles.eventIcon}
-                  >
-                    <Feather name="calendar" size={20} color={theme.primary} />
-                  </LinearGradient>
-
-                  <View style={styles.eventInfo}>
-                    <ThemedText
-                      type="body"
-                      numberOfLines={1}
-                      style={{ fontWeight: "500" }}
-                    >
-                      {eventTitle}
-                    </ThemedText>
-                    <ThemedText
-                      type="small"
-                      style={{ color: theme.textSecondary }}
-                      numberOfLines={1}
-                    >
-                      {eventDesc}
-                    </ThemedText>
-                  </View>
-
-                  <View
-                    style={[
-                      styles.eventArrow,
-                      { backgroundColor: theme.primary + "10" },
-                    ]}
-                  >
-                    <Feather
-                      name="chevron-right"
-                      size={18}
-                      color={theme.primary}
-                    />
-                  </View>
-                </Pressable>
-              </Animated.View>
-            );
-          })}
-      </View>
+      <HealthTipCard />
     </ScrollView>
   );
 }
@@ -709,28 +907,85 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
     marginTop: Spacing.sm,
   },
-  eventsContainer: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.lg },
-  eventCard: {
+  tipContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.xl,
+  },
+  tipCard: {
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.xl,
+    overflow: "hidden",
+    position: "relative",
+    minHeight: 160,
+  },
+  tipCardInner: {
     flexDirection: "row",
     alignItems: "center",
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.md,
   },
-  eventIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: BorderRadius.md,
+  tipIconContainer: {
+    marginRight: Spacing.lg,
+  },
+  tipIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: Spacing.md,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  eventInfo: { flex: 1, marginRight: Spacing.md },
-  eventArrow: {
-    width: 32,
-    height: 32,
-    borderRadius: BorderRadius.sm,
-    alignItems: "center",
+  tipTextContent: {
+    flex: 1,
+  },
+  tipTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: Spacing.sm,
+    lineHeight: 26,
+  },
+  tipDesc: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  tipProgress: {
+    height: 3,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 2,
+    marginTop: Spacing.lg,
+    overflow: "hidden",
+  },
+  tipProgressFill: {
+    height: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 2,
+  },
+  tipDotsRow: {
+    flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+    marginTop: Spacing.md,
+  },
+  tipDot: {
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 3,
+  },
+  tipPattern: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: "40%",
+  },
+  tipPatternCircle: {
+    position: "absolute",
+    borderRadius: 9999,
+    backgroundColor: "rgba(255,255,255,0.08)",
   },
 });
