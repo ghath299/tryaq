@@ -606,8 +606,6 @@ const styles = StyleSheet.create({
   bannerSection: {
     paddingTop: Spacing.md,
     paddingBottom: Spacing.sm,
-    borderBottomLeftRadius: BorderRadius.xl,
-    borderBottomRightRadius: BorderRadius.xl,
     marginBottom: Spacing.sm,
   },
   slider: { marginBottom: Spacing.md },
