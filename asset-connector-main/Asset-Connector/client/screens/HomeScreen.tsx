@@ -503,6 +503,8 @@ export default function HomeScreen() {
         )}
       />
 
+      <View style={[styles.sectionDivider, { backgroundColor: theme.border }]} />
+
       <SectionHeader
         title={t("promotedPharmacies")}
         onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
@@ -526,6 +528,8 @@ export default function HomeScreen() {
           />
         )}
       />
+
+      <View style={[styles.sectionDivider, { backgroundColor: theme.border }]} />
 
       <SectionHeader
         title={t("healthEvents")}
@@ -607,6 +611,11 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: Spacing.sm,
     marginBottom: Spacing.sm,
+  },
+  sectionDivider: {
+    height: 1,
+    marginHorizontal: Spacing.lg,
+    marginVertical: Spacing.md,
   },
   slider: { marginBottom: Spacing.md },
   sliderContent: { paddingHorizontal: Spacing.lg },
