@@ -19,7 +19,6 @@ export default function DrawerNavigator() {
   const { theme } = useTheme();
   const { language } = useApp();
   const isRTL = language === "ar";
-  const drawerWidth = Math.min(WINDOW_WIDTH * 0.82, 320);
 
   return (
     <>
@@ -32,9 +31,9 @@ export default function DrawerNavigator() {
         screenOptions={{
           headerShown: false,
           drawerPosition: isRTL ? "right" : "left",
-          drawerType: "slide",
+          drawerType: "front",
           drawerStyle: {
-            width: drawerWidth,
+            width: WINDOW_WIDTH * 0.82,
             backgroundColor: theme.backgroundRoot,
           },
           sceneStyle: {
@@ -42,7 +41,7 @@ export default function DrawerNavigator() {
           },
           overlayColor: "rgba(0,0,0,0.5)",
           swipeEnabled: true,
-          swipeEdgeWidth: isRTL ? 80 : 60,
+          swipeEdgeWidth: WINDOW_WIDTH,
           drawerActiveBackgroundColor: "transparent",
           drawerInactiveBackgroundColor: "transparent",
           drawerActiveTintColor: theme.primary,
