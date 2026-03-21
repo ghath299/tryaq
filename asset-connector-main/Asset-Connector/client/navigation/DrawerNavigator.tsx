@@ -19,34 +19,32 @@ export default function DrawerNavigator() {
   const { theme } = useTheme();
   const { language } = useApp();
   const isRTL = language === "ar";
+  const drawerWidth = Math.min(WINDOW_WIDTH * 0.82, 320);
 
   return (
     <>
       <StatusBar style="auto" />
 
       <Drawer.Navigator
-        key={language} 
+        key={language}
         drawerContent={(props) => <DrawerContent {...props} />}
-        // ✅ الحل الجذري لبقاء "شبح" القائمة أو التحديد الرمادي الخلفي
-        detachInactiveScreens={false} 
+        detachInactiveScreens={false}
         screenOptions={{
           headerShown: false,
           drawerPosition: isRTL ? "right" : "left",
-          drawerType: "front",
+          drawerType: "slide",
           drawerStyle: {
-            width: 320,
-            backgroundColor: theme.backgroundRoot, // لازم يكون #F2F2F7
+            width: drawerWidth,
+            backgroundColor: theme.backgroundRoot,
           },
-          // ✅ إجبار الخلفية اللي تحت الـ Drawer تكون نفس اللون عشان ما يطلع رمادي
           sceneStyle: {
             backgroundColor: theme.backgroundRoot,
           },
           overlayColor: "rgba(0,0,0,0.5)",
           swipeEnabled: true,
-          swipeEdgeWidth: WINDOW_WIDTH,
-          // ✅ "خنق" التحديد الرمادي في القائمة الجانبية (الأندرويد)
-          drawerActiveBackgroundColor: 'transparent',
-          drawerInactiveBackgroundColor: 'transparent',
+          swipeEdgeWidth: isRTL ? 80 : 60,
+          drawerActiveBackgroundColor: "transparent",
+          drawerInactiveBackgroundColor: "transparent",
           drawerActiveTintColor: theme.primary,
         }}
       >
