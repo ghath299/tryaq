@@ -614,9 +614,8 @@ const styles = StyleSheet.create({
   },
   sectionDivider: {
     height: 3,
-    marginHorizontal: Spacing.lg,
     marginVertical: Spacing.lg,
-    borderRadius: 2,
+    borderRadius: 0,
   },
   slider: { marginBottom: Spacing.md },
   sliderContent: { paddingHorizontal: Spacing.lg },
