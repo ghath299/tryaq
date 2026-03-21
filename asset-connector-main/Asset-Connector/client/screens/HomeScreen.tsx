@@ -439,9 +439,7 @@ export default function HomeScreen() {
       overScrollMode="never"
       removeClippedSubviews={false}
     >
-      {/* ❌ حذفنا الـ Animated.View entering={FadeIn} اللي كان يغلف المحتوى العلوي */}
-      {/* هو الجاني الحقيقي اللي كان يسبب الرمشة لأنه يخلي الشاشة شفافة وقت التحميل */}
-      <View>
+      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground }]}>
         <FlatList
           ref={sliderRef}
           data={announcements}
@@ -605,6 +603,13 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  bannerSection: {
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+    borderBottomLeftRadius: BorderRadius.xl,
+    borderBottomRightRadius: BorderRadius.xl,
+    marginBottom: Spacing.sm,
+  },
   slider: { marginBottom: Spacing.md },
   sliderContent: { paddingHorizontal: Spacing.lg },
   slide: {
