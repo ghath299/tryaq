@@ -439,6 +439,11 @@ export default function HomeScreen() {
       overScrollMode="never"
       removeClippedSubviews={false}
     >
+      <SectionHeader
+        title={t("announcements")}
+        viewAllLabel={t("viewAll")}
+        index={3}
+      />
       <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground }]}>
         <FlatList
           ref={sliderRef}
