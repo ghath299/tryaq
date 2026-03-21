@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   sectionDivider: {
-    height: 3,
+    height: 1,
     marginVertical: Spacing.lg,
     borderRadius: 0,
   },
