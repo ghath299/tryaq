@@ -71,7 +71,7 @@ function SectionHeader({
       entering={FadeInUp.delay(index * 100).duration(400)}
       style={styles.sectionHeader}
     >
-      <ThemedText type="h3">{title}</ThemedText>
+      <ThemedText type="h3" style={{ color: "#FFFFFF" }}>{title}</ThemedText>
       {onViewAll ? (
         <AnimatedPressable
           // ✅ تمويه التحديد بلون الخلفية للقضاء على المربع الرمادي
@@ -82,11 +82,11 @@ function SectionHeader({
           <View style={styles.viewAllButton}>
             <ThemedText
               type="small"
-              style={{ color: theme.primaryDark, fontWeight: "600" }}
+              style={{ color: "#FFFFFF", fontWeight: "600" }}
             >
               {viewAllLabel}
             </ThemedText>
-            <Feather name="chevron-right" size={16} color={theme.primaryDark} />
+            <Feather name="chevron-right" size={16} color="#FFFFFF" />
           </View>
         </AnimatedPressable>
       ) : null}
@@ -503,8 +503,6 @@ export default function HomeScreen() {
         )}
       />
 
-      <View style={[styles.sectionDivider, { backgroundColor: "#909090" }]} />
-
       <SectionHeader
         title={t("promotedPharmacies")}
         onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
@@ -528,8 +526,6 @@ export default function HomeScreen() {
           />
         )}
       />
-
-      <View style={[styles.sectionDivider, { backgroundColor: "#909090" }]} />
 
       <SectionHeader
         title={t("healthEvents")}
@@ -659,7 +655,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     marginBottom: Spacing.md,
     marginTop: Spacing.md,
-    backgroundColor: "#EBF3FA",
+    backgroundColor: "#34495E",
   },
   viewAllButton: { flexDirection: "row", alignItems: "center" },
   horizontalList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
