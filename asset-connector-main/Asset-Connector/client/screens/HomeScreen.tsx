@@ -527,9 +527,10 @@ function HealthTipCard() {
     transform: [{ scale: pulseAnim.value }],
   }));
 
-  const renderTipItem = useCallback(({ item }: { item: typeof HEALTH_TIPS[0] }) => {
-    const title = language === "ar" ? item.titleAr : item.titleEn;
+  const renderTipItem = useCallback(({ item, index }: { item: typeof HEALTH_TIPS[0]; index: number }) => {
+    const tipTitle = language === "ar" ? item.titleAr : item.titleEn;
     const desc = language === "ar" ? item.descAr : item.descEn;
+    const sectionTitle = language === "ar" ? "نصائح صحية" : "Health Tips";
 
     return (
       <LinearGradient
@@ -538,6 +539,13 @@ function HealthTipCard() {
         end={{ x: isRTL ? 0 : 1, y: 1 }}
         style={styles.tipCard}
       >
+        <ThemedText
+          type="small"
+          style={[styles.tipSectionLabel, { textAlign: isRTL ? "right" : "left" }]}
+        >
+          {sectionTitle}
+        </ThemedText>
+
         <Animated.View style={[
           styles.tipIconContainer,
           isRTL ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" },
@@ -552,7 +560,7 @@ function HealthTipCard() {
           type="h3"
           style={[styles.tipTitle, { textAlign: isRTL ? "right" : "left" }]}
         >
-          {title}
+          {tipTitle}
         </ThemedText>
         <ThemedText
           type="body"
@@ -560,6 +568,22 @@ function HealthTipCard() {
         >
           {desc}
         </ThemedText>
+
+        <View style={styles.tipDotsRow}>
+          {HEALTH_TIPS.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.tipDot,
+                {
+                  backgroundColor:
+                    i === index ? "#FFFFFF" : "rgba(255,255,255,0.35)",
+                  width: i === index ? 18 : 6,
+                },
+              ]}
+            />
+          ))}
+        </View>
 
         <View style={[
           styles.tipPattern,
@@ -583,36 +607,20 @@ function HealthTipCard() {
   }, [language, isRTL, pulseStyle]);
 
   return (
-    <View style={styles.tipContainer}>
-      <FlatList
-        ref={tipListRef}
-        data={HEALTH_TIPS}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onViewableItemsChanged={handleViewableTips}
-        viewabilityConfig={tipViewabilityConfig}
-        keyExtractor={(item) => item.id}
-        renderItem={renderTipItem}
-        decelerationRate="fast"
-        snapToInterval={TIP_CARD_WIDTH}
-      />
-      <View style={styles.tipDotsRow}>
-        {HEALTH_TIPS.map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.tipDot,
-              {
-                backgroundColor:
-                  i === activeTip ? theme.primary : theme.border,
-                width: i === activeTip ? 18 : 6,
-              },
-            ]}
-          />
-        ))}
-      </View>
-    </View>
+    <FlatList
+      ref={tipListRef}
+      data={HEALTH_TIPS}
+      horizontal
+      pagingEnabled
+      showsHorizontalScrollIndicator={false}
+      onViewableItemsChanged={handleViewableTips}
+      viewabilityConfig={tipViewabilityConfig}
+      keyExtractor={(item) => item.id}
+      renderItem={renderTipItem}
+      decelerationRate="fast"
+      snapToInterval={TIP_CARD_WIDTH}
+      style={styles.tipContainer}
+    />
   );
 }
 
@@ -756,11 +764,6 @@ export default function HomeScreen() {
         )}
       />
 
-      <SectionHeader
-        title={t("healthTips")}
-        viewAllLabel={t("viewAll")}
-        index={2}
-      />
       <HealthTipCard />
     </ScrollView>
   );
@@ -874,14 +877,22 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   tipContainer: {
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.md,
   },
   tipCard: {
     width: TIP_CARD_WIDTH,
     padding: Spacing.xl,
-    paddingVertical: Spacing.xl + 8,
+    paddingVertical: Spacing.xl,
     overflow: "hidden",
     position: "relative",
+  },
+  tipSectionLabel: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: Spacing.md,
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
   tipIconContainer: {
     marginBottom: Spacing.md,
