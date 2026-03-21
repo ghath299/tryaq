@@ -5,7 +5,6 @@ import {
   FlatList,
   ScrollView,
   Pressable,
-  Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar"; // ✅ أضفنا الـ StatusBar
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -134,17 +133,6 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
     onPress();
   };
 
-  const shadowStyle = Platform.select({
-    ios: {
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 8,
-    },
-    android: { elevation: 3 },
-    default: {},
-  });
-
   return (
     <Animated.View
       entering={FadeInUp.delay(index * 60)
@@ -152,14 +140,18 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
         .springify()}
     >
       <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
+        android_ripple={{ color: theme.backgroundRoot, borderless: false, foreground: false }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[
           styles.pharmacyCard,
-          { backgroundColor: theme.backgroundDefault },
-          shadowStyle,
+          {
+            backgroundColor: theme.backgroundDefault,
+            elevation: 0,
+            borderWidth: 1,
+            borderColor: theme.border,
+          },
           animatedStyle,
         ]}
       >
