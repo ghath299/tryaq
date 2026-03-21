@@ -482,7 +482,7 @@ function AnnouncementSlide({
   );
 }
 
-const TIP_CARD_WIDTH = SCREEN_WIDTH - Spacing.lg * 2;
+const TIP_CARD_WIDTH = SCREEN_WIDTH;
 
 function HealthTipCard() {
   const { theme } = useTheme();
@@ -553,14 +553,12 @@ function HealthTipCard() {
             <ThemedText
               type="h3"
               style={[styles.tipTitle, isRTL && { textAlign: "right" }]}
-              numberOfLines={2}
             >
               {title}
             </ThemedText>
             <ThemedText
               type="body"
               style={[styles.tipDesc, isRTL && { textAlign: "right" }]}
-              numberOfLines={3}
             >
               {desc}
             </ThemedText>
@@ -600,9 +598,8 @@ function HealthTipCard() {
         viewabilityConfig={tipViewabilityConfig}
         keyExtractor={(item) => item.id}
         renderItem={renderTipItem}
-        contentContainerStyle={styles.tipListContent}
         decelerationRate="fast"
-        snapToInterval={TIP_CARD_WIDTH + Spacing.md}
+        snapToInterval={TIP_CARD_WIDTH}
       />
       <View style={styles.tipDotsRow}>
         {HEALTH_TIPS.map((_, i) => (
@@ -883,18 +880,12 @@ const styles = StyleSheet.create({
   tipContainer: {
     marginBottom: Spacing.xl,
   },
-  tipListContent: {
-    paddingHorizontal: Spacing.lg,
-  },
   tipCard: {
     width: TIP_CARD_WIDTH,
-    borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
-    paddingVertical: Spacing.xl + 4,
+    paddingVertical: Spacing.xl + 8,
     overflow: "hidden",
     position: "relative",
-    minHeight: 180,
-    marginRight: Spacing.md,
     justifyContent: "center",
   },
   tipCardInner: {
