@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     marginBottom: Spacing.md,
     marginTop: Spacing.md,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#EBF3FA",
   },
   viewAllButton: { flexDirection: "row", alignItems: "center" },
   horizontalList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
