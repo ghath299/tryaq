@@ -538,32 +538,28 @@ function HealthTipCard() {
         end={{ x: isRTL ? 0 : 1, y: 1 }}
         style={styles.tipCard}
       >
-        <View style={[styles.tipCardInner, isRTL && { flexDirection: "row-reverse" }]}>
-          <Animated.View style={[
-            styles.tipIconContainer,
-            isRTL ? { marginLeft: Spacing.lg, marginRight: 0 } : null,
-            pulseStyle,
-          ]}>
-            <View style={styles.tipIconCircle}>
-              <Feather name={item.icon} size={32} color={item.colors[0]} />
-            </View>
-          </Animated.View>
-
-          <View style={styles.tipTextContent}>
-            <ThemedText
-              type="h3"
-              style={[styles.tipTitle, isRTL && { textAlign: "right" }]}
-            >
-              {title}
-            </ThemedText>
-            <ThemedText
-              type="body"
-              style={[styles.tipDesc, isRTL && { textAlign: "right" }]}
-            >
-              {desc}
-            </ThemedText>
+        <Animated.View style={[
+          styles.tipIconContainer,
+          isRTL ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" },
+          pulseStyle,
+        ]}>
+          <View style={styles.tipIconCircle}>
+            <Feather name={item.icon} size={32} color={item.colors[0]} />
           </View>
-        </View>
+        </Animated.View>
+
+        <ThemedText
+          type="h3"
+          style={[styles.tipTitle, { textAlign: isRTL ? "right" : "left" }]}
+        >
+          {title}
+        </ThemedText>
+        <ThemedText
+          type="body"
+          style={[styles.tipDesc, { textAlign: isRTL ? "right" : "left" }]}
+        >
+          {desc}
+        </ThemedText>
 
         <View style={[
           styles.tipPattern,
@@ -886,14 +882,9 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xl + 8,
     overflow: "hidden",
     position: "relative",
-    justifyContent: "center",
-  },
-  tipCardInner: {
-    flexDirection: "row",
-    alignItems: "center",
   },
   tipIconContainer: {
-    marginRight: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   tipIconCircle: {
     width: 68,
@@ -907,9 +898,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 6,
-  },
-  tipTextContent: {
-    flex: 1,
   },
   tipTitle: {
     color: "#FFFFFF",
