@@ -708,7 +708,7 @@ export default function HomeScreen() {
       overScrollMode="never"
       removeClippedSubviews={false}
     >
-      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground }]}>
+      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground, shadowColor: "#00000010", shadowOpacity: 0.08, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 2 }]}>
         <ThemedText type="h3" style={styles.announcementTitle}>{t("announcements")}</ThemedText>
         <FlatList
           ref={sliderRef}
@@ -821,6 +821,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     paddingVertical: Spacing.md,
     marginVertical: Spacing.sm,
+    shadowColor: "#00000008",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 1,
   },
   announcementTitle: {
     paddingHorizontal: Spacing.lg,
@@ -888,6 +893,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(94, 223, 255, 0.2)",
+    shadowColor: "#1F6AE1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
   },
   promotedCardInner: {
     alignItems: "center",
@@ -900,6 +912,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.md,
+    shadowColor: "#1F6AE1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
   },
   promotedIconGradient: {
     width: 76,
@@ -907,6 +924,8 @@ const styles = StyleSheet.create({
     borderRadius: 38,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.3)",
   },
   promotedName: {
     textAlign: "center",
@@ -937,6 +956,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#E63946",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
   },
   deliveryBadge: {
     flexDirection: "row",
@@ -974,6 +1000,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
   },
   tipTitle: {
     color: "#FFFFFF",
