@@ -290,19 +290,11 @@ function PromotedDoctorCard({
           >
             <ThemedText
               type="body"
-              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 14 }}
+              style={{ color: "#FFFFFF", fontWeight: "800", fontSize: 22 }}
             >
               {rank}
             </ThemedText>
           </LinearGradient>
-
-          {doctor.isVerified ? (
-            <View
-              style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}
-            >
-              <Feather name="check" size={10} color="#FFFFFF" />
-            </View>
-          ) : null}
         </LinearGradient>
       </AnimatedPressable>
     </Animated.View>
@@ -941,19 +933,19 @@ const styles = StyleSheet.create({
   },
   rankBadge: {
     position: "absolute",
-    top: -8,
-    right: -8,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    top: -12,
+    right: -12,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 10,
-    borderWidth: 2,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 12,
+    borderWidth: 3,
     borderColor: "#FFFFFF",
   },
   deliveryBadge: {
