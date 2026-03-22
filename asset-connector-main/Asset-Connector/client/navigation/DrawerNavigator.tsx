@@ -32,7 +32,7 @@ export default function DrawerNavigator() {
           drawerPosition: isRTL ? "right" : "left",
           drawerType: "front",
           drawerStyle: {
-            width: WINDOW_WIDTH * 0.7,
+            width: WINDOW_WIDTH * 0.55,
             backgroundColor: theme.backgroundRoot,
           },
           sceneStyle: {
