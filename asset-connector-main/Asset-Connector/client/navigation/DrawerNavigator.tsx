@@ -29,7 +29,7 @@ export default function DrawerNavigator() {
         detachInactiveScreens={false}
         screenOptions={{
           headerShown: false,
-          drawerPosition: isRTL ? "right" : "left",
+          drawerPosition: isRTL ? "left" : "right",
           drawerType: "slide",
           drawerStyle: {
             width: WINDOW_WIDTH * 0.75,
