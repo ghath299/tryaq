@@ -30,15 +30,15 @@ export default function DrawerNavigator() {
         screenOptions={{
           headerShown: false,
           drawerPosition: isRTL ? "right" : "left",
-          drawerType: "slide",
+          drawerType: "front",
           drawerStyle: {
-            width: WINDOW_WIDTH * 0.75,
+            width: WINDOW_WIDTH * 0.7,
             backgroundColor: theme.backgroundRoot,
           },
           sceneStyle: {
             backgroundColor: theme.backgroundRoot,
           },
-          overlayColor: "rgba(0,0,0,0.4)",
+          overlayColor: "rgba(0,0,0,0.5)",
           swipeEnabled: true,
           drawerActiveBackgroundColor: "transparent",
           drawerInactiveBackgroundColor: "transparent",
