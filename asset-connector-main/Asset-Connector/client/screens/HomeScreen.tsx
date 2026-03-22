@@ -375,22 +375,15 @@ function PromotedPharmacyCard({
               {district}
             </ThemedText>
 
-            {pharmacy.hasDelivery ? (
-              <View
-                style={[
-                  styles.deliveryBadge,
-                  { backgroundColor: theme.success + "15" },
-                ]}
+            <View style={styles.promotedRating}>
+              <Feather name="star" size={12} color="#FFB800" />
+              <ThemedText
+                type="caption"
+                style={{ color: theme.textSecondary, marginLeft: 4 }}
               >
-                <Feather name="truck" size={10} color={theme.success} />
-                <ThemedText
-                  type="caption"
-                  style={{ color: theme.success, marginLeft: 4 }}
-                >
-                  {t("delivery")}
-                </ThemedText>
-              </View>
-            ) : null}
+                {pharmacy.rating}
+              </ThemedText>
+            </View>
           </View>
         </LinearGradient>
       </AnimatedPressable>
