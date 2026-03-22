@@ -289,8 +289,8 @@ function PromotedDoctorCard({
             style={styles.rankBadge}
           >
             <ThemedText
-              type="body"
-              style={{ color: "#FFFFFF", fontWeight: "800", fontSize: 22 }}
+              type="caption"
+              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 10 }}
             >
               {rank}
             </ThemedText>
@@ -933,19 +933,19 @@ const styles = StyleSheet.create({
   },
   rankBadge: {
     position: "absolute",
-    top: -12,
-    right: -12,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    top: -6,
+    right: -6,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#FFD700",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 12,
-    borderWidth: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
+    borderWidth: 1.5,
     borderColor: "#FFFFFF",
   },
   deliveryBadge: {
