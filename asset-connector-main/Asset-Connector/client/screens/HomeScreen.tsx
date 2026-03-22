@@ -749,59 +749,55 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View style={styles.sectionContainer}>
-        <SectionHeader
-          title={t("promotedDoctors")}
-          onViewAll={() => navigation.navigate("DoctorsTab" as never)}
-          viewAllLabel={t("viewAll")}
-          index={0}
-        />
-        <FlatList
-          data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
-          horizontal
-          inverted={language === "ar"}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.horizontalList}
-          renderItem={({ item, index }) => (
-            <PromotedDoctorCard
-              doctor={item}
-              index={index}
-              rank={index + 1}
-              onPress={() =>
-                navigation.navigate("DoctorDetail", { doctorId: item.id })
-              }
-            />
-          )}
-        />
-      </View>
+      <SectionHeader
+        title={t("promotedDoctors")}
+        onViewAll={() => navigation.navigate("DoctorsTab" as never)}
+        viewAllLabel={t("viewAll")}
+        index={0}
+      />
+      <FlatList
+        data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
+        horizontal
+        inverted={language === "ar"}
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.horizontalList}
+        renderItem={({ item, index }) => (
+          <PromotedDoctorCard
+            doctor={item}
+            index={index}
+            rank={index + 1}
+            onPress={() =>
+              navigation.navigate("DoctorDetail", { doctorId: item.id })
+            }
+          />
+        )}
+      />
 
-      <View style={styles.sectionContainer}>
-        <SectionHeader
-          title={t("promotedPharmacies")}
-          onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
-          viewAllLabel={t("viewAll")}
-          index={1}
-        />
-        <FlatList
-          data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
-          horizontal
-          inverted={language === "ar"}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.horizontalList}
-          renderItem={({ item, index }) => (
-            <PromotedPharmacyCard
-              pharmacy={item}
-              index={index}
-              rank={index + 1}
-              onPress={() =>
-                navigation.navigate("PharmacyDetail", { pharmacyId: item.id })
-              }
-            />
-          )}
-        />
-      </View>
+      <SectionHeader
+        title={t("promotedPharmacies")}
+        onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
+        viewAllLabel={t("viewAll")}
+        index={1}
+      />
+      <FlatList
+        data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
+        horizontal
+        inverted={language === "ar"}
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.horizontalList}
+        renderItem={({ item, index }) => (
+          <PromotedPharmacyCard
+            pharmacy={item}
+            index={index}
+            rank={index + 1}
+            onPress={() =>
+              navigation.navigate("PharmacyDetail", { pharmacyId: item.id })
+            }
+          />
+        )}
+      />
 
       <HealthTipCard />
     </ScrollView>
@@ -810,15 +806,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  sectionContainer: {
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-    paddingVertical: Spacing.md,
-    borderWidth: 1,
-    borderColor: "rgba(94, 223, 255, 0.2)",
-    borderRadius: BorderRadius.lg,
-    paddingHorizontal: 0,
-  },
   bannerSection: {
     paddingTop: Spacing.md,
     paddingBottom: Spacing.sm,
