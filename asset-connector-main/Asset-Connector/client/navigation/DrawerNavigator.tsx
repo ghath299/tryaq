@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, Platform } from "react-native";
+import { Dimensions } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import PatientTabNavigator from "@/navigation/PatientTabNavigator";
 import { DrawerContent } from "@/components/DrawerContent";
@@ -30,16 +30,18 @@ export default function DrawerNavigator() {
         screenOptions={{
           headerShown: false,
           drawerPosition: isRTL ? "right" : "left",
+
           drawerType: "slide",
+
           drawerStyle: {
             width: WINDOW_WIDTH * 0.75,
             backgroundColor: theme.backgroundRoot,
           },
-          sceneStyle: {
-            backgroundColor: theme.backgroundRoot,
-          },
+
+
           overlayColor: "rgba(0,0,0,0.4)",
           swipeEnabled: true,
+
           drawerActiveBackgroundColor: "transparent",
           drawerInactiveBackgroundColor: "transparent",
           drawerActiveTintColor: theme.primary,

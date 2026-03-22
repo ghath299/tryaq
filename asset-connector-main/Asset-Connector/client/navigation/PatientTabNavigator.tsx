@@ -53,7 +53,6 @@ function DrawerButton() {
 
   return (
     <AnimatedPressable
-      // ✅ تمويه التحديد بلون الخلفية
       android_ripple={{ color: theme.backgroundRoot }}
       onPress={handlePress}
       style={[
@@ -112,8 +111,9 @@ export default function PatientTabNavigator() {
         lazy: false,
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.tabIconDefault,
+
+        // ✅ تم حذف position:absolute من هنا
         tabBarStyle: {
-          position: "absolute",
           backgroundColor: Platform.select({
             ios: "transparent",
             android: theme.backgroundRoot,
@@ -124,11 +124,13 @@ export default function PatientTabNavigator() {
           paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
           paddingTop: 8,
         },
+
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: "500",
           marginTop: 2,
         },
+
         tabBarBackground: () =>
           Platform.OS === "ios" ? (
             <BlurView
@@ -144,11 +146,13 @@ export default function PatientTabNavigator() {
               ]}
             />
           ),
+
         headerLeft: () => (language === "ar" ? null : <DrawerButton />),
         headerRight: () => (language === "ar" ? <DrawerButton /> : null),
 
         animation: "fade",
         freezeOnBlur: true,
+
         sceneStyle: {
           backgroundColor: theme.backgroundRoot,
         },
@@ -170,6 +174,7 @@ export default function PatientTabNavigator() {
           ),
         }}
       />
+
       <Tab.Screen
         name="DoctorsTab"
         component={DoctorsScreen}
@@ -186,6 +191,7 @@ export default function PatientTabNavigator() {
           ),
         }}
       />
+
       <Tab.Screen
         name="MedicinesTab"
         component={MedicinesScreen}
@@ -202,6 +208,7 @@ export default function PatientTabNavigator() {
           ),
         }}
       />
+
       <Tab.Screen
         name="PharmaciesTab"
         component={PharmaciesScreen}

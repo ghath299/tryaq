@@ -80,6 +80,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
         >
           <Feather name={icon} size={20} color={theme.primary} />
         </View>
+
         <ThemedText
           type="body"
           style={[
@@ -93,6 +94,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
         >
           {label}
         </ThemedText>
+
         <Feather
           name={isRTL ? "chevron-left" : "chevron-right"}
           size={18}
@@ -150,8 +152,13 @@ export function DrawerContent(props: DrawerContentComponentProps) {
       contentContainerStyle={{
         paddingTop: 0,
         paddingBottom: insets.bottom,
+        flexGrow: 1,
       }}
-      style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
+      style={{
+        flex: 1,
+        width: "100%",
+        backgroundColor: theme.backgroundRoot,
+      }}
     >
       <Animated.View
         entering={FadeInUp.duration(500)}
@@ -176,12 +183,14 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             <View style={styles.avatar}>
               <Feather name="user" size={32} color={theme.primary} />
             </View>
+
             {user?.isVerified ? (
               <View style={styles.verifiedBadge}>
                 <Feather name="check" size={12} color="#FFFFFF" />
               </View>
             ) : null}
           </View>
+
           <ThemedText
             type="h4"
             style={[
@@ -191,6 +200,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           >
             {user?.fullName || "مرحباً بك"}
           </ThemedText>
+
           {user?.phoneNumber ? (
             <ThemedText
               type="small"
@@ -229,7 +239,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             icon={item.icon}
             label={item.label}
             onPress={() => {
-              navigation.navigate(item.screen);
+              navigation.navigate(item.screen as never);
               navigation.closeDrawer();
             }}
             index={index}
@@ -259,16 +269,17 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           icon="user-plus"
           label={t("joinAsDoctor")}
           onPress={() => {
-            navigation.navigate("CareerJoin", { type: "doctor" });
+            (navigation.navigate as any)("CareerJoin", { type: "doctor" });
             navigation.closeDrawer();
           }}
           index={patientItems.length + 1}
         />
+
         <DrawerItem
           icon="plus-square"
           label={t("joinAsPharmacist")}
           onPress={() => {
-            navigation.navigate("CareerJoin", { type: "pharmacist" });
+            (navigation.navigate as any)("CareerJoin", { type: "pharmacist" });
             navigation.closeDrawer();
           }}
           index={patientItems.length + 2}
@@ -297,6 +308,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             >
               <Feather name="globe" size={20} color={theme.primary} />
             </View>
+
             <ThemedText
               type="body"
               style={[
@@ -310,6 +322,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             >
               {t("language")}
             </ThemedText>
+
             <Pressable
               android_ripple={{ color: "transparent" }}
               onPress={handleLanguageToggle}
@@ -355,6 +368,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
                 color={theme.primary}
               />
             </View>
+
             <ThemedText
               type="body"
               style={[
@@ -368,6 +382,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             >
               {getThemeLabel()}
             </ThemedText>
+
             <View
               style={[
                 styles.langButton,
