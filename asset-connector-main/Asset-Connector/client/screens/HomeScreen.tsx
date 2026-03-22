@@ -700,7 +700,7 @@ export default function HomeScreen() {
       // ✅ السر الأول للقضاء على الرمشة: إجبار الخلفية على لون الثيم ومنع الـ OverScroll
       style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
       contentContainerStyle={{
-        backgroundColor: theme.backgroundDefault === "#F2F2F7" ? "#FAFAFA" : "#0A0E14",
+        backgroundColor: theme.backgroundRoot,
         paddingTop: Spacing.md,
         paddingBottom: tabBarHeight + insets.bottom + Spacing.xl,
       }}
@@ -749,40 +749,37 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View style={styles.sectionContainer}>
-        <SectionHeader
-          title={t("promotedDoctors")}
-          onViewAll={() => navigation.navigate("DoctorsTab" as never)}
-          viewAllLabel={t("viewAll")}
-          index={0}
-        />
-        <FlatList
-          data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
-          horizontal
-          inverted={language === "ar"}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.horizontalList}
-          renderItem={({ item, index }) => (
-            <PromotedDoctorCard
-              doctor={item}
-              index={index}
-              rank={index + 1}
-              onPress={() =>
-                navigation.navigate("DoctorDetail", { doctorId: item.id })
-              }
-            />
-          )}
-        />
-      </View>
+      <SectionHeader
+        title={t("promotedDoctors")}
+        onViewAll={() => navigation.navigate("DoctorsTab" as never)}
+        viewAllLabel={t("viewAll")}
+        index={0}
+      />
+      <FlatList
+        data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
+        horizontal
+        inverted={language === "ar"}
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.horizontalList}
+        renderItem={({ item, index }) => (
+          <PromotedDoctorCard
+            doctor={item}
+            index={index}
+            rank={index + 1}
+            onPress={() =>
+              navigation.navigate("DoctorDetail", { doctorId: item.id })
+            }
+          />
+        )}
+      />
 
-      <View style={styles.sectionContainer}>
-        <SectionHeader
-          title={t("promotedPharmacies")}
-          onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
-          viewAllLabel={t("viewAll")}
-          index={1}
-        />
+      <SectionHeader
+        title={t("promotedPharmacies")}
+        onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
+        viewAllLabel={t("viewAll")}
+        index={1}
+      />
       <FlatList
         data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
         horizontal
@@ -801,11 +798,8 @@ export default function HomeScreen() {
           />
         )}
       />
-      </View>
 
-      <View style={styles.sectionContainer}>
-        <HealthTipCard />
-      </View>
+      <HealthTipCard />
     </ScrollView>
   );
 }
@@ -816,16 +810,6 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: Spacing.md,
     marginBottom: Spacing.lg,
-  },
-  sectionContainer: {
-    backgroundColor: "#FFFFFF",
-    paddingVertical: Spacing.md,
-    marginVertical: Spacing.sm,
-    shadowColor: "#00000008",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    elevation: 1,
   },
   announcementTitle: {
     paddingHorizontal: Spacing.lg,
