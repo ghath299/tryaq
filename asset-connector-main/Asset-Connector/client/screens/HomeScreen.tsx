@@ -908,8 +908,8 @@ const styles = StyleSheet.create({
     borderRadius: 38,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.4)",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.3)",
   },
   promotedName: {
     textAlign: "center",
