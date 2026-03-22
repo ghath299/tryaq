@@ -192,12 +192,14 @@ interface PromotedDoctorCardProps {
   doctor: (typeof doctors)[0];
   onPress: () => void;
   index: number;
+  rank: number;
 }
 
 function PromotedDoctorCard({
   doctor,
   onPress,
   index,
+  rank,
 }: PromotedDoctorCardProps) {
   const { theme } = useTheme();
   const { language } = useApp();
@@ -280,6 +282,12 @@ function PromotedDoctorCard({
             </View>
           </View>
 
+          <View style={[styles.rankBadge, { backgroundColor: theme.primary }]}>
+            <ThemedText type="caption" style={{ color: "#FFFFFF", fontWeight: "600" }}>
+              {rank}
+            </ThemedText>
+          </View>
+
           {doctor.isVerified ? (
             <View
               style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}
@@ -297,12 +305,14 @@ interface PromotedPharmacyCardProps {
   pharmacy: (typeof pharmacies)[0];
   onPress: () => void;
   index: number;
+  rank: number;
 }
 
 function PromotedPharmacyCard({
   pharmacy,
   onPress,
   index,
+  rank,
 }: PromotedPharmacyCardProps) {
   const { theme } = useTheme();
   const { language, t } = useApp();
@@ -384,6 +394,12 @@ function PromotedPharmacyCard({
                 {pharmacy.rating}
               </ThemedText>
             </View>
+          </View>
+
+          <View style={[styles.rankBadge, { backgroundColor: theme.primary }]}>
+            <ThemedText type="caption" style={{ color: "#FFFFFF", fontWeight: "600" }}>
+              {rank}
+            </ThemedText>
           </View>
         </LinearGradient>
       </AnimatedPressable>
@@ -732,7 +748,7 @@ export default function HomeScreen() {
         index={0}
       />
       <FlatList
-        data={doctors.slice(0, 5)}
+        data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
         horizontal
         inverted={language === "ar"}
         showsHorizontalScrollIndicator={false}
@@ -742,6 +758,7 @@ export default function HomeScreen() {
           <PromotedDoctorCard
             doctor={item}
             index={index}
+            rank={index + 1}
             onPress={() =>
               navigation.navigate("DoctorDetail", { doctorId: item.id })
             }
@@ -756,7 +773,7 @@ export default function HomeScreen() {
         index={1}
       />
       <FlatList
-        data={pharmacies}
+        data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
         horizontal
         inverted={language === "ar"}
         showsHorizontalScrollIndicator={false}
@@ -766,6 +783,7 @@ export default function HomeScreen() {
           <PromotedPharmacyCard
             pharmacy={item}
             index={index}
+            rank={index + 1}
             onPress={() =>
               navigation.navigate("PharmacyDetail", { pharmacyId: item.id })
             }
@@ -902,6 +920,16 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rankBadge: {
+    position: "absolute",
+    top: Spacing.sm,
+    right: Spacing.sm,
+    minWidth: 24,
+    height: 24,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
   },
