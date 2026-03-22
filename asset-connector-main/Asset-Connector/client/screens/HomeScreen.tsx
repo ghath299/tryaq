@@ -244,12 +244,16 @@ function PromotedDoctorCard({
           animatedStyle,
         ]}
       >
-        <LinearGradient
-          colors={[theme.primary + "20", theme.primaryDark + "10"]}
-          style={styles.promotedIconGradient}
-        >
-          <Feather name="user" size={28} color={theme.primary} />
-        </LinearGradient>
+        <View style={styles.promotedIconWrapper}>
+          <LinearGradient
+            colors={[theme.primary, theme.primaryDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.promotedIconGradient}
+          >
+            <Feather name="activity" size={32} color="#FFFFFF" />
+          </LinearGradient>
+        </View>
 
         <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
           {name}
@@ -840,13 +844,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
-  promotedIconGradient: {
-    width: 64,
-    height: 64,
-    borderRadius: BorderRadius.full,
+  promotedIconWrapper: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.md,
+    shadowColor: "#1F6AE1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  promotedIconGradient: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.3)",
   },
   promotedName: {
     textAlign: "center",
