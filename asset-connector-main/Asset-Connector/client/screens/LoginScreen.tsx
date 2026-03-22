@@ -39,6 +39,7 @@ export default function LoginScreen() {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const buttonScale = useSharedValue(1);
   const pulseScale = useSharedValue(1);
@@ -91,8 +92,18 @@ export default function LoginScreen() {
   }));
 
   const handleSubmit = async () => {
+    setError("");
+    
     if (!fullName.trim() || !phoneNumber.trim()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError("يرجى ملء جميع الحقول");
+      return;
+    }
+
+    const nameWords = fullName.trim().split(/\s+/).length;
+    if (nameWords < 3) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError("الاسم يجب أن يكون اسماً ثلاثياً (3 كلمات على الأقل)");
       return;
     }
 
@@ -268,6 +279,15 @@ export default function LoginScreen() {
               </View>
             </View>
 
+            {error && (
+              <View style={[styles.errorContainer, { borderLeftColor: theme.primary }]}>
+                <Feather name="alert-circle" size={18} color={theme.primary} />
+                <ThemedText type="small" style={[styles.errorText, { color: theme.primary }]}>
+                  {error}
+                </ThemedText>
+              </View>
+            )}
+
             <Animated.View entering={FadeIn.delay(500).duration(400)}>
               <AnimatedPressable
                 android_ripple={{ color: "transparent" }}
@@ -439,6 +459,21 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "600",
     fontSize: 18,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    backgroundColor: "rgba(255,59,48,0.08)",
+    borderRadius: BorderRadius.md,
+    borderLeftWidth: 3,
+    marginTop: Spacing.md,
+    gap: Spacing.sm,
+  },
+  errorText: {
+    flex: 1,
+    fontWeight: "500",
   },
   footer: {
     marginTop: Spacing.xl,
