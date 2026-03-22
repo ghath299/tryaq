@@ -700,7 +700,7 @@ export default function HomeScreen() {
       // ✅ السر الأول للقضاء على الرمشة: إجبار الخلفية على لون الثيم ومنع الـ OverScroll
       style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
       contentContainerStyle={{
-        backgroundColor: theme.backgroundRoot,
+        backgroundColor: theme.backgroundDefault === "#F2F2F7" ? "#FAFAFA" : "#0A0E14",
         paddingTop: Spacing.md,
         paddingBottom: tabBarHeight + insets.bottom + Spacing.xl,
       }}
@@ -708,7 +708,7 @@ export default function HomeScreen() {
       overScrollMode="never"
       removeClippedSubviews={false}
     >
-      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground }]}>
+      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground, shadowColor: "#00000010", shadowOpacity: 0.08, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 2 }]}>
         <ThemedText type="h3" style={styles.announcementTitle}>{t("announcements")}</ThemedText>
         <FlatList
           ref={sliderRef}
@@ -749,37 +749,40 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <SectionHeader
-        title={t("promotedDoctors")}
-        onViewAll={() => navigation.navigate("DoctorsTab" as never)}
-        viewAllLabel={t("viewAll")}
-        index={0}
-      />
-      <FlatList
-        data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
-        horizontal
-        inverted={language === "ar"}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.horizontalList}
-        renderItem={({ item, index }) => (
-          <PromotedDoctorCard
-            doctor={item}
-            index={index}
-            rank={index + 1}
-            onPress={() =>
-              navigation.navigate("DoctorDetail", { doctorId: item.id })
-            }
-          />
-        )}
-      />
+      <View style={styles.sectionContainer}>
+        <SectionHeader
+          title={t("promotedDoctors")}
+          onViewAll={() => navigation.navigate("DoctorsTab" as never)}
+          viewAllLabel={t("viewAll")}
+          index={0}
+        />
+        <FlatList
+          data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
+          horizontal
+          inverted={language === "ar"}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.horizontalList}
+          renderItem={({ item, index }) => (
+            <PromotedDoctorCard
+              doctor={item}
+              index={index}
+              rank={index + 1}
+              onPress={() =>
+                navigation.navigate("DoctorDetail", { doctorId: item.id })
+              }
+            />
+          )}
+        />
+      </View>
 
-      <SectionHeader
-        title={t("promotedPharmacies")}
-        onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
-        viewAllLabel={t("viewAll")}
-        index={1}
-      />
+      <View style={styles.sectionContainer}>
+        <SectionHeader
+          title={t("promotedPharmacies")}
+          onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
+          viewAllLabel={t("viewAll")}
+          index={1}
+        />
       <FlatList
         data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
         horizontal
@@ -798,8 +801,11 @@ export default function HomeScreen() {
           />
         )}
       />
+      </View>
 
-      <HealthTipCard />
+      <View style={styles.sectionContainer}>
+        <HealthTipCard />
+      </View>
     </ScrollView>
   );
 }
@@ -808,8 +814,18 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   bannerSection: {
     paddingTop: Spacing.md,
-    paddingBottom: Spacing.sm,
-    marginBottom: Spacing.sm,
+    paddingBottom: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  sectionContainer: {
+    backgroundColor: "#FFFFFF",
+    paddingVertical: Spacing.md,
+    marginVertical: Spacing.sm,
+    shadowColor: "#00000008",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 1,
   },
   announcementTitle: {
     paddingHorizontal: Spacing.lg,
