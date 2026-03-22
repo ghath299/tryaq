@@ -708,7 +708,7 @@ export default function HomeScreen() {
       overScrollMode="never"
       removeClippedSubviews={false}
     >
-      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground, shadowColor: "#00000010", shadowOpacity: 0.08, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 2 }]}>
+      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground }]}>
         <ThemedText type="h3" style={styles.announcementTitle}>{t("announcements")}</ThemedText>
         <FlatList
           ref={sliderRef}
@@ -821,11 +821,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     paddingVertical: Spacing.md,
     marginVertical: Spacing.sm,
-    shadowColor: "#00000008",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    elevation: 1,
   },
   announcementTitle: {
     paddingHorizontal: Spacing.lg,
