@@ -282,11 +282,19 @@ function PromotedDoctorCard({
             </View>
           </View>
 
-          <View style={[styles.rankBadge, { backgroundColor: theme.primary }]}>
-            <ThemedText type="caption" style={{ color: "#FFFFFF", fontWeight: "600" }}>
+          <LinearGradient
+            colors={["#FFD700", "#FFA500"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.rankBadge}
+          >
+            <ThemedText
+              type="body"
+              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 14 }}
+            >
               {rank}
             </ThemedText>
-          </View>
+          </LinearGradient>
 
           {doctor.isVerified ? (
             <View
@@ -396,11 +404,19 @@ function PromotedPharmacyCard({
             </View>
           </View>
 
-          <View style={[styles.rankBadge, { backgroundColor: theme.primary }]}>
-            <ThemedText type="caption" style={{ color: "#FFFFFF", fontWeight: "600" }}>
+          <LinearGradient
+            colors={["#FFD700", "#FFA500"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.rankBadge}
+          >
+            <ThemedText
+              type="body"
+              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 14 }}
+            >
               {rank}
             </ThemedText>
-          </View>
+          </LinearGradient>
         </LinearGradient>
       </AnimatedPressable>
     </Animated.View>
@@ -925,13 +941,20 @@ const styles = StyleSheet.create({
   },
   rankBadge: {
     position: "absolute",
-    top: Spacing.sm,
-    right: Spacing.sm,
-    minWidth: 24,
-    height: 24,
-    borderRadius: 12,
+    top: -8,
+    right: -8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#FFD700",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 10,
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
   deliveryBadge: {
     flexDirection: "row",
