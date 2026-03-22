@@ -233,57 +233,61 @@ function PromotedDoctorCard({
         .springify()}
     >
       <AnimatedPressable
-        // ✅ تمويه التحديد بلون الخلفية
-        android_ripple={{ color: theme.backgroundRoot }}
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={[
-          styles.promotedCard,
-          { backgroundColor: theme.backgroundDefault },
-          animatedStyle,
-        ]}
+        style={[styles.promotedCardWrapper, animatedStyle]}
       >
-        <View style={styles.promotedIconWrapper}>
-          <LinearGradient
-            colors={[theme.primary, theme.primaryDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.promotedIconGradient}
-          >
-            <Feather name="activity" size={32} color="#FFFFFF" />
-          </LinearGradient>
-        </View>
-
-        <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
-          {name}
-        </ThemedText>
-
-        <ThemedText
-          type="small"
-          style={{ color: theme.textSecondary }}
-          numberOfLines={1}
+        <LinearGradient
+          colors={["#5EDFFF15", "#1F6AE115"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.promotedCard}
         >
-          {specialty}
-        </ThemedText>
+          <View style={styles.promotedCardInner}>
+            <View style={styles.promotedIconWrapper}>
+              <LinearGradient
+                colors={[theme.primary, theme.primaryDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.promotedIconGradient}
+              >
+                <Feather name="activity" size={32} color="#FFFFFF" />
+              </LinearGradient>
+            </View>
 
-        <View style={styles.promotedRating}>
-          <Feather name="star" size={12} color="#FFB800" />
-          <ThemedText
-            type="caption"
-            style={{ color: theme.textSecondary, marginLeft: 4 }}
-          >
-            {doctor.rating}
-          </ThemedText>
-        </View>
+            <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
+              {name}
+            </ThemedText>
 
-        {doctor.isVerified ? (
-          <View
-            style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}
-          >
-            <Feather name="check" size={10} color="#FFFFFF" />
+            <ThemedText
+              type="small"
+              style={{ color: theme.textSecondary }}
+              numberOfLines={1}
+            >
+              {specialty}
+            </ThemedText>
+
+            <View style={styles.promotedRating}>
+              <Feather name="star" size={12} color="#FFB800" />
+              <ThemedText
+                type="caption"
+                style={{ color: theme.textSecondary, marginLeft: 4 }}
+              >
+                {doctor.rating}
+              </ThemedText>
+            </View>
           </View>
-        ) : null}
+
+          {doctor.isVerified ? (
+            <View
+              style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}
+            >
+              <Feather name="check" size={10} color="#FFFFFF" />
+            </View>
+          ) : null}
+        </LinearGradient>
       </AnimatedPressable>
     </Animated.View>
   );
@@ -836,13 +840,27 @@ const styles = StyleSheet.create({
   },
   viewAllButton: { flexDirection: "row", alignItems: "center" },
   horizontalList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
-  promotedCard: {
+  promotedCardWrapper: {
     width: 150,
+    marginRight: Spacing.md,
+  },
+  promotedCard: {
     padding: Spacing.lg,
     borderRadius: BorderRadius.xl,
-    marginRight: Spacing.md,
     alignItems: "center",
     position: "relative",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(94, 223, 255, 0.2)",
+    shadowColor: "#1F6AE1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  promotedCardInner: {
+    alignItems: "center",
+    width: "100%",
   },
   promotedIconWrapper: {
     width: 80,
