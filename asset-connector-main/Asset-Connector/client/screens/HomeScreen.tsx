@@ -933,8 +933,8 @@ const styles = StyleSheet.create({
   },
   rankBadge: {
     position: "absolute",
-    top: -6,
-    right: -6,
+    top: Spacing.md,
+    right: Spacing.md,
     width: 28,
     height: 28,
     borderRadius: 14,
