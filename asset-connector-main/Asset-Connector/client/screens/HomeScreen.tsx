@@ -774,8 +774,6 @@ export default function HomeScreen() {
         )}
       />
 
-      <View style={styles.divider} />
-
       <SectionHeader
         title={t("promotedPharmacies")}
         onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
@@ -801,8 +799,6 @@ export default function HomeScreen() {
         )}
       />
 
-      <View style={styles.divider} />
-
       <HealthTipCard />
     </ScrollView>
   );
@@ -824,11 +820,6 @@ const styles = StyleSheet.create({
     height: 1,
     marginVertical: Spacing.lg,
     borderRadius: 0,
-  },
-  divider: {
-    height: 8,
-    backgroundColor: "#E5E5EA",
-    marginVertical: Spacing.md,
   },
   slider: { marginBottom: Spacing.md },
   sliderContent: { paddingHorizontal: Spacing.lg },
