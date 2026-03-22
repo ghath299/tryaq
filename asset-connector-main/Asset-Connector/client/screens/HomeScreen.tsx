@@ -339,52 +339,60 @@ function PromotedPharmacyCard({
         .springify()}
     >
       <AnimatedPressable
-        // ✅ تمويه التحديد بلون الخلفية
-        android_ripple={{ color: theme.backgroundRoot }}
+        android_ripple={{ color: "transparent" }}
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={[
-          styles.promotedCard,
-          { backgroundColor: theme.backgroundDefault },
-          animatedStyle,
-        ]}
+        style={[styles.promotedCardWrapper, animatedStyle]}
       >
         <LinearGradient
-          colors={[theme.primaryDark + "20", theme.primary + "10"]}
-          style={styles.promotedIconGradient}
+          colors={["#5EDFFF15", "#1F6AE115"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.promotedCard}
         >
-          <Feather name="plus-square" size={28} color={theme.primaryDark} />
-        </LinearGradient>
+          <View style={styles.promotedCardInner}>
+            <View style={styles.promotedIconWrapper}>
+              <LinearGradient
+                colors={[theme.primary, theme.primaryDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.promotedIconGradient}
+              >
+                <Feather name="briefcase" size={32} color="#FFFFFF" />
+              </LinearGradient>
+            </View>
 
-        <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
-          {name}
-        </ThemedText>
-
-        <ThemedText
-          type="small"
-          style={{ color: theme.textSecondary }}
-          numberOfLines={1}
-        >
-          {district}
-        </ThemedText>
-
-        {pharmacy.hasDelivery ? (
-          <View
-            style={[
-              styles.deliveryBadge,
-              { backgroundColor: theme.success + "15" },
-            ]}
-          >
-            <Feather name="truck" size={10} color={theme.success} />
-            <ThemedText
-              type="caption"
-              style={{ color: theme.success, marginLeft: 4 }}
-            >
-              {t("delivery")}
+            <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
+              {name}
             </ThemedText>
+
+            <ThemedText
+              type="small"
+              style={{ color: theme.textSecondary }}
+              numberOfLines={1}
+            >
+              {district}
+            </ThemedText>
+
+            {pharmacy.hasDelivery ? (
+              <View
+                style={[
+                  styles.deliveryBadge,
+                  { backgroundColor: theme.success + "15" },
+                ]}
+              >
+                <Feather name="truck" size={10} color={theme.success} />
+                <ThemedText
+                  type="caption"
+                  style={{ color: theme.success, marginLeft: 4 }}
+                >
+                  {t("delivery")}
+                </ThemedText>
+              </View>
+            ) : null}
           </View>
-        ) : null}
+        </LinearGradient>
       </AnimatedPressable>
     </Animated.View>
   );
