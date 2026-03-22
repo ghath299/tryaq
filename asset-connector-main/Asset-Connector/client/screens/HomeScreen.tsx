@@ -283,14 +283,14 @@ function PromotedDoctorCard({
           </View>
 
           <LinearGradient
-            colors={["#FFD700", "#FFA500"]}
+            colors={["#FF6B6B", "#E63946"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.rankBadge}
           >
             <ThemedText
               type="caption"
-              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 10 }}
+              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 9 }}
             >
               {rank}
             </ThemedText>
@@ -935,12 +935,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: Spacing.md,
     right: Spacing.md,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#FFD700",
+    shadowColor: "#E63946",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
