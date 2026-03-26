@@ -5,14 +5,17 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { ref, push } from "firebase/database";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { ThemedText } from "@/components/ThemedText";
 import { Button } from "@/components/Button";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { doctors } from "@/data/mockData";
+import { database } from "@/lib/firebase";
 
 type BookAppointmentRouteProp = RouteProp<
   { BookAppointment: { doctorId: string } },
@@ -24,10 +27,11 @@ export default function BookAppointmentScreen() {
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
   const { language, t } = useApp();
+  const { user } = useAuth();
   const route = useRoute<BookAppointmentRouteProp>();
   const navigation = useNavigation();
 
-  const [fullName, setFullName] = useState("");
+  const [fullName, setFullName] = useState(user?.fullName || "");
   const [age, setAge] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,19 +45,51 @@ export default function BookAppointmentScreen() {
 
   const handleSubmit = async () => {
     if (!fullName.trim()) {
-      Alert.alert(t("error"), t("fullName") + " " + t("locationRequired"));
+      Alert.alert(
+        t("error"),
+        language === "ar" ? "يرجى إدخال الاسم الكامل" : "Please enter your full name",
+      );
       return;
     }
 
     setIsSubmitting(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const appointmentsRef = ref(database, "appointments");
+      await push(appointmentsRef, {
+        fullName: fullName.trim(),
+        phoneNumber: user?.phoneNumber || "",
+        doctorId: route.params?.doctorId || "",
+        doctorNameAr: doctor?.nameAr || "",
+        doctorNameEn: doctor?.nameEn || "",
+        age: age.trim() || null,
+        notes: notes.trim() || null,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      });
 
-    setIsSubmitting(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setIsSubmitting(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    navigation.goBack();
+      Alert.alert(
+        language === "ar" ? "تم بنجاح" : "Success",
+        language === "ar"
+          ? "تم تأكيد حجز موعدك بنجاح"
+          : "Your appointment has been booked successfully",
+        [{ text: language === "ar" ? "حسناً" : "OK", onPress: () => navigation.goBack() }],
+      );
+    } catch (error) {
+      setIsSubmitting(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+      Alert.alert(
+        t("error"),
+        language === "ar"
+          ? "حدث خطأ أثناء الحجز، حاول مرة أخرى"
+          : "An error occurred while booking, please try again",
+      );
+    }
   };
 
   return (

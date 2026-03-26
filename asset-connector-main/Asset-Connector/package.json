@@ -52,6 +52,7 @@
     "expo-updates": "~29.0.16",
     "expo-web-browser": "~15.0.9",
     "express": "^5.0.1",
+    "firebase": "^12.11.0",
     "http-proxy-middleware": "^3.0.5",
     "pg": "^8.16.3",
     "react": "19.1.0",

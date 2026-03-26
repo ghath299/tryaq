@@ -102,9 +102,18 @@ Preferred communication style: Simple, everyday language.
 - **expo-haptics** — haptic feedback on button presses
 - **react-native-maps** — native map views (mobile only)
 
+### Firebase Integration
+- **Firebase Realtime Database** — stores appointment bookings at `appointments` path
+- **Config file**: `Asset-Connector/client/lib/firebase.ts`
+- **Project**: `ghath-c86ae` (Firebase console)
+- **Database URL**: `https://ghath-c86ae-default-rtdb.firebaseio.com`
+- **Data model** (appointments): `{ fullName, phoneNumber, doctorId, doctorNameAr, doctorNameEn, age, notes, status: "pending", createdAt }`
+- **BookAppointmentScreen** pushes data to Firebase on confirm
+
 ### Data & Storage
 - **@tanstack/react-query** — server state management
 - **@react-native-async-storage/async-storage** — local persistence (auth, theme, language)
+- **firebase** — Firebase SDK for Realtime Database
 - **drizzle-orm** + **drizzle-zod** — PostgreSQL ORM and schema validation
 - **pg** — PostgreSQL client (requires DATABASE_URL env var)
 
