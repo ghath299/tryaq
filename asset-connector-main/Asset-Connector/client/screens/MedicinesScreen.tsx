@@ -50,12 +50,11 @@ interface MedicineCardNewProps {
 
 function MedicineCardNew({ medicine, onPress, index }: MedicineCardNewProps) {
   const { theme } = useTheme();
-  const { language } = useApp();
   const scale = useSharedValue(1);
 
-  const name = language === "ar" ? medicine.nameAr : medicine.nameEn;
-  const company = language === "ar" ? medicine.companyAr : medicine.companyEn;
-  const category = language === "ar" ? medicine.usageAr : medicine.usageEn;
+  const name = medicine.nameAr;
+  const company = medicine.companyAr;
+  const category = medicine.usageAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -606,7 +605,7 @@ export default function MedicinesScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const navigation = useNavigation<any>();
 
   const [searchMode, setSearchMode] = useState<SearchMode>("text");
@@ -637,7 +636,7 @@ export default function MedicinesScreen() {
   const handleMedicinePress = (medicineId: string) => {
     const medicine = medicines.find((m) => m.id === medicineId);
     if (medicine) {
-      const name = language === "ar" ? medicine.nameAr : medicine.nameEn;
+      const name = medicine.nameAr;
       navigation.navigate(
         "MedicinePharmacies" as never,
         { initialQuery: name } as never,

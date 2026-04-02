@@ -42,20 +42,20 @@ const AVATAR_OVERLAP = AVATAR_SIZE / 2;
 export default function DoctorDetailScreen() {
   const insets = useSafeAreaInsets();
   const { theme, isDark } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const route = useRoute<DoctorDetailRouteProp>();
   const navigation = useNavigation<any>();
   const { width: W } = useWindowDimensions();
 
-  const isRTL = language === "ar";
+  const isRTL = true;
 
   const TXT = {
-    route: isRTL ? "المسار" : "Route",
-    clinicInfo: isRTL ? "معلومات العيادة" : "Clinic Info",
-    clinic: isRTL ? "العيادة" : "Clinic",
-    workingHours: isRTL ? "ساعات العمل" : "Working Hours",
-    distance: isRTL ? "المسافة" : "Distance",
-    km: isRTL ? "كم" : "km",
+    route: "المسار",
+    clinicInfo: "معلومات العيادة",
+    clinic: "العيادة",
+    workingHours: "ساعات العمل",
+    distance: "المسافة",
+    km: "كم",
   };
 
   const doctor = doctors.find((d) => d.id === route.params?.doctorId);
@@ -70,11 +70,11 @@ export default function DoctorDetailScreen() {
     );
   }
 
-  const name = isRTL ? doctor.nameAr : doctor.nameEn;
-  const specialty = isRTL ? doctor.specialtyAr : doctor.specialtyEn;
-  const province = isRTL ? doctor.provinceAr : doctor.provinceEn;
-  const district = isRTL ? doctor.districtAr : doctor.districtEn;
-  const clinicAddress = isRTL ? doctor.clinicAddress : doctor.clinicAddressEn;
+  const name = doctor.nameAr;
+  const specialty = doctor.specialtyAr;
+  const province = doctor.provinceAr;
+  const district = doctor.districtAr;
+  const clinicAddress = doctor.clinicAddress;
 
   const doctorSource = require("../assets/placeholders/doctor.png");
 

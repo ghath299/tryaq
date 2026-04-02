@@ -4,9 +4,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withRepeat,
-  withSequence,
-  withTiming,
 } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,7 +28,7 @@ export function GlowingSearchBar({
   autoFocus = false,
 }: GlowingSearchBarProps) {
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const [isFocused, setIsFocused] = useState(false);
 
   const scale = useSharedValue(1);
@@ -103,7 +100,7 @@ export function GlowingSearchBar({
             styles.input,
             {
               color: theme.text,
-              textAlign: language === "ar" ? "right" : "left",
+              textAlign: "right",
             },
           ]}
           value={value}

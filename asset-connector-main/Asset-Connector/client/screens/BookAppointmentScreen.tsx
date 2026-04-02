@@ -26,7 +26,7 @@ export default function BookAppointmentScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const { user } = useAuth();
   const route = useRoute<BookAppointmentRouteProp>();
   const navigation = useNavigation();
@@ -37,17 +37,13 @@ export default function BookAppointmentScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const doctor = doctors.find((d) => d.id === route.params?.doctorId);
-  const doctorName = doctor
-    ? language === "ar"
-      ? doctor.nameAr
-      : doctor.nameEn
-    : "";
+  const doctorName = doctor ? doctor.nameAr : "";
 
   const handleSubmit = async () => {
     if (!fullName.trim()) {
       Alert.alert(
         t("error"),
-        language === "ar" ? "يرجى إدخال الاسم الكامل" : "Please enter your full name",
+        "يرجى إدخال الاسم الكامل",
       );
       return;
     }
@@ -73,11 +69,9 @@ export default function BookAppointmentScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
       Alert.alert(
-        language === "ar" ? "تم بنجاح" : "Success",
-        language === "ar"
-          ? "تم تأكيد حجز موعدك بنجاح"
-          : "Your appointment has been booked successfully",
-        [{ text: language === "ar" ? "حسناً" : "OK", onPress: () => navigation.goBack() }],
+        "تم بنجاح",
+        "تم تأكيد حجز موعدك بنجاح",
+        [{ text: "حسناً", onPress: () => navigation.goBack() }],
       );
     } catch (error) {
       setIsSubmitting(false);
@@ -85,9 +79,7 @@ export default function BookAppointmentScreen() {
 
       Alert.alert(
         t("error"),
-        language === "ar"
-          ? "حدث خطأ أثناء الحجز، حاول مرة أخرى"
-          : "An error occurred while booking, please try again",
+        "حدث خطأ أثناء الحجز، حاول مرة أخرى",
       );
     }
   };
@@ -144,7 +136,7 @@ export default function BookAppointmentScreen() {
               type="small"
               style={[styles.label, { color: theme.textSecondary }]}
             >
-              {t("age")} ({language === "ar" ? "اختياري" : "optional"})
+              {t("age")} (اختياري)
             </ThemedText>
             <TextInput
               value={age}
@@ -169,7 +161,7 @@ export default function BookAppointmentScreen() {
               type="small"
               style={[styles.label, { color: theme.textSecondary }]}
             >
-              {t("notes")} ({language === "ar" ? "اختياري" : "optional"})
+              {t("notes")} (اختياري)
             </ThemedText>
             <TextInput
               value={notes}

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A cross-platform mobile healthcare application built with React Native (Expo SDK 54) and an Express.js backend that connects patients with doctors and pharmacists in Iraq. The platform enables patients to search for doctors by specialty, find medicines (including AI-powered medicine recognition via camera), locate pharmacies, and book appointments. It supports three user roles — patient, doctor, and pharmacist — with role-based navigation and interfaces. The app is bilingual (Arabic/English) with full RTL support and features a medical-modern design aesthetic with fluid animations throughout.
+A cross-platform mobile healthcare application built with React Native (Expo SDK 54) and an Express.js backend that connects patients with doctors and pharmacists in Iraq. The platform enables patients to search for doctors by specialty, find medicines (including AI-powered medicine recognition via camera), locate pharmacies, and book appointments. It supports three user roles — patient, doctor, and pharmacist — with role-based navigation and interfaces. The app is Arabic-only with RTL layout throughout and features a medical-modern design aesthetic with fluid animations.
 
 The main application code lives in `Asset-Connector/` subdirectory. The root `package.json` is a workspace wrapper; the actual app is in `Asset-Connector/`.
 
@@ -39,7 +39,7 @@ Preferred communication style: Simple, everyday language.
 
 **Platform-specific**: `MapView.native.tsx` uses `react-native-maps` on mobile; `MapView.tsx` uses OpenStreetMap iframe on web. `PharmacyRouteScreen` uses `react-native-maps` with `UrlTile` for OpenStreetMap tiles (light/dark) on native, and iframe fallback on web.
 
-**i18n/RTL**: Bilingual Arabic/English with RTL layout support. Translations are inline in `AppContext`. Language toggle available in drawer.
+**i18n/RTL**: Arabic-only with hardcoded RTL layout. Translation function `t()` returns Arabic strings from `AppContext`. Language is fixed to `"ar"` — no language switching or English translations.
 
 ### Authentication Architecture
 

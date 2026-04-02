@@ -13,7 +13,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { GlowingSearchBar } from "@/components/GlowingSearchBar";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { useApp } from "@/contexts/AppContext";
+
 import { getApiUrl } from "@/lib/query-client";
 import { loadGovernorate, saveGovernorate } from "@/lib/governorate";
 import { provinces } from "@/data/mockData";
@@ -33,7 +33,6 @@ const PAGE_SIZE = 6;
 export default function MedicinePharmaciesScreen() {
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const { language } = useApp();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const apiUrl = getApiUrl();
@@ -112,7 +111,7 @@ export default function MedicinePharmaciesScreen() {
 
   const handleSelectMedicine = async (medicine: Medicine) => {
     setSelectedMedicine(medicine);
-    setQuery(language === "ar" ? medicine.nameAr : medicine.nameEn);
+    setQuery(medicine.nameAr);
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -145,7 +144,7 @@ export default function MedicinePharmaciesScreen() {
         <GlowingSearchBar
           value={query}
           onChangeText={setQuery}
-          placeholder="ابحث عن دواء / Search medicine"
+          placeholder="ابحث عن دواء"
         />
         <Pressable
           android_ripple={{ color: "transparent" }}
@@ -167,7 +166,7 @@ export default function MedicinePharmaciesScreen() {
               onPress={() => handleSelectMedicine(item)}
             >
               <ThemedText type="body">
-                {language === "ar" ? item.nameAr : item.nameEn}
+                {item.nameAr}
               </ThemedText>
             </Pressable>
           )}
@@ -181,7 +180,7 @@ export default function MedicinePharmaciesScreen() {
           ListHeaderComponent={
             <ThemedText type="small" style={{ marginBottom: Spacing.sm }}>
               {selectedMedicine
-                ? `الصيدليات المتوفرة لـ ${language === "ar" ? selectedMedicine.nameAr : selectedMedicine.nameEn}`
+                ? `الصيدليات المتوفرة لـ ${selectedMedicine.nameAr}`
                 : ""}
             </ThemedText>
           }
@@ -207,19 +206,17 @@ export default function MedicinePharmaciesScreen() {
                   {
                     pharmacyIds: pharmacies.map((p: Pharmacy) => p.id),
                     medicineName: selectedMedicine
-                      ? language === "ar"
-                        ? selectedMedicine.nameAr
-                        : selectedMedicine.nameEn
+                      ? selectedMedicine.nameAr
                       : undefined,
                   } as never,
                 )
               }
             >
               <ThemedText type="body" style={{ fontWeight: "700" }}>
-                {language === "ar" ? item.nameAr : item.nameEn}
+                {item.nameAr}
               </ThemedText>
               <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                {language === "ar" ? item.governorateAr : item.governorate}
+                {item.governorateAr}
               </ThemedText>
             </Pressable>
           )}
@@ -254,7 +251,7 @@ export default function MedicinePharmaciesScreen() {
                   }}
                 >
                   <ThemedText type="body">
-                    {language === "ar" ? item.nameAr : item.nameEn}
+                    {item.nameAr}
                   </ThemedText>
                 </Pressable>
               )}

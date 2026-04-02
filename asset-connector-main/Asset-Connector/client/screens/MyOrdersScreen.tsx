@@ -16,7 +16,7 @@ export default function MyOrdersScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
 
   const renderOrder = ({
     item,
@@ -25,8 +25,7 @@ export default function MyOrdersScreen() {
     item: (typeof orders)[0];
     index: number;
   }) => {
-    const pharmacyName =
-      language === "ar" ? item.pharmacyNameAr : item.pharmacyNameEn;
+    const pharmacyName = item.pharmacyNameAr;
 
     const getStatusColor = () => {
       switch (item.status) {
@@ -61,7 +60,7 @@ export default function MyOrdersScreen() {
                 {pharmacyName}
               </ThemedText>
               <ThemedText type="small" style={{ color: theme.textSecondary }}>
-                {item.medicines.length} {language === "ar" ? "عنصر" : "items"}
+                {item.medicines.length} عنصر
               </ThemedText>
             </View>
             <View

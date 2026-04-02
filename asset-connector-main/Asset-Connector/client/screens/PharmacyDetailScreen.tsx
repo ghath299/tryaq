@@ -77,7 +77,7 @@ export default function PharmacyDetailScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const route = useRoute<PharmacyDetailRouteProp>();
   const apiUrl = getApiUrl();
   const chatListRef = useRef<FlatList<ChatMessage>>(null);
@@ -192,9 +192,8 @@ export default function PharmacyDetailScreen() {
     );
   }
 
-  const name = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const province =
-    language === "ar" ? pharmacy.provinceAr : pharmacy.provinceEn;
+  const name = pharmacy.nameAr;
+  const province = pharmacy.provinceAr;
 
   const callPhone = () =>
     Linking.openURL(`tel:${pharmacy.phone.replace(/\s+/g, "")}`);

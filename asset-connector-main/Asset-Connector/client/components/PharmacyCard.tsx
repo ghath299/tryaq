@@ -42,11 +42,11 @@ export function PharmacyCard({
   index = 0,
 }: PharmacyCardProps) {
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const scale = useSharedValue(1);
 
-  const name = language === "ar" ? nameAr : nameEn;
-  const district = language === "ar" ? districtAr : districtEn;
+  const name = nameAr;
+  const district = districtAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

@@ -104,15 +104,13 @@ interface PharmacyCardNewProps {
 
 function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
-  const name = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const province =
-    language === "ar" ? pharmacy.provinceAr : pharmacy.provinceEn;
-  const district =
-    language === "ar" ? pharmacy.districtAr : pharmacy.districtEn;
+  const name = pharmacy.nameAr;
+  const province = pharmacy.provinceAr;
+  const district = pharmacy.districtAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],
@@ -246,7 +244,7 @@ export default function PharmaciesScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const navigation = useNavigation<any>();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -331,7 +329,7 @@ export default function PharmaciesScreen() {
           {provinces.map((province, index) => (
             <FilterChip
               key={province.id}
-              label={language === "ar" ? province.nameAr : province.nameEn}
+              label={province.nameAr}
               selected={selectedProvince === province.id}
               onPress={() =>
                 setSelectedProvince(

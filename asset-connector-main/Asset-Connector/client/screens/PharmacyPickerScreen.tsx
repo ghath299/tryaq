@@ -16,12 +16,11 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { useApp } from "@/contexts/AppContext";
 import { pharmacies as allPharmacies } from "@/data/mockData";
 import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-const isRTL = (lang: string) => lang === "ar";
+const isRTL = true;
 
 type PharmacyLocal = (typeof allPharmacies)[number];
 
@@ -46,7 +45,6 @@ function haversineKm(
 export default function PharmacyPickerScreen() {
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const { language } = useApp();
   const navigation = useNavigation<any>();
   const route = useRoute<RouteProp<RootStackParamList, "PharmacyPicker">>();
 
@@ -110,15 +108,11 @@ export default function PharmacyPickerScreen() {
           haversineKm(userLocation.lat, userLocation.lng, b.lat, b.lng),
       );
     } else {
-      list.sort((a, b) => {
-        const nameA = language === "ar" ? a.nameAr : a.nameEn;
-        const nameB = language === "ar" ? b.nameAr : b.nameEn;
-        return nameA.localeCompare(nameB);
-      });
+      list.sort((a, b) => a.nameAr.localeCompare(b.nameAr));
     }
 
     return list;
-  }, [sourcePharmacies, searchText, sortMode, userLocation, language]);
+  }, [sourcePharmacies, searchText, sortMode, userLocation]);
 
   const getDistance = useCallback(
     (pharmacy: PharmacyLocal) => {
@@ -135,10 +129,10 @@ export default function PharmacyPickerScreen() {
 
   const renderPharmacy = useCallback(
     ({ item, index }: { item: PharmacyLocal; index: number }) => {
-      const rtl = isRTL(language);
-      const name = language === "ar" ? item.nameAr : item.nameEn;
-      const address = language === "ar" ? item.address : item.addressEn;
-      const province = language === "ar" ? item.provinceAr : item.provinceEn;
+      const rtl = isRTL;
+      const name = item.nameAr;
+      const address = item.address;
+      const province = item.provinceAr;
       const dist = getDistance(item);
 
       const handleOpenWaze = async (lat: number, lng: number) => {
@@ -237,7 +231,7 @@ export default function PharmacyPickerScreen() {
                           [rtl ? "marginRight" : "marginLeft"]: 4,
                         }}
                       >
-                        {dist.toFixed(1)} {language === "ar" ? "كم" : "km"}
+                        {dist.toFixed(1)} كم
                       </ThemedText>
                     </View>
                   </View>
@@ -265,7 +259,7 @@ export default function PharmacyPickerScreen() {
                     [rtl ? "marginRight" : "marginLeft"]: 6,
                   }}
                 >
-                  {language === "ar" ? "المسار" : "Route"}
+                  المسار
                 </ThemedText>
               </Pressable>
               <Pressable
@@ -292,7 +286,7 @@ export default function PharmacyPickerScreen() {
                     [rtl ? "marginRight" : "marginLeft"]: 6,
                   }}
                 >
-                  {language === "ar" ? "معلومات" : "Info"}
+                  معلومات
                 </ThemedText>
               </Pressable>
             </View>
@@ -300,7 +294,7 @@ export default function PharmacyPickerScreen() {
         </Animated.View>
       );
     },
-    [language, theme, getDistance, navigation],
+    [theme, getDistance, navigation],
   );
 
   return (
@@ -341,15 +335,13 @@ export default function PharmacyPickerScreen() {
           <TextInput
             value={searchText}
             onChangeText={setSearchText}
-            placeholder={
-              language === "ar" ? "ابحث عن صيدلية..." : "Search pharmacy..."
-            }
+            placeholder="ابحث عن صيدلية..."
             placeholderTextColor={theme.textSecondary}
             style={[
               styles.input,
               {
                 color: theme.text,
-                textAlign: language === "ar" ? "right" : "left",
+                textAlign: "right",
               },
             ]}
           />
@@ -384,7 +376,7 @@ export default function PharmacyPickerScreen() {
                 marginLeft: 4,
               }}
             >
-              {language === "ar" ? "الأقرب" : "Nearest"}
+              الأقرب
             </ThemedText>
           </Pressable>
           <Pressable
@@ -415,7 +407,7 @@ export default function PharmacyPickerScreen() {
                 marginLeft: 4,
               }}
             >
-              {language === "ar" ? "أبجدي" : "A-Z"}
+              أبجدي
             </ThemedText>
           </Pressable>
 
@@ -442,7 +434,7 @@ export default function PharmacyPickerScreen() {
               type="body"
               style={{ color: theme.textSecondary, marginTop: Spacing.md }}
             >
-              {language === "ar" ? "لا توجد صيدليات" : "No pharmacies found"}
+              لا توجد صيدليات
             </ThemedText>
           </View>
         }

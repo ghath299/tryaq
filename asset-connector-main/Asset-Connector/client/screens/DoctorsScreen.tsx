@@ -107,14 +107,14 @@ interface DoctorCardNewProps {
 
 function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
-  const name = language === "ar" ? doctor.nameAr : doctor.nameEn;
-  const specialty = language === "ar" ? doctor.specialtyAr : doctor.specialtyEn;
-  const province = language === "ar" ? doctor.provinceAr : doctor.provinceEn;
-  const district = language === "ar" ? doctor.districtAr : doctor.districtEn;
+  const name = doctor.nameAr;
+  const specialty = doctor.specialtyAr;
+  const province = doctor.provinceAr;
+  const district = doctor.districtAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],
@@ -163,7 +163,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
           colors={[theme.primary + "25", theme.primaryDark + "15"]}
           style={[
             styles.doctorAvatar,
-            language === "ar" && { marginRight: 0, marginLeft: Spacing.lg },
+            { marginRight: 0, marginLeft: Spacing.lg },
           ]}
         >
           <Feather name="user" size={28} color={theme.primary} />
@@ -173,14 +173,14 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
           <View
             style={[
               styles.doctorHeader,
-              language === "ar" && { flexDirection: "row-reverse" },
+              { flexDirection: "row-reverse" },
             ]}
           >
             <ThemedText
               type="h4"
               style={[
                 styles.doctorName,
-                language === "ar" && { textAlign: "right" },
+                { textAlign: "right" },
               ]}
               numberOfLines={1}
             >
@@ -191,7 +191,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
                 style={[
                   styles.verifiedIcon,
                   { backgroundColor: theme.primary },
-                  language === "ar" && {
+                  {
                     marginLeft: 0,
                     marginRight: Spacing.xs,
                   },
@@ -206,7 +206,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
             type="small"
             style={[
               { color: theme.primaryDark, fontWeight: "500" },
-              language === "ar" && { textAlign: "right" },
+              { textAlign: "right" },
             ]}
           >
             {specialty}
@@ -215,13 +215,13 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
           <View
             style={[
               styles.doctorMeta,
-              language === "ar" && { alignItems: "flex-end" },
+              { alignItems: "flex-end" },
             ]}
           >
             <View
               style={[
                 styles.metaItem,
-                language === "ar" && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <Feather name="map-pin" size={12} color={theme.textSecondary} />
@@ -229,7 +229,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
                 type="caption"
                 style={[
                   { color: theme.textSecondary, marginLeft: 4 },
-                  language === "ar" && { marginLeft: 0, marginRight: 4 },
+                  { marginLeft: 0, marginRight: 4 },
                 ]}
               >
                 {province} - {district}
@@ -240,13 +240,13 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
           <View
             style={[
               styles.doctorFooter,
-              language === "ar" && { flexDirection: "row-reverse" },
+              { flexDirection: "row-reverse" },
             ]}
           >
             <View
               style={[
                 styles.ratingContainer,
-                language === "ar" && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <Feather name="star" size={14} color="#FFB800" />
@@ -254,7 +254,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
                 type="small"
                 style={[
                   { fontWeight: "600", marginLeft: 4 },
-                  language === "ar" && { marginLeft: 0, marginRight: 4 },
+                  { marginLeft: 0, marginRight: 4 },
                 ]}
               >
                 {doctor.rating}
@@ -265,7 +265,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
               style={[
                 styles.distanceChip,
                 { backgroundColor: theme.primary + "15" },
-                language === "ar" && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <Feather name="navigation" size={12} color={theme.primary} />
@@ -273,7 +273,7 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
                 type="caption"
                 style={[
                   { color: theme.primary, marginLeft: 4, fontWeight: "500" },
-                  language === "ar" && { marginLeft: 0, marginRight: 4 },
+                  { marginLeft: 0, marginRight: 4 },
                 ]}
               >
                 {doctor.distance} {t("km")}
@@ -286,11 +286,11 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
           style={[
             styles.arrowContainer,
             { backgroundColor: theme.primary + "10" },
-            language === "ar" && { marginLeft: 0, marginRight: Spacing.sm },
+            { marginLeft: 0, marginRight: Spacing.sm },
           ]}
         >
           <Feather
-            name={language === "ar" ? "chevron-left" : "chevron-right"}
+            name="chevron-left"
             size={20}
             color={theme.primary}
           />
@@ -305,7 +305,7 @@ export default function DoctorsScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const navigation = useNavigation<any>();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -392,7 +392,7 @@ export default function DoctorsScreen() {
           {specialties.map((specialty, index) => (
             <FilterChip
               key={specialty.id}
-              label={language === "ar" ? specialty.nameAr : specialty.nameEn}
+              label={specialty.nameAr}
               selected={selectedSpecialty === specialty.id}
               onPress={() =>
                 setSelectedSpecialty(
@@ -419,7 +419,7 @@ export default function DoctorsScreen() {
           {provinces.map((province, index) => (
             <FilterChip
               key={province.id}
-              label={language === "ar" ? province.nameAr : province.nameEn}
+              label={province.nameAr}
               selected={selectedProvince === province.id}
               onPress={() =>
                 setSelectedProvince(

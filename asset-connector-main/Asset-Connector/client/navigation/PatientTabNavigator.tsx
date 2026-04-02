@@ -34,7 +34,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 function DrawerButton() {
   const { theme } = useTheme();
   const navigation = useNavigation();
-  const { language } = useApp();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -49,14 +48,12 @@ function DrawerButton() {
     navigation.dispatch(DrawerActions.openDrawer());
   };
 
-  const isRTL = language === "ar";
-
   return (
     <AnimatedPressable
       android_ripple={{ color: theme.backgroundRoot }}
       onPress={handlePress}
       style={[
-        isRTL ? { marginRight: Spacing.lg } : { marginLeft: Spacing.lg },
+        { marginRight: Spacing.lg },
         animatedStyle,
       ]}
     >
@@ -101,7 +98,7 @@ function AnimatedTabIcon({ name, color, size, focused }: AnimatedTabIconProps) {
 export default function PatientTabNavigator() {
   const insets = useSafeAreaInsets();
   const { theme, isDark } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
 
   return (
     <Tab.Navigator
@@ -147,8 +144,8 @@ export default function PatientTabNavigator() {
             />
           ),
 
-        headerLeft: () => (language === "ar" ? null : <DrawerButton />),
-        headerRight: () => (language === "ar" ? <DrawerButton /> : null),
+        headerLeft: () => null,
+        headerRight: () => <DrawerButton />,
 
         animation: "fade",
         freezeOnBlur: true,

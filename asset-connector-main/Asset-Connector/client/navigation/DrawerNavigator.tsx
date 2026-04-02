@@ -4,7 +4,6 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import PatientTabNavigator from "@/navigation/PatientTabNavigator";
 import { DrawerContent } from "@/components/DrawerContent";
 import { useTheme } from "@/hooks/useTheme";
-import { useApp } from "@/contexts/AppContext";
 import { StatusBar } from "expo-status-bar";
 
 const { width: WINDOW_WIDTH } = Dimensions.get("window");
@@ -17,8 +16,7 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export default function DrawerNavigator() {
   const { theme } = useTheme();
-  const { language } = useApp();
-  const isRTL = language === "ar";
+  const isRTL = true;
 
   return (
     <>

@@ -16,7 +16,7 @@ export default function MyBookingsScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
 
   const renderBooking = ({
     item,
@@ -25,9 +25,8 @@ export default function MyBookingsScreen() {
     item: (typeof bookings)[0];
     index: number;
   }) => {
-    const doctorName =
-      language === "ar" ? item.doctorNameAr : item.doctorNameEn;
-    const specialty = language === "ar" ? item.specialtyAr : item.specialtyEn;
+    const doctorName = item.doctorNameAr;
+    const specialty = item.specialtyAr;
 
     const getStatusColor = () => {
       switch (item.status) {

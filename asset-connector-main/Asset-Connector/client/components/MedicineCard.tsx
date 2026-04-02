@@ -10,7 +10,6 @@ import Animated, {
 
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
 
 interface MedicineCardProps {
@@ -40,12 +39,11 @@ export function MedicineCard({
   index = 0,
 }: MedicineCardProps) {
   const { theme } = useTheme();
-  const { language } = useApp();
   const scale = useSharedValue(1);
 
-  const name = language === "ar" ? nameAr : nameEn;
-  const company = language === "ar" ? companyAr : companyEn;
-  const usage = language === "ar" ? usageAr : usageEn;
+  const name = nameAr;
+  const company = companyAr;
+  const usage = usageAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

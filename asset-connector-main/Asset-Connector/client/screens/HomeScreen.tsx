@@ -35,91 +35,71 @@ const HEALTH_TIPS = [
   {
     id: "1",
     icon: "droplet" as const,
-    titleAr: "اشرب 8 أكواب ماء يومياً",
-    titleEn: "Drink 8 glasses of water daily",
-    descAr: "الماء ضروري لصحة الجسم والبشرة ويساعد على تحسين وظائف الأعضاء",
-    descEn: "Water is essential for body and skin health and improves organ function",
+    title: "اشرب 8 أكواب ماء يومياً",
+    desc: "الماء ضروري لصحة الجسم والبشرة ويساعد على تحسين وظائف الأعضاء",
     colors: ["#00B4DB", "#0083B0"] as [string, string],
   },
   {
     id: "2",
     icon: "moon" as const,
-    titleAr: "نم 7-8 ساعات كل ليلة",
-    titleEn: "Sleep 7-8 hours every night",
-    descAr: "النوم الكافي يقوي المناعة ويحسن التركيز والصحة النفسية",
-    descEn: "Adequate sleep strengthens immunity and improves focus and mental health",
+    title: "نم 7-8 ساعات كل ليلة",
+    desc: "النوم الكافي يقوي المناعة ويحسن التركيز والصحة النفسية",
     colors: ["#6C63FF", "#4834DF"] as [string, string],
   },
   {
     id: "3",
     icon: "heart" as const,
-    titleAr: "مارس الرياضة 30 دقيقة يومياً",
-    titleEn: "Exercise 30 minutes daily",
-    descAr: "النشاط البدني يقلل خطر أمراض القلب ويحسن المزاج والطاقة",
-    descEn: "Physical activity reduces heart disease risk and boosts mood and energy",
+    title: "مارس الرياضة 30 دقيقة يومياً",
+    desc: "النشاط البدني يقلل خطر أمراض القلب ويحسن المزاج والطاقة",
     colors: ["#FF6B6B", "#EE5A24"] as [string, string],
   },
   {
     id: "4",
     icon: "sun" as const,
-    titleAr: "تعرض لأشعة الشمس صباحاً",
-    titleEn: "Get morning sunlight exposure",
-    descAr: "أشعة الشمس الصباحية تمنحك فيتامين D وتحسن النوم والمزاج",
-    descEn: "Morning sunlight provides vitamin D and improves sleep and mood",
+    title: "تعرض لأشعة الشمس صباحاً",
+    desc: "أشعة الشمس الصباحية تمنحك فيتامين D وتحسن النوم والمزاج",
     colors: ["#F9A826", "#F39C12"] as [string, string],
   },
   {
     id: "5",
     icon: "smile" as const,
-    titleAr: "تناول الفواكه والخضروات يومياً",
-    titleEn: "Eat fruits and vegetables daily",
-    descAr: "الفواكه والخضروات غنية بالفيتامينات والمعادن الضرورية للجسم",
-    descEn: "Fruits and vegetables are rich in vitamins and minerals essential for the body",
+    title: "تناول الفواكه والخضروات يومياً",
+    desc: "الفواكه والخضروات غنية بالفيتامينات والمعادن الضرورية للجسم",
     colors: ["#00C851", "#007E33"] as [string, string],
   },
   {
     id: "6",
     icon: "wind" as const,
-    titleAr: "تنفس بعمق لتقليل التوتر",
-    titleEn: "Practice deep breathing to reduce stress",
-    descAr: "التنفس العميق يهدئ الأعصاب ويخفض ضغط الدم ويحسن التركيز",
-    descEn: "Deep breathing calms nerves, lowers blood pressure and improves focus",
+    title: "تنفس بعمق لتقليل التوتر",
+    desc: "التنفس العميق يهدئ الأعصاب ويخفض ضغط الدم ويحسن التركيز",
     colors: ["#A29BFE", "#6C5CE7"] as [string, string],
   },
   {
     id: "7",
     icon: "coffee" as const,
-    titleAr: "قلل من تناول الكافيين",
-    titleEn: "Reduce caffeine intake",
-    descAr: "الإفراط في الكافيين يسبب الأرق والقلق وزيادة ضربات القلب",
-    descEn: "Excess caffeine causes insomnia, anxiety and increased heart rate",
+    title: "قلل من تناول الكافيين",
+    desc: "الإفراط في الكافيين يسبب الأرق والقلق وزيادة ضربات القلب",
     colors: ["#E17055", "#D63031"] as [string, string],
   },
   {
     id: "8",
     icon: "eye" as const,
-    titleAr: "أرح عينيك من الشاشات",
-    titleEn: "Rest your eyes from screens",
-    descAr: "اتبع قاعدة 20-20-20: كل 20 دقيقة انظر لمسافة 20 قدم لمدة 20 ثانية",
-    descEn: "Follow the 20-20-20 rule: every 20 min look 20 feet away for 20 seconds",
+    title: "أرح عينيك من الشاشات",
+    desc: "اتبع قاعدة 20-20-20: كل 20 دقيقة انظر لمسافة 20 قدم لمدة 20 ثانية",
     colors: ["#00CEC9", "#0984E3"] as [string, string],
   },
   {
     id: "9",
     icon: "users" as const,
-    titleAr: "حافظ على علاقاتك الاجتماعية",
-    titleEn: "Maintain your social relationships",
-    descAr: "العلاقات الاجتماعية الصحية تقلل التوتر وتحسن الصحة النفسية",
-    descEn: "Healthy social relationships reduce stress and improve mental health",
+    title: "حافظ على علاقاتك الاجتماعية",
+    desc: "العلاقات الاجتماعية الصحية تقلل التوتر وتحسن الصحة النفسية",
     colors: ["#FD79A8", "#E84393"] as [string, string],
   },
   {
     id: "10",
     icon: "clipboard" as const,
-    titleAr: "قم بفحص طبي دوري",
-    titleEn: "Get regular health checkups",
-    descAr: "الفحوصات الدورية تساعد في الكشف المبكر عن الأمراض وعلاجها",
-    descEn: "Regular checkups help in early disease detection and treatment",
+    title: "قم بفحص طبي دوري",
+    desc: "الفحوصات الدورية تساعد في الكشف المبكر عن الأمراض وعلاجها",
     colors: ["#74B9FF", "#0984E3"] as [string, string],
   },
 ];
@@ -202,12 +182,11 @@ function PromotedDoctorCard({
   rank,
 }: PromotedDoctorCardProps) {
   const { theme } = useTheme();
-  const { language } = useApp();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
-  const name = language === "ar" ? doctor.nameAr : doctor.nameEn;
-  const specialty = language === "ar" ? doctor.specialtyAr : doctor.specialtyEn;
+  const name = doctor.nameAr;
+  const specialty = doctor.specialtyAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],
@@ -315,13 +294,12 @@ function PromotedPharmacyCard({
   rank,
 }: PromotedPharmacyCardProps) {
   const { theme } = useTheme();
-  const { language, t } = useApp();
+  const { t } = useApp();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
-  const name = language === "ar" ? pharmacy.nameAr : pharmacy.nameEn;
-  const district =
-    language === "ar" ? pharmacy.districtAr : pharmacy.districtEn;
+  const name = pharmacy.nameAr;
+  const district = pharmacy.districtAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],
@@ -427,12 +405,10 @@ function AnnouncementSlide({
   activeIndex,
 }: AnnouncementSlideProps) {
   const { theme } = useTheme();
-  const { language } = useApp();
   const pulseValue = useSharedValue(1);
 
-  const title = language === "ar" ? item.titleAr : item.titleEn;
-  const description =
-    language === "ar" ? item.descriptionAr : item.descriptionEn;
+  const title = item.titleAr;
+  const description = item.descriptionAr;
 
   useEffect(() => {
     if (index === activeIndex) {
@@ -519,8 +495,7 @@ const TIP_CARD_WIDTH = SCREEN_WIDTH;
 
 function HealthTipCard() {
   const { theme } = useTheme();
-  const { language } = useApp();
-  const isRTL = language === "ar";
+  const isRTL = true;
   const [activeTip, setActiveTip] = useState(0);
   const tipListRef = useRef<FlatList>(null);
   const pulseAnim = useSharedValue(1);
@@ -561,9 +536,9 @@ function HealthTipCard() {
   }));
 
   const renderTipItem = useCallback(({ item, index }: { item: typeof HEALTH_TIPS[0]; index: number }) => {
-    const tipTitle = language === "ar" ? item.titleAr : item.titleEn;
-    const desc = language === "ar" ? item.descAr : item.descEn;
-    const sectionTitle = language === "ar" ? "نصائح صحية" : "Health Tips";
+    const tipTitle = item.title;
+    const desc = item.desc;
+    const sectionTitle = "نصائح صحية";
 
     return (
       <LinearGradient
@@ -637,7 +612,7 @@ function HealthTipCard() {
         </View>
       </LinearGradient>
     );
-  }, [language, isRTL, pulseStyle]);
+  }, [isRTL, pulseStyle]);
 
   return (
     <FlatList
@@ -661,7 +636,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
-  const { t, language } = useApp();
+  const { t } = useApp();
   const navigation = useNavigation<any>();
 
   const [activeSlide, setActiveSlide] = useState(0);
@@ -758,7 +733,7 @@ export default function HomeScreen() {
       <FlatList
         data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
         horizontal
-        inverted={language === "ar"}
+        inverted={true}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.horizontalList}
@@ -783,7 +758,7 @@ export default function HomeScreen() {
       <FlatList
         data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
         horizontal
-        inverted={language === "ar"}
+        inverted={true}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.horizontalList}

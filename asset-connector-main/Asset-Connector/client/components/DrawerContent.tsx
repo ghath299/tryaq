@@ -33,11 +33,8 @@ interface DrawerItemProps {
 
 function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
   const { theme } = useTheme();
-  const { language } = useApp();
   const scale = useSharedValue(1);
   const translateX = useSharedValue(0);
-
-  const isRTL = language === "ar";
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateX: translateX.value }],
@@ -45,7 +42,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
 
   const handlePressIn = () => {
     scale.value = withSpring(0.97, Animation.spring.snappy);
-    translateX.value = withSpring(isRTL ? -8 : 8, Animation.spring.snappy);
+    translateX.value = withSpring(-8, Animation.spring.snappy);
   };
 
   const handlePressOut = () => {
@@ -71,7 +68,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
         onPressOut={handlePressOut}
         style={[
           styles.drawerItem,
-          isRTL && { flexDirection: "row-reverse" },
+          { flexDirection: "row-reverse" },
           animatedStyle,
         ]}
       >
@@ -85,7 +82,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
           type="body"
           style={[
             styles.drawerItemLabel,
-            isRTL && {
+            {
               marginLeft: 0,
               marginRight: Spacing.md,
               textAlign: "right",
@@ -96,7 +93,7 @@ function DrawerItem({ icon, label, onPress, index }: DrawerItemProps) {
         </ThemedText>
 
         <Feather
-          name={isRTL ? "chevron-left" : "chevron-right"}
+          name="chevron-left"
           size={18}
           color={theme.textSecondary}
         />
@@ -109,22 +106,13 @@ export function DrawerContent(props: DrawerContentComponentProps) {
   const { navigation } = props;
   const insets = useSafeAreaInsets();
   const { theme, isDark, themeMode, setThemeMode } = useTheme();
-  const { language, setLanguage, t, logout: appLogout } = useApp();
+  const { t, logout: appLogout } = useApp();
   const { user, logout: authLogout } = useAuth();
 
   const patientItems = [
     { icon: "calendar" as const, label: t("myBookings"), screen: "MyBookings" },
     { icon: "shopping-bag" as const, label: t("myOrders"), screen: "MyOrders" },
   ];
-
-  const handleLanguageToggle = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    navigation.closeDrawer();
-    setTimeout(() => {
-      const newLang = language === "ar" ? "en" : "ar";
-      setLanguage(newLang);
-    }, 300);
-  };
 
   const handleLogout = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -171,13 +159,13 @@ export function DrawerContent(props: DrawerContentComponentProps) {
           style={[
             styles.headerGradient,
             { paddingTop: insets.top + Spacing.xl },
-            language === "ar" && { alignItems: "flex-end" },
+            { alignItems: "flex-end" },
           ]}
         >
           <View
             style={[
               styles.avatarContainer,
-              language === "ar" && { alignSelf: "flex-end" },
+              { alignSelf: "flex-end" },
             ]}
           >
             <View style={styles.avatar}>
@@ -195,7 +183,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             type="h4"
             style={[
               styles.userName,
-              language === "ar" && { textAlign: "right" },
+              { textAlign: "right" },
             ]}
           >
             {user?.fullName || "مرحباً بك"}
@@ -206,7 +194,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
               type="small"
               style={[
                 styles.userInfo,
-                language === "ar" && { textAlign: "right" },
+                { textAlign: "right" },
               ]}
             >
               {user.phoneNumber}
@@ -222,7 +210,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             style={[
               styles.sectionTitle,
               { color: theme.textSecondary },
-              language === "ar" && {
+              {
                 textAlign: "right",
                 marginRight: Spacing.sm,
                 marginLeft: 0,
@@ -254,7 +242,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             style={[
               styles.sectionTitle,
               { color: theme.textSecondary },
-              language === "ar" && {
+              {
                 textAlign: "right",
                 marginRight: Spacing.sm,
                 marginLeft: 0,
@@ -294,66 +282,12 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             { backgroundColor: theme.backgroundSecondary },
           ]}
         >
-          <View
-            style={[
-              styles.settingItem,
-              language === "ar" && { flexDirection: "row-reverse" },
-            ]}
-          >
-            <View
-              style={[
-                styles.iconCircle,
-                { backgroundColor: theme.primary + "15" },
-              ]}
-            >
-              <Feather name="globe" size={20} color={theme.primary} />
-            </View>
-
-            <ThemedText
-              type="body"
-              style={[
-                styles.settingLabel,
-                language === "ar" && {
-                  marginLeft: 0,
-                  marginRight: Spacing.md,
-                  textAlign: "right",
-                },
-              ]}
-            >
-              {t("language")}
-            </ThemedText>
-
-            <Pressable
-              android_ripple={{ color: "transparent" }}
-              onPress={handleLanguageToggle}
-              style={[
-                styles.langButton,
-                { backgroundColor: theme.primary + "20" },
-              ]}
-            >
-              <ThemedText
-                type="small"
-                style={{ color: theme.primary, fontWeight: "600" }}
-              >
-                {language === "ar" ? "EN" : "عربي"}
-              </ThemedText>
-            </Pressable>
-          </View>
-
-          <View
-            style={[
-              styles.settingDivider,
-              { backgroundColor: theme.border },
-              language === "ar" && { marginLeft: 0, marginRight: 52 },
-            ]}
-          />
-
           <Pressable
             android_ripple={{ color: "transparent" }}
             onPress={handleThemeToggle}
             style={[
               styles.settingItem,
-              language === "ar" && { flexDirection: "row-reverse" },
+              { flexDirection: "row-reverse" },
             ]}
           >
             <View
@@ -373,7 +307,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
               type="body"
               style={[
                 styles.settingLabel,
-                language === "ar" && {
+                {
                   marginLeft: 0,
                   marginRight: Spacing.md,
                   textAlign: "right",
@@ -406,7 +340,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
             style={[
               styles.logoutButton,
               { borderColor: theme.error },
-              language === "ar" && { flexDirection: "row-reverse" },
+              { flexDirection: "row-reverse" },
             ]}
           >
             <Feather name="log-out" size={20} color={theme.error} />
@@ -414,9 +348,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
               type="body"
               style={[
                 { color: theme.error, fontWeight: "500" },
-                language === "ar"
-                  ? { marginRight: Spacing.sm }
-                  : { marginLeft: Spacing.sm },
+                { marginRight: Spacing.sm },
               ]}
             >
               {t("logout")}
