@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native"; // ✅ أضفنا DefaultTheme
+import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -19,13 +19,12 @@ import { ThemeProvider } from "@/hooks/useTheme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-// ✅ تعريف الثيم المخصص للقضاء على الرمشة البيضاء
 const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: "#000000", // ✅ جعل خلفية التنقل سودة تماماً
-    card: "#000000",
+    background: "#0D1117",
+    card: "#0D1117",
   },
 };
 
@@ -43,13 +42,15 @@ function AppContent() {
   }, [fontsLoaded, fontError]);
 
   if (!fontsLoaded && !fontError) {
-    return null;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#5EDFFF" />
+      </View>
+    );
   }
 
   return (
-    // ✅ التأكد من أن الحاوية الأساسية سودة
-    <View style={{ flex: 1, backgroundColor: "#000000" }}>
-      {/* ✅ تمرير الثيم المخصص هنا هو الحل النهائي للرمشة */}
+    <View style={{ flex: 1, backgroundColor: "#0D1117" }}>
       <NavigationContainer theme={MyTheme}>
         <RootStackNavigator />
       </NavigationContainer>
@@ -58,10 +59,6 @@ function AppContent() {
 }
 
 export default function App() {
-  useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
-
   return (
     <ErrorBoundary
       onError={(error) => {
@@ -76,7 +73,7 @@ export default function App() {
               <SafeAreaProvider>
                 <GestureHandlerRootView style={styles.root}>
                   <KeyboardProvider>
-                    <StatusBar style="light" backgroundColor="#000000" />
+                    <StatusBar style="light" backgroundColor="#0D1117" />
                     <AppContent />
                   </KeyboardProvider>
                 </GestureHandlerRootView>
@@ -92,6 +89,12 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#000000", // ✅ ضمان أن الجذر دائماً أسود
+    backgroundColor: "#0D1117",
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#0D1117",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

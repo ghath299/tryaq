@@ -69,9 +69,8 @@ export default function PatientTabNavigator() {
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
-      detachInactiveScreens={false}
       screenOptions={{
-        lazy: false,
+        lazy: true,
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.tabIconDefault,
 
