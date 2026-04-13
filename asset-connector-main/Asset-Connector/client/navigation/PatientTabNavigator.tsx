@@ -37,12 +37,12 @@ interface AnimatedTabIconProps {
 
 function AnimatedTabIcon({ name, color, size, focused }: AnimatedTabIconProps) {
   const { theme } = useTheme();
-  const scale = useSharedValue(focused ? 1.15 : 1);
-  const translateY = useSharedValue(focused ? -2 : 0);
+  const scale = useSharedValue(focused ? 1.1 : 1);
+  const translateY = useSharedValue(focused ? -1 : 0);
 
   React.useEffect(() => {
-    scale.value = withSpring(focused ? 1.15 : 1, Animation.spring.bouncy);
-    translateY.value = withSpring(focused ? -2 : 0, Animation.spring.bouncy);
+    scale.value = withSpring(focused ? 1.1 : 1, Animation.spring.gentle);
+    translateY.value = withSpring(focused ? -1 : 0, Animation.spring.gentle);
   }, [focused]);
 
   const animatedStyle = useAnimatedStyle(() => ({

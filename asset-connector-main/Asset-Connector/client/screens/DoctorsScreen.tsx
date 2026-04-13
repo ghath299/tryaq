@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useLayoutEffect, useCallback } from "react";
+import React, { useState, useMemo, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -15,12 +15,10 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   FadeInUp,
-  FadeInDown,
   FadeIn,
   SlideInDown,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
   interpolateColor,
 } from "react-native-reanimated";
@@ -31,7 +29,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
 import { doctors, specialties, provinces } from "@/data/mockData";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -85,10 +83,10 @@ function FilterButton({
     <AnimatedPressable
       android_ripple={{ color: "transparent" }}
       onPress={() => {
-        scale.value = withSpring(0.94, Animation.spring.snappy);
+        scale.value = withTiming(0.97, { duration: 80 });
         setTimeout(() => {
-          scale.value = withSpring(1, Animation.spring.gentle);
-        }, 100);
+          scale.value = withTiming(1, { duration: 150 });
+        }, 80);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPress();
       }}
@@ -160,7 +158,7 @@ function FilterSheet({
     >
       <Pressable style={styles.sheetOverlay} onPress={onClose}>
         <Animated.View
-          entering={SlideInDown.duration(350).springify().damping(18)}
+          entering={SlideInDown.duration(300)}
           style={[
             styles.sheetContainer,
             {
@@ -264,7 +262,6 @@ function DoctorCardNew({
   const { theme } = useTheme();
   const { t } = useApp();
   const scale = useSharedValue(1);
-  const translateY = useSharedValue(0);
 
   const name = doctor.nameAr;
   const specialty = doctor.specialtyAr;
@@ -272,22 +269,20 @@ function DoctorCardNew({
   const district = doctor.districtAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { translateY: translateY.value }],
+    transform: [{ scale: scale.value }],
   }));
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.98, Animation.spring.snappy);
-    translateY.value = withSpring(-2, Animation.spring.snappy);
+    scale.value = withTiming(0.98, { duration: 80 });
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, Animation.spring.gentle);
-    translateY.value = withSpring(0, Animation.spring.gentle);
+    scale.value = withTiming(1, { duration: 150 });
   };
 
   return (
     <Animated.View
-      entering={FadeInUp.delay(index * 60).duration(400).springify()}
+      entering={FadeInUp.delay(index * 40).duration(300)}
     >
       <AnimatedPressable
         android_ripple={{ color: theme.backgroundRoot }}
