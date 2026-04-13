@@ -208,11 +208,7 @@ function PromotedDoctorCard({
   };
 
   return (
-    <Animated.View
-      entering={FadeInUp.delay(200 + index * 80)
-        .duration(400)
-        .springify()}
-    >
+    <Animated.View entering={FadeInUp.delay(200 + index * 80).duration(400)}>
       <AnimatedPressable
         android_ripple={{ color: "transparent" }}
         onPress={handlePress}
@@ -220,61 +216,63 @@ function PromotedDoctorCard({
         onPressOut={handlePressOut}
         style={[styles.promotedCardWrapper, animatedStyle]}
       >
-        <LinearGradient
-          colors={["#5EDFFF15", "#1F6AE115"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.promotedCard}
-        >
-          <View style={styles.promotedCardInner}>
-            <View style={styles.promotedIconWrapper}>
-              <LinearGradient
-                colors={[theme.primary, theme.primaryDark]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.promotedIconGradient}
-              >
-                <Feather name="activity" size={32} color="#FFFFFF" />
-              </LinearGradient>
-            </View>
-
-            <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
-              {name}
-            </ThemedText>
-
-            <ThemedText
-              type="small"
-              style={{ color: theme.textSecondary }}
-              numberOfLines={1}
-            >
-              {specialty}
-            </ThemedText>
-
-            <View style={styles.promotedRating}>
-              <Feather name="star" size={12} color="#FFB800" />
-              <ThemedText
-                type="caption"
-                style={{ color: theme.textSecondary, marginLeft: 4 }}
-              >
-                {doctor.rating}
-              </ThemedText>
-            </View>
-          </View>
-
+        <View style={styles.promotedCardShadow}>
           <LinearGradient
-            colors={["#FF6B6B", "#E63946"]}
+            colors={["rgba(94,223,255,0.10)", "rgba(31,106,225,0.10)"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={styles.rankBadge}
+            style={styles.promotedCard}
           >
-            <ThemedText
-              type="caption"
-              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 9 }}
+            <View style={styles.promotedCardInner}>
+              <View style={styles.promotedIconWrapper}>
+                <LinearGradient
+                  colors={[theme.primary, theme.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.promotedIconGradient}
+                >
+                  <Feather name="activity" size={32} color="#FFFFFF" />
+                </LinearGradient>
+              </View>
+
+              <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
+                {name}
+              </ThemedText>
+
+              <ThemedText
+                type="small"
+                style={{ color: theme.textSecondary }}
+                numberOfLines={1}
+              >
+                {specialty}
+              </ThemedText>
+
+              <View style={styles.promotedRating}>
+                <Feather name="star" size={12} color="#FFB800" />
+                <ThemedText
+                  type="caption"
+                  style={{ color: theme.textSecondary, marginLeft: 4 }}
+                >
+                  {doctor.rating}
+                </ThemedText>
+              </View>
+            </View>
+
+            <LinearGradient
+              colors={["#FF6B6B", "#E63946"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.rankBadge}
             >
-              {rank}
-            </ThemedText>
+              <ThemedText
+                type="caption"
+                style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 9 }}
+              >
+                {rank}
+              </ThemedText>
+            </LinearGradient>
           </LinearGradient>
-        </LinearGradient>
+        </View>
       </AnimatedPressable>
     </Animated.View>
   );
@@ -321,11 +319,7 @@ function PromotedPharmacyCard({
   };
 
   return (
-    <Animated.View
-      entering={FadeInUp.delay(300 + index * 80)
-        .duration(400)
-        .springify()}
-    >
+    <Animated.View entering={FadeInUp.delay(300 + index * 80).duration(400)}>
       <AnimatedPressable
         android_ripple={{ color: "transparent" }}
         onPress={handlePress}
@@ -333,61 +327,63 @@ function PromotedPharmacyCard({
         onPressOut={handlePressOut}
         style={[styles.promotedCardWrapper, animatedStyle]}
       >
-        <LinearGradient
-          colors={["#5EDFFF15", "#1F6AE115"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.promotedCard}
-        >
-          <View style={styles.promotedCardInner}>
-            <View style={styles.promotedIconWrapper}>
-              <LinearGradient
-                colors={[theme.primary, theme.primaryDark]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.promotedIconGradient}
-              >
-                <Feather name="briefcase" size={32} color="#FFFFFF" />
-              </LinearGradient>
-            </View>
-
-            <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
-              {name}
-            </ThemedText>
-
-            <ThemedText
-              type="small"
-              style={{ color: theme.textSecondary }}
-              numberOfLines={1}
-            >
-              {district}
-            </ThemedText>
-
-            <View style={styles.promotedRating}>
-              <Feather name="star" size={12} color="#FFB800" />
-              <ThemedText
-                type="caption"
-                style={{ color: theme.textSecondary, marginLeft: 4 }}
-              >
-                {pharmacy.rating}
-              </ThemedText>
-            </View>
-          </View>
-
+        <View style={styles.promotedCardShadow}>
           <LinearGradient
-            colors={["#FFD700", "#FFA500"]}
+            colors={["rgba(94,223,255,0.10)", "rgba(31,106,225,0.10)"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={styles.rankBadge}
+            style={styles.promotedCard}
           >
-            <ThemedText
-              type="body"
-              style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 14 }}
+            <View style={styles.promotedCardInner}>
+              <View style={styles.promotedIconWrapper}>
+                <LinearGradient
+                  colors={[theme.primary, theme.primaryDark]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.promotedIconGradient}
+                >
+                  <Feather name="briefcase" size={32} color="#FFFFFF" />
+                </LinearGradient>
+              </View>
+
+              <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
+                {name}
+              </ThemedText>
+
+              <ThemedText
+                type="small"
+                style={{ color: theme.textSecondary }}
+                numberOfLines={1}
+              >
+                {district}
+              </ThemedText>
+
+              <View style={styles.promotedRating}>
+                <Feather name="star" size={12} color="#FFB800" />
+                <ThemedText
+                  type="caption"
+                  style={{ color: theme.textSecondary, marginLeft: 4 }}
+                >
+                  {pharmacy.rating}
+                </ThemedText>
+              </View>
+            </View>
+
+            <LinearGradient
+              colors={["#FFD700", "#FFA500"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.rankBadge}
             >
-              {rank}
-            </ThemedText>
+              <ThemedText
+                type="body"
+                style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 14 }}
+              >
+                {rank}
+              </ThemedText>
+            </LinearGradient>
           </LinearGradient>
-        </LinearGradient>
+        </View>
       </AnimatedPressable>
     </Animated.View>
   );
@@ -846,19 +842,23 @@ const styles = StyleSheet.create({
     width: 150,
     marginRight: Spacing.md,
   },
+  promotedCardShadow: {
+    borderRadius: BorderRadius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(94, 223, 255, 0.3)",
+    shadowColor: "#1F6AE1",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
+    overflow: "hidden",
+  },
   promotedCard: {
     padding: Spacing.lg,
     borderRadius: BorderRadius.xl,
     alignItems: "center",
     position: "relative",
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(94, 223, 255, 0.2)",
-    shadowColor: "#1F6AE1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
   },
   promotedCardInner: {
     alignItems: "center",
