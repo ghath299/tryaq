@@ -3,6 +3,7 @@ import {
   View,
   StyleSheet,
   FlatList,
+  ScrollView,
   Pressable,
   Modal,
   Dimensions,
@@ -168,7 +169,7 @@ function FilterSheet({
             },
           ]}
         >
-          <Pressable onPress={(e) => e.stopPropagation()}>
+          <Pressable onPress={(e) => e.stopPropagation()} style={{ flex: 1 }}>
             <View style={styles.sheetHandle}>
               <View style={[styles.handleBar, { backgroundColor: theme.border }]} />
             </View>
@@ -196,7 +197,12 @@ function FilterSheet({
               )}
             </View>
 
-            <View style={styles.sheetGrid}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={{ flex: 1 }}
+              contentContainerStyle={styles.sheetGrid}
+              keyboardShouldPersistTaps="handled"
+            >
               {options.map((option, index) => {
                 const isSelected = selectedId === option.id;
                 return (
@@ -242,7 +248,7 @@ function FilterSheet({
                   </Animated.View>
                 );
               })}
-            </View>
+            </ScrollView>
           </Pressable>
         </Animated.View>
       </Pressable>
@@ -625,7 +631,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: BorderRadius.xl + 4,
     borderWidth: 1,
     borderBottomWidth: 0,
-    maxHeight: "70%",
+    maxHeight: "82%",
   },
   sheetHandle: {
     alignItems: "center",
