@@ -438,10 +438,14 @@ export default function DoctorsScreen() {
 
   const activeFilterCount = (selectedSpecialty ? 1 : 0) + (selectedProvince ? 1 : 0);
 
-  const specialtyOptions: FilterOption[] = specialties.map((s) => ({
-    id: s.id,
-    label: s.nameAr,
-  }));
+  const activeSpecialtyIds = useMemo(
+    () => new Set(doctors.map((d) => d.specialtyId)),
+    [],
+  );
+
+  const specialtyOptions: FilterOption[] = specialties
+    .filter((s) => activeSpecialtyIds.has(s.id))
+    .map((s) => ({ id: s.id, label: s.nameAr }));
 
   const provinceOptions: FilterOption[] = provinces.map((p) => ({
     id: p.id,

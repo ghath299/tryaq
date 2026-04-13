@@ -12,16 +12,25 @@ export const specialties = [
 ];
 
 export const provinces = [
-  { id: "1", nameAr: "بغداد", nameEn: "Baghdad" },
-  { id: "2", nameAr: "البصرة", nameEn: "Basra" },
-  { id: "3", nameAr: "نينوى", nameEn: "Nineveh" },
-  { id: "4", nameAr: "أربيل", nameEn: "Erbil" },
-  { id: "5", nameAr: "النجف", nameEn: "Najaf" },
-  { id: "6", nameAr: "كربلاء", nameEn: "Karbala" },
-  { id: "7", nameAr: "ذي قار", nameEn: "Dhi Qar" },
-  { id: "8", nameAr: "الأنبار", nameEn: "Anbar" },
-  { id: "9", nameAr: "ديالى", nameEn: "Diyala" },
-  { id: "10", nameAr: "كركوك", nameEn: "Kirkuk" },
+  { id: "1",  nameAr: "بغداد",      nameEn: "Baghdad" },
+  { id: "2",  nameAr: "البصرة",     nameEn: "Basra" },
+  { id: "3",  nameAr: "نينوى",      nameEn: "Nineveh" },
+  { id: "4",  nameAr: "أربيل",      nameEn: "Erbil" },
+  { id: "5",  nameAr: "النجف",      nameEn: "Najaf" },
+  { id: "6",  nameAr: "كربلاء",     nameEn: "Karbala" },
+  { id: "7",  nameAr: "ذي قار",     nameEn: "Dhi Qar" },
+  { id: "8",  nameAr: "الأنبار",    nameEn: "Anbar" },
+  { id: "9",  nameAr: "ديالى",      nameEn: "Diyala" },
+  { id: "10", nameAr: "كركوك",      nameEn: "Kirkuk" },
+  { id: "11", nameAr: "صلاح الدين", nameEn: "Salah ad-Din" },
+  { id: "12", nameAr: "واسط",       nameEn: "Wasit" },
+  { id: "13", nameAr: "بابل",       nameEn: "Babylon" },
+  { id: "14", nameAr: "القادسية",   nameEn: "Al-Qadisiyyah" },
+  { id: "15", nameAr: "ميسان",      nameEn: "Maysan" },
+  { id: "16", nameAr: "المثنى",     nameEn: "Al-Muthanna" },
+  { id: "17", nameAr: "السليمانية", nameEn: "Sulaymaniyah" },
+  { id: "18", nameAr: "دهوك",       nameEn: "Duhok" },
+  { id: "19", nameAr: "الكويت",     nameEn: "Kuwait" },
 ];
 
 export const doctors = [
