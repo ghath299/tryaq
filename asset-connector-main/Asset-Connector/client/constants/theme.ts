@@ -216,3 +216,22 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+/**
+ * Converts a hex color + opacity to rgba() format.
+ * Use this instead of `color + "AA"` (hex alpha) in LinearGradient colors
+ * because expo-linear-gradient on Android uses AARRGGBB format (not RRGGBBAA),
+ * which causes colors to render incorrectly on Android devices.
+ *
+ * @param color  Hex color string e.g. "#5EDFFF"
+ * @param opacity  Float 0–1
+ */
+export function addAlpha(color: string, opacity: number): string {
+  const hex = color.replace("#", "");
+  if (hex.length !== 6) return color;
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const a = Math.round(opacity * 100) / 100;
+  return `rgba(${r},${g},${b},${a})`;
+}

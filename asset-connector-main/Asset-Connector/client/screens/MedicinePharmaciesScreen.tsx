@@ -41,6 +41,7 @@ export default function MedicinePharmaciesScreen() {
   const [query, setQuery] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [governorate, setGovernorate] = useState("Baghdad");
+  const [governorateAr, setGovernorateAr] = useState("بغداد");
   const [showGovernorates, setShowGovernorates] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(
@@ -53,13 +54,18 @@ export default function MedicinePharmaciesScreen() {
   const searchCache = useRef<Map<string, Medicine[]>>(new Map());
 
   useEffect(() => {
-    loadGovernorate().then((value) => value && setGovernorate(value));
+    loadGovernorate().then((value) => {
+      if (value) {
+        setGovernorate(value);
+        const match = provinces.find((p) => p.nameEn === value);
+        if (match) setGovernorateAr(match.nameAr);
+      }
+    });
 
-    // If we have an initial query, try to find a direct match in local data first for speed
     if (initialQuery) {
       const { medicines: localMedicines } = require("@/data/mockData");
       const localMatch = localMedicines.find(
-        (m: any) => m.nameAr === initialQuery || m.nameEn === initialQuery,
+        (m: any) => m.nameAr === initialQuery,
       );
       if (localMatch) {
         handleSelectMedicine({
@@ -98,8 +104,7 @@ export default function MedicinePharmaciesScreen() {
 
       const directMatch = (data.items || []).find(
         (item: Medicine) =>
-          item.nameAr.toLowerCase() === normalized ||
-          item.nameEn.toLowerCase() === normalized,
+          item.nameAr.toLowerCase() === normalized,
       );
       if (directMatch) {
         handleSelectMedicine(directMatch);
@@ -151,7 +156,7 @@ export default function MedicinePharmaciesScreen() {
           style={[styles.governorateButton, { borderColor: theme.border }]}
           onPress={() => setShowGovernorates(true)}
         >
-          <ThemedText type="small">تغيير المحافظة: {governorate}</ThemedText>
+          <ThemedText type="small">تغيير المحافظة: {governorateAr}</ThemedText>
         </Pressable>
       </View>
 
@@ -245,6 +250,7 @@ export default function MedicinePharmaciesScreen() {
                   onPress={async () => {
                     await saveGovernorate(item.nameEn);
                     setGovernorate(item.nameEn);
+                    setGovernorateAr(item.nameAr);
                     setShowGovernorates(false);
                     if (selectedMedicine)
                       handleSelectMedicine(selectedMedicine);

@@ -26,7 +26,7 @@ import * as Haptics from "expo-haptics";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const OTP_LENGTH = 6;
@@ -186,7 +186,7 @@ export default function OTPVerificationScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <LinearGradient
-        colors={[theme.primary + "10", "transparent"]}
+        colors={[addAlpha(theme.primary, 0.06), "transparent"]}
         style={styles.topGradient}
       />
 
@@ -347,7 +347,7 @@ export default function OTPVerificationScreen() {
             <View style={styles.methodsRow}>
               <Pressable
                 android_ripple={{ color: "transparent" }}
-                style={[styles.methodChip, { backgroundColor: "#25D36615" }]}
+                style={[styles.methodChip, { backgroundColor: "rgba(37,211,102,0.08)" }]}
               >
                 <Feather name="message-circle" size={16} color="#25D366" />
                 <ThemedText

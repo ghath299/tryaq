@@ -95,9 +95,7 @@ export default function PharmacyPickerScreen() {
       list = list.filter(
         (p) =>
           p.nameAr.toLowerCase().includes(q) ||
-          p.nameEn.toLowerCase().includes(q) ||
-          p.address.toLowerCase().includes(q) ||
-          (p.addressEn && p.addressEn.toLowerCase().includes(q)),
+          p.address.toLowerCase().includes(q),
       );
     }
 

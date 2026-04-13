@@ -90,9 +90,7 @@ export function AnimatedCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled}
-        entering={FadeInDown.delay(index * Animation.stagger.normal)
-          .duration(Animation.duration.slow)
-          .springify()}
+        entering={FadeInDown.delay(index * Animation.stagger.normal).duration(Animation.duration.slow)}
         style={[styles.card, shadowStyle, animatedStyle, style]}
       >
         <LinearGradient
@@ -117,9 +115,7 @@ export function AnimatedCard({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      entering={FadeInDown.delay(index * Animation.stagger.normal)
-        .duration(Animation.duration.slow)
-        .springify()}
+      entering={FadeInDown.delay(index * Animation.stagger.normal).duration(Animation.duration.slow)}
       style={[
         styles.card,
         {

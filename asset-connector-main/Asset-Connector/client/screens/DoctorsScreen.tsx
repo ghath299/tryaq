@@ -30,7 +30,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius, addAlpha } from "@/constants/theme";
 import { doctors, specialties, provinces } from "@/data/mockData";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -71,12 +71,12 @@ function FilterButton({
     backgroundColor: interpolateColor(
       progress.value,
       [0, 1],
-      [theme.backgroundSecondary, theme.primary + "18"]
+      [theme.backgroundSecondary, addAlpha(theme.primary, 0.09)]
     ),
     borderColor: interpolateColor(
       progress.value,
       [0, 1],
-      [theme.border, theme.primary + "60"]
+      [theme.border, addAlpha(theme.primary, 0.38)]
     ),
   }));
 
@@ -310,7 +310,7 @@ function DoctorCardNew({
         ]}
       >
         <LinearGradient
-          colors={[theme.primary + "25", theme.primaryDark + "15"]}
+          colors={[addAlpha(theme.primary, 0.15), addAlpha(theme.primaryDark, 0.08)]}
           style={[styles.doctorAvatar, { marginRight: 0, marginLeft: Spacing.lg }]}
         >
           <Feather name="user" size={28} color={theme.primary} />
@@ -429,8 +429,7 @@ export default function DoctorsScreen() {
       const query = searchQuery.toLowerCase();
       results = results.filter(
         (doctor) =>
-          doctor.nameAr.toLowerCase().includes(query) ||
-          doctor.nameEn.toLowerCase().includes(query),
+          doctor.nameAr.toLowerCase().includes(query),
       );
     }
     if (selectedSpecialty) {

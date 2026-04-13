@@ -17,7 +17,7 @@ import * as Haptics from "expo-haptics";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
-import { BorderRadius, Spacing } from "@/constants/theme";
+import { BorderRadius, Spacing, addAlpha } from "@/constants/theme";
 import { provinces } from "@/data/mockData";
 import {
   getClosestGovernorateFromCoords,
@@ -75,7 +75,7 @@ export default function LocationPermissionScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <LinearGradient
-        colors={[theme.primary + "10", "transparent"]}
+        colors={[addAlpha(theme.primary, 0.06), "transparent"]}
         style={styles.topGradient}
       />
       <View
@@ -108,7 +108,7 @@ export default function LocationPermissionScreen() {
           <View
             style={[
               styles.deniedBox,
-              { backgroundColor: "#FF3B3015", borderColor: "#FF3B30" },
+              { backgroundColor: "rgba(255,59,48,0.08)", borderColor: "#FF3B30" },
             ]}
           >
             <Feather name="alert-circle" size={20} color="#FF3B30" />

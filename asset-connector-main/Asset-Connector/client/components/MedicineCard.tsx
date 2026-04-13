@@ -15,11 +15,8 @@ import { Spacing, BorderRadius } from "@/constants/theme";
 interface MedicineCardProps {
   id: string;
   nameAr: string;
-  nameEn: string;
   companyAr: string;
-  companyEn: string;
   usageAr: string;
-  usageEn: string;
   dosage: string;
   onPress: () => void;
   index?: number;
@@ -29,21 +26,14 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function MedicineCard({
   nameAr,
-  nameEn,
   companyAr,
-  companyEn,
   usageAr,
-  usageEn,
   dosage,
   onPress,
   index = 0,
 }: MedicineCardProps) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
-
-  const name = nameAr;
-  const company = companyAr;
-  const usage = usageAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -76,10 +66,10 @@ export function MedicineCard({
           </View>
           <View style={styles.headerInfo}>
             <ThemedText type="h4" style={styles.name} numberOfLines={1}>
-              {name}
+              {nameAr}
             </ThemedText>
             <ThemedText type="small" style={{ color: theme.textSecondary }}>
-              {company} - {dosage}
+              {companyAr} - {dosage}
             </ThemedText>
           </View>
         </View>
@@ -89,7 +79,7 @@ export function MedicineCard({
           style={[styles.usage, { color: theme.textSecondary }]}
           numberOfLines={2}
         >
-          {usage}
+          {usageAr}
         </ThemedText>
       </AnimatedPressable>
     </Animated.View>

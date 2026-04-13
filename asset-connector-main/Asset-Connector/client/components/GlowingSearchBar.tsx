@@ -10,7 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
 
 const isAndroid = Platform.OS === "android";
 
@@ -57,8 +57,8 @@ export function GlowingSearchBar({
         <View style={[styles.glowContainer, { opacity: isFocused ? 0.6 : 0.3 }]}>
           <LinearGradient
             colors={[
-              theme.primary + "40",
-              theme.primaryDark + "20",
+              addAlpha(theme.primary, 0.25),
+              addAlpha(theme.primaryDark, 0.12),
               "transparent",
             ]}
             start={{ x: 0.5, y: 0 }}

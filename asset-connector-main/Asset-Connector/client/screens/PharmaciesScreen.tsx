@@ -133,9 +133,7 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
 
   return (
     <Animated.View
-      entering={FadeInUp.delay(index * 60)
-        .duration(400)
-        .springify()}
+      entering={FadeInUp.delay(index * 60).duration(400)}
     >
       <AnimatedPressable
         android_ripple={{ color: theme.backgroundRoot, borderless: false, foreground: false }}
@@ -154,7 +152,7 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
         ]}
       >
         <LinearGradient
-          colors={["#4CD96425", "#4CD96415"]}
+          colors={["rgba(76,217,100,0.15)", "rgba(76,217,100,0.08)"]}
           style={styles.pharmacyIcon}
         >
           <Feather name="plus-square" size={28} color="#4CD964" />
@@ -232,7 +230,7 @@ function PharmacyCardNew({ pharmacy, onPress, index }: PharmacyCardNewProps) {
           </View>
         </View>
 
-        <View style={[styles.arrowContainer, { backgroundColor: "#4CD96415" }]}>
+        <View style={[styles.arrowContainer, { backgroundColor: "rgba(76,217,100,0.08)" }]}>
           <Feather name="chevron-right" size={20} color="#4CD964" />
         </View>
       </AnimatedPressable>
@@ -267,8 +265,7 @@ export default function PharmaciesScreen() {
       const query = searchQuery.toLowerCase();
       results = results.filter(
         (pharmacy) =>
-          pharmacy.nameAr.toLowerCase().includes(query) ||
-          pharmacy.nameEn.toLowerCase().includes(query),
+          pharmacy.nameAr.toLowerCase().includes(query),
       );
     }
 

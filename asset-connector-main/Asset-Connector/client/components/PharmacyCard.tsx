@@ -16,9 +16,7 @@ import { Spacing, BorderRadius } from "@/constants/theme";
 interface PharmacyCardProps {
   id: string;
   nameAr: string;
-  nameEn: string;
   districtAr: string;
-  districtEn: string;
   distance: number;
   isVerified: boolean;
   hasDelivery: boolean;
@@ -31,9 +29,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function PharmacyCard({
   nameAr,
-  nameEn,
   districtAr,
-  districtEn,
   distance,
   isVerified,
   hasDelivery,
@@ -44,9 +40,6 @@ export function PharmacyCard({
   const { theme } = useTheme();
   const { t } = useApp();
   const scale = useSharedValue(1);
-
-  const name = nameAr;
-  const district = districtAr;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -82,7 +75,7 @@ export function PharmacyCard({
           <View style={styles.headerInfo}>
             <View style={styles.nameRow}>
               <ThemedText type="h4" style={styles.name} numberOfLines={1}>
-                {name}
+                {nameAr}
               </ThemedText>
               {isVerified ? (
                 <Feather name="check-circle" size={16} color={theme.primary} />
@@ -116,7 +109,7 @@ export function PharmacyCard({
               type="small"
               style={[styles.infoText, { color: theme.textSecondary }]}
             >
-              {district}
+              {districtAr}
             </ThemedText>
           </View>
           <View style={styles.infoItem}>

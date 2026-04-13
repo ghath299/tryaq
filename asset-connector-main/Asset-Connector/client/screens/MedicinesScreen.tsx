@@ -34,7 +34,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { getApiUrl } from "@/lib/query-client";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
 import { medicines } from "@/data/mockData";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -75,9 +75,7 @@ function MedicineCardNew({ medicine, onPress, index }: MedicineCardNewProps) {
 
   return (
     <Animated.View
-      entering={FadeInUp.delay(index * 50)
-        .duration(400)
-        .springify()}
+      entering={FadeInUp.delay(index * 50).duration(400)}
     >
       <AnimatedPressable
         android_ripple={{ color: theme.backgroundRoot }}
@@ -91,7 +89,7 @@ function MedicineCardNew({ medicine, onPress, index }: MedicineCardNewProps) {
         ]}
       >
         <LinearGradient
-          colors={[theme.primaryDark + "25", theme.primary + "15"]}
+          colors={[addAlpha(theme.primaryDark, 0.15), addAlpha(theme.primary, 0.08)]}
           style={styles.medicineIcon}
         >
           <Feather name="package" size={24} color={theme.primaryDark} />
@@ -297,7 +295,7 @@ function AISearchSection({
         <>
           <View style={styles.aiHeader}>
             <LinearGradient
-              colors={[theme.primary + "20", theme.primaryDark + "10"]}
+              colors={[addAlpha(theme.primary, 0.12), addAlpha(theme.primaryDark, 0.06)]}
               style={styles.aiHeaderGradient}
             >
               <Feather name="cpu" size={20} color={theme.primary} />
@@ -318,8 +316,8 @@ function AISearchSection({
             <Animated.View style={[styles.glowRing, glowStyle]}>
               <LinearGradient
                 colors={[
-                  theme.primary + "40",
-                  theme.primaryDark + "20",
+                  addAlpha(theme.primary, 0.25),
+                  addAlpha(theme.primaryDark, 0.12),
                   "transparent",
                 ]}
                 style={StyleSheet.absoluteFill}
@@ -374,7 +372,7 @@ function AISearchSection({
         </>
       ) : (
         <Animated.View
-          entering={FadeInUp.duration(600).springify().damping(15)}
+          entering={FadeInUp.duration(500)}
           style={[
             styles.resultCard,
             {
@@ -627,9 +625,7 @@ export default function MedicinesScreen() {
     return medicines.filter(
       (m) =>
         m.nameAr.toLowerCase().includes(query) ||
-        m.nameEn.toLowerCase().includes(query) ||
-        m.companyAr.toLowerCase().includes(query) ||
-        m.companyEn.toLowerCase().includes(query),
+        m.companyAr.toLowerCase().includes(query),
     );
   }, [searchQuery]);
 

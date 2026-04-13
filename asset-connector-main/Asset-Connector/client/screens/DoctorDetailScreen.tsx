@@ -19,7 +19,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Button } from "@/components/Button";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius, addAlpha } from "@/constants/theme";
 import { doctors } from "@/data/mockData";
 
 type DoctorDetailRouteProp = RouteProp<
@@ -108,8 +108,8 @@ export default function DoctorDetailScreen() {
           <LinearGradient
             colors={
               isDark
-                ? [theme.primary + "30", theme.backgroundRoot]
-                : [theme.primary + "25", theme.backgroundRoot]
+                ? [addAlpha(theme.primary, 0.19), theme.backgroundRoot]
+                : [addAlpha(theme.primary, 0.15), theme.backgroundRoot]
             }
             style={{ height: heroHeight }}
             start={{ x: 0.5, y: 0 }}

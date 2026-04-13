@@ -27,7 +27,7 @@ import * as Haptics from "expo-haptics";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
+import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -134,13 +134,13 @@ export default function LoginScreen() {
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <Animated.View style={[styles.orb1, orb1Style]}>
         <LinearGradient
-          colors={[theme.primary + "30", theme.primary + "10"]}
+          colors={[addAlpha(theme.primary, 0.19), addAlpha(theme.primary, 0.06)]}
           style={styles.orbGradient}
         />
       </Animated.View>
       <Animated.View style={[styles.orb2, orb2Style]}>
         <LinearGradient
-          colors={[theme.primaryDark + "25", theme.primaryDark + "08"]}
+          colors={[addAlpha(theme.primaryDark, 0.15), addAlpha(theme.primaryDark, 0.03)]}
           style={styles.orbGradient2}
         />
       </Animated.View>
