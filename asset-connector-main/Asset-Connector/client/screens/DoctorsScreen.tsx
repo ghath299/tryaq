@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useLayoutEffect } from "react";
+import React, { useState, useMemo, useLayoutEffect, useCallback } from "react";
 import {
   View,
   StyleSheet,
   FlatList,
-  ScrollView,
   Pressable,
+  Modal,
+  Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,11 +15,15 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   FadeInUp,
-  FadeInRight,
+  FadeInDown,
+  FadeIn,
+  SlideInDown,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-} from "react-native-reanimated"; // ❌ شلنا FadeIn لأن شفافيته هي سبب الرمشة
+  withTiming,
+  interpolateColor,
+} from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 
 import { GlowingSearchBar } from "@/components/GlowingSearchBar";
@@ -29,83 +34,233 @@ import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius, Animation } from "@/constants/theme";
 import { doctors, specialties, provinces } from "@/data/mockData";
 
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-// --- مكون الـ FilterChip ---
-interface FilterChipProps {
+type FilterType = "specialty" | "province";
+
+interface FilterOption {
+  id: string;
   label: string;
-  selected: boolean;
-  onPress: () => void;
-  index: number;
 }
 
-function FilterChip({ label, selected, onPress, index }: FilterChipProps) {
+function FilterButton({
+  icon,
+  label,
+  activeLabel,
+  isActive,
+  count,
+  onPress,
+}: {
+  icon: keyof typeof Feather.glyphMap;
+  label: string;
+  activeLabel?: string;
+  isActive: boolean;
+  count?: number;
+  onPress: () => void;
+}) {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
+  const progress = useSharedValue(isActive ? 1 : 0);
+
+  React.useEffect(() => {
+    progress.value = withTiming(isActive ? 1 : 0, { duration: 250 });
+  }, [isActive]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+    backgroundColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [theme.backgroundSecondary, theme.primary + "18"]
+    ),
+    borderColor: interpolateColor(
+      progress.value,
+      [0, 1],
+      [theme.border, theme.primary + "60"]
+    ),
   }));
 
-  const handlePress = () => {
-    scale.value = withSpring(0.95, Animation.spring.snappy);
-    setTimeout(() => {
-      scale.value = withSpring(1, Animation.spring.gentle);
-    }, 100);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  };
-
   return (
-    <Animated.View entering={FadeInRight.delay(index * 40).duration(300)}>
-      <AnimatedPressable
-        // ✅ تمويه التحديد بلون الخلفية للقضاء على اللون الرمادي
-        android_ripple={{ color: theme.backgroundRoot }}
-        onPress={handlePress}
-        style={animatedStyle}
+    <AnimatedPressable
+      android_ripple={{ color: "transparent" }}
+      onPress={() => {
+        scale.value = withSpring(0.94, Animation.spring.snappy);
+        setTimeout(() => {
+          scale.value = withSpring(1, Animation.spring.gentle);
+        }, 100);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
+      style={[styles.filterBtn, animatedStyle]}
+    >
+      <Feather
+        name={icon}
+        size={16}
+        color={isActive ? theme.primary : theme.textSecondary}
+      />
+      <ThemedText
+        type="small"
+        style={{
+          color: isActive ? theme.primary : theme.text,
+          fontWeight: isActive ? "700" : "500",
+          marginRight: 6,
+        }}
+        numberOfLines={1}
       >
-        {selected ? (
-          <LinearGradient
-            colors={[theme.primary, theme.primaryDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.chipGradient}
-          >
-            <ThemedText
-              type="small"
-              style={{ color: "#FFFFFF", fontWeight: "500" }}
-            >
-              {label}
-            </ThemedText>
-          </LinearGradient>
-        ) : (
-          <View
-            style={[
-              styles.chip,
-              {
-                backgroundColor: theme.backgroundSecondary,
-                borderColor: theme.border,
-              },
-            ]}
-          >
-            <ThemedText type="small" style={{ color: theme.text }}>
-              {label}
-            </ThemedText>
-          </View>
-        )}
-      </AnimatedPressable>
-    </Animated.View>
+        {isActive && activeLabel ? activeLabel : label}
+      </ThemedText>
+      {isActive && count ? (
+        <Animated.View
+          entering={FadeIn.duration(200)}
+          style={[styles.badge, { backgroundColor: theme.primary }]}
+        >
+          <ThemedText type="caption" style={{ color: "#FFF", fontSize: 10, fontWeight: "700" }}>
+            {count}
+          </ThemedText>
+        </Animated.View>
+      ) : (
+        <Feather
+          name="chevron-down"
+          size={14}
+          color={isActive ? theme.primary : theme.textSecondary}
+        />
+      )}
+    </AnimatedPressable>
   );
 }
 
-// --- مكون الـ DoctorCardNew ---
-interface DoctorCardNewProps {
+function FilterSheet({
+  visible,
+  title,
+  options,
+  selectedId,
+  onSelect,
+  onClose,
+}: {
+  visible: boolean;
+  title: string;
+  options: FilterOption[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+  onClose: () => void;
+}) {
+  const { theme, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
+
+  if (!visible) return null;
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.sheetOverlay} onPress={onClose}>
+        <Animated.View
+          entering={SlideInDown.duration(350).springify().damping(18)}
+          style={[
+            styles.sheetContainer,
+            {
+              backgroundColor: theme.backgroundDefault,
+              paddingBottom: insets.bottom + Spacing.lg,
+              borderColor: theme.border,
+            },
+          ]}
+        >
+          <Pressable onPress={(e) => e.stopPropagation()}>
+            <View style={styles.sheetHandle}>
+              <View style={[styles.handleBar, { backgroundColor: theme.border }]} />
+            </View>
+
+            <View style={[styles.sheetHeader, { borderBottomColor: theme.border }]}>
+              <ThemedText type="h4" style={{ textAlign: "right", flex: 1 }}>
+                {title}
+              </ThemedText>
+              {selectedId && (
+                <Pressable
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    onSelect(null);
+                  }}
+                  style={[styles.clearBtn, { backgroundColor: theme.error + "15" }]}
+                >
+                  <Feather name="x" size={14} color={theme.error} />
+                  <ThemedText
+                    type="caption"
+                    style={{ color: theme.error, fontWeight: "600", marginRight: 4 }}
+                  >
+                    مسح
+                  </ThemedText>
+                </Pressable>
+              )}
+            </View>
+
+            <View style={styles.sheetGrid}>
+              {options.map((option, index) => {
+                const isSelected = selectedId === option.id;
+                return (
+                  <Animated.View
+                    key={option.id}
+                    entering={FadeInUp.delay(index * 30).duration(250)}
+                  >
+                    <Pressable
+                      android_ripple={{ color: "transparent" }}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                        onSelect(isSelected ? null : option.id);
+                        setTimeout(onClose, 200);
+                      }}
+                      style={({ pressed }) => [
+                        styles.sheetOption,
+                        {
+                          backgroundColor: isSelected
+                            ? theme.primary + "15"
+                            : pressed
+                            ? theme.backgroundSecondary
+                            : theme.backgroundDefault,
+                          borderColor: isSelected ? theme.primary : theme.border,
+                        },
+                      ]}
+                    >
+                      {isSelected && (
+                        <View style={[styles.optionCheck, { backgroundColor: theme.primary }]}>
+                          <Feather name="check" size={12} color="#FFF" />
+                        </View>
+                      )}
+                      <ThemedText
+                        type="body"
+                        style={{
+                          textAlign: "center",
+                          fontWeight: isSelected ? "700" : "400",
+                          color: isSelected ? theme.primary : theme.text,
+                        }}
+                      >
+                        {option.label}
+                      </ThemedText>
+                    </Pressable>
+                  </Animated.View>
+                );
+              })}
+            </View>
+          </Pressable>
+        </Animated.View>
+      </Pressable>
+    </Modal>
+  );
+}
+
+function DoctorCardNew({
+  doctor,
+  onPress,
+  index,
+}: {
   doctor: (typeof doctors)[0];
   onPress: () => void;
   index: number;
-}
-
-function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
+}) {
   const { theme } = useTheme();
   const { t } = useApp();
   const scale = useSharedValue(1);
@@ -130,28 +285,22 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
     translateY.value = withSpring(0, Animation.spring.gentle);
   };
 
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  };
-
   return (
     <Animated.View
-      entering={FadeInUp.delay(index * 60)
-        .duration(400)
-        .springify()}
+      entering={FadeInUp.delay(index * 60).duration(400).springify()}
     >
       <AnimatedPressable
-        // ✅ تمويه التحديد بلون الخلفية
         android_ripple={{ color: theme.backgroundRoot }}
-        onPress={handlePress}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onPress();
+        }}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         style={[
           styles.doctorCard,
           {
             backgroundColor: theme.backgroundDefault,
-            // ✅ استبدال الـ elevation بـ Border لمنع الرمشة في أندرويد
             elevation: 0,
             borderWidth: 1,
             borderColor: theme.border,
@@ -161,101 +310,57 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
       >
         <LinearGradient
           colors={[theme.primary + "25", theme.primaryDark + "15"]}
-          style={[
-            styles.doctorAvatar,
-            { marginRight: 0, marginLeft: Spacing.lg },
-          ]}
+          style={[styles.doctorAvatar, { marginRight: 0, marginLeft: Spacing.lg }]}
         >
           <Feather name="user" size={28} color={theme.primary} />
         </LinearGradient>
 
         <View style={styles.doctorInfo}>
-          <View
-            style={[
-              styles.doctorHeader,
-              { flexDirection: "row-reverse" },
-            ]}
-          >
+          <View style={[styles.doctorHeader, { flexDirection: "row-reverse" }]}>
             <ThemedText
               type="h4"
-              style={[
-                styles.doctorName,
-                { textAlign: "right" },
-              ]}
+              style={[styles.doctorName, { textAlign: "right" }]}
               numberOfLines={1}
             >
               {name}
             </ThemedText>
-            {doctor.isVerified ? (
+            {doctor.isVerified && (
               <View
                 style={[
                   styles.verifiedIcon,
-                  { backgroundColor: theme.primary },
-                  {
-                    marginLeft: 0,
-                    marginRight: Spacing.xs,
-                  },
+                  { backgroundColor: theme.primary, marginLeft: 0, marginRight: Spacing.xs },
                 ]}
               >
                 <Feather name="check" size={10} color="#FFFFFF" />
               </View>
-            ) : null}
+            )}
           </View>
 
           <ThemedText
             type="small"
-            style={[
-              { color: theme.primaryDark, fontWeight: "500" },
-              { textAlign: "right" },
-            ]}
+            style={{ color: theme.primaryDark, fontWeight: "500", textAlign: "right" }}
           >
             {specialty}
           </ThemedText>
 
-          <View
-            style={[
-              styles.doctorMeta,
-              { alignItems: "flex-end" },
-            ]}
-          >
-            <View
-              style={[
-                styles.metaItem,
-                { flexDirection: "row-reverse" },
-              ]}
-            >
+          <View style={[styles.doctorMeta, { alignItems: "flex-end" }]}>
+            <View style={[styles.metaItem, { flexDirection: "row-reverse" }]}>
               <Feather name="map-pin" size={12} color={theme.textSecondary} />
               <ThemedText
                 type="caption"
-                style={[
-                  { color: theme.textSecondary, marginLeft: 4 },
-                  { marginLeft: 0, marginRight: 4 },
-                ]}
+                style={{ color: theme.textSecondary, marginLeft: 0, marginRight: 4 }}
               >
                 {province} - {district}
               </ThemedText>
             </View>
           </View>
 
-          <View
-            style={[
-              styles.doctorFooter,
-              { flexDirection: "row-reverse" },
-            ]}
-          >
-            <View
-              style={[
-                styles.ratingContainer,
-                { flexDirection: "row-reverse" },
-              ]}
-            >
+          <View style={[styles.doctorFooter, { flexDirection: "row-reverse" }]}>
+            <View style={[styles.ratingContainer, { flexDirection: "row-reverse" }]}>
               <Feather name="star" size={14} color="#FFB800" />
               <ThemedText
                 type="small"
-                style={[
-                  { fontWeight: "600", marginLeft: 4 },
-                  { marginLeft: 0, marginRight: 4 },
-                ]}
+                style={{ fontWeight: "600", marginLeft: 0, marginRight: 4 }}
               >
                 {doctor.rating}
               </ThemedText>
@@ -264,17 +369,18 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
             <View
               style={[
                 styles.distanceChip,
-                { backgroundColor: theme.primary + "15" },
-                { flexDirection: "row-reverse" },
+                { backgroundColor: theme.primary + "15", flexDirection: "row-reverse" },
               ]}
             >
               <Feather name="navigation" size={12} color={theme.primary} />
               <ThemedText
                 type="caption"
-                style={[
-                  { color: theme.primary, marginLeft: 4, fontWeight: "500" },
-                  { marginLeft: 0, marginRight: 4 },
-                ]}
+                style={{
+                  color: theme.primary,
+                  marginLeft: 0,
+                  marginRight: 4,
+                  fontWeight: "500",
+                }}
               >
                 {doctor.distance} {t("km")}
               </ThemedText>
@@ -285,22 +391,16 @@ function DoctorCardNew({ doctor, onPress, index }: DoctorCardNewProps) {
         <View
           style={[
             styles.arrowContainer,
-            { backgroundColor: theme.primary + "10" },
-            { marginLeft: 0, marginRight: Spacing.sm },
+            { backgroundColor: theme.primary + "10", marginLeft: 0, marginRight: Spacing.sm },
           ]}
         >
-          <Feather
-            name="chevron-left"
-            size={20}
-            color={theme.primary}
-          />
+          <Feather name="chevron-left" size={20} color={theme.primary} />
         </View>
       </AnimatedPressable>
     </Animated.View>
   );
 }
 
-// --- الشاشة الرئيسية للأطباء ---
 export default function DoctorsScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
@@ -309,10 +409,9 @@ export default function DoctorsScreen() {
   const navigation = useNavigation<any>();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(
-    null,
-  );
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [activeSheet, setActiveSheet] = useState<FilterType | null>(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -334,20 +433,42 @@ export default function DoctorsScreen() {
       );
     }
     if (selectedSpecialty) {
-      results = results.filter(
-        (doctor) => doctor.specialtyId === selectedSpecialty,
-      );
+      results = results.filter((doctor) => doctor.specialtyId === selectedSpecialty);
     }
     if (selectedProvince) {
-      results = results.filter(
-        (doctor) => doctor.provinceId === selectedProvince,
-      );
+      results = results.filter((doctor) => doctor.provinceId === selectedProvince);
     }
     return results;
   }, [searchQuery, selectedSpecialty, selectedProvince]);
 
+  const activeFilterCount = (selectedSpecialty ? 1 : 0) + (selectedProvince ? 1 : 0);
+
+  const specialtyOptions: FilterOption[] = specialties.map((s) => ({
+    id: s.id,
+    label: s.nameAr,
+  }));
+
+  const provinceOptions: FilterOption[] = provinces.map((p) => ({
+    id: p.id,
+    label: p.nameAr,
+  }));
+
+  const selectedSpecialtyLabel = selectedSpecialty
+    ? specialties.find((s) => s.id === selectedSpecialty)?.nameAr
+    : undefined;
+
+  const selectedProvinceLabel = selectedProvince
+    ? provinces.find((p) => p.id === selectedProvince)?.nameAr
+    : undefined;
+
   const handleDoctorPress = (doctorId: string) => {
     navigation.navigate("DoctorDetail" as never, { doctorId } as never);
+  };
+
+  const handleClearAll = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setSelectedSpecialty(null);
+    setSelectedProvince(null);
   };
 
   const renderEmpty = () => (
@@ -375,61 +496,41 @@ export default function DoctorsScreen() {
         />
       </View>
 
-      {/* ✅ الحل النووي للرمشة: إزالة الأنميشن FadeIn عن الفلاتر لضمان ظهورها الفوري */}
-      <View style={styles.filtersContainer}>
-        <ThemedText
-          type="caption"
-          style={[styles.filterLabel, { color: theme.textSecondary }]}
-        >
-          {t("selectSpecialty")}
-        </ThemedText>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          overScrollMode="never"
-          contentContainerStyle={styles.filterScroll}
-        >
-          {specialties.map((specialty, index) => (
-            <FilterChip
-              key={specialty.id}
-              label={specialty.nameAr}
-              selected={selectedSpecialty === specialty.id}
-              onPress={() =>
-                setSelectedSpecialty(
-                  selectedSpecialty === specialty.id ? null : specialty.id,
-                )
-              }
-              index={index}
-            />
-          ))}
-        </ScrollView>
+      <View style={styles.filterBar}>
+        <View style={styles.filterBtnRow}>
+          <FilterButton
+            icon="grid"
+            label="التخصص"
+            activeLabel={selectedSpecialtyLabel}
+            isActive={!!selectedSpecialty}
+            onPress={() => setActiveSheet("specialty")}
+          />
+          <FilterButton
+            icon="map-pin"
+            label="المحافظة"
+            activeLabel={selectedProvinceLabel}
+            isActive={!!selectedProvince}
+            onPress={() => setActiveSheet("province")}
+          />
+        </View>
 
-        <ThemedText
-          type="caption"
-          style={[styles.filterLabel, { color: theme.textSecondary }]}
-        >
-          {t("selectProvince")}
-        </ThemedText>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          overScrollMode="never"
-          contentContainerStyle={styles.filterScroll}
-        >
-          {provinces.map((province, index) => (
-            <FilterChip
-              key={province.id}
-              label={province.nameAr}
-              selected={selectedProvince === province.id}
-              onPress={() =>
-                setSelectedProvince(
-                  selectedProvince === province.id ? null : province.id,
-                )
-              }
-              index={index}
-            />
-          ))}
-        </ScrollView>
+        {activeFilterCount > 0 && (
+          <Animated.View entering={FadeIn.duration(200)}>
+            <Pressable
+              android_ripple={{ color: "transparent" }}
+              onPress={handleClearAll}
+              style={[styles.clearAllBtn, { backgroundColor: theme.error + "12" }]}
+            >
+              <Feather name="x-circle" size={14} color={theme.error} />
+              <ThemedText
+                type="caption"
+                style={{ color: theme.error, fontWeight: "600", marginRight: 4 }}
+              >
+                مسح الكل ({activeFilterCount})
+              </ThemedText>
+            </Pressable>
+          </Animated.View>
+        )}
       </View>
 
       <FlatList
@@ -452,37 +553,134 @@ export default function DoctorsScreen() {
         )}
         ListEmptyComponent={renderEmpty}
       />
+
+      <FilterSheet
+        visible={activeSheet === "specialty"}
+        title="اختر التخصص"
+        options={specialtyOptions}
+        selectedId={selectedSpecialty}
+        onSelect={setSelectedSpecialty}
+        onClose={() => setActiveSheet(null)}
+      />
+
+      <FilterSheet
+        visible={activeSheet === "province"}
+        title="اختر المحافظة"
+        options={provinceOptions}
+        selectedId={selectedProvince}
+        onSelect={setSelectedProvince}
+        onClose={() => setActiveSheet(null)}
+      />
     </View>
   );
 }
 
-// --- الـ Styles الكاملة (بدون حذف ولا سطر) ---
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  searchContainer: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.md },
-  filtersContainer: { paddingBottom: Spacing.sm },
-  filterLabel: {
+  searchContainer: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
+  filterBar: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
     paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.xs,
-    marginTop: Spacing.sm,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    fontSize: 11,
-    fontWeight: "600",
+    paddingBottom: Spacing.md,
+    gap: Spacing.sm,
   },
-  filterScroll: { paddingHorizontal: Spacing.lg, gap: Spacing.sm },
-  chip: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.full,
+  filterBtnRow: {
+    flexDirection: "row-reverse",
+    gap: Spacing.sm,
+    flex: 1,
+  },
+  filterBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
+    gap: 4,
+    flex: 1,
   },
-  chipGradient: {
-    paddingHorizontal: Spacing.lg,
+  badge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  clearAllBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    paddingHorizontal: Spacing.sm + 2,
     paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.full,
+    borderRadius: BorderRadius.sm,
+    gap: 2,
   },
-  list: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md },
+  sheetOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
+  sheetContainer: {
+    borderTopLeftRadius: BorderRadius.xl + 4,
+    borderTopRightRadius: BorderRadius.xl + 4,
+    borderWidth: 1,
+    borderBottomWidth: 0,
+    maxHeight: "70%",
+  },
+  sheetHandle: {
+    alignItems: "center",
+    paddingVertical: Spacing.md,
+  },
+  handleBar: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+  },
+  sheetHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    paddingHorizontal: Spacing.xl,
+    paddingBottom: Spacing.md,
+    borderBottomWidth: 1,
+    marginBottom: Spacing.md,
+  },
+  clearBtn: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    paddingHorizontal: Spacing.sm + 2,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: BorderRadius.full,
+    gap: 2,
+  },
+  sheetGrid: {
+    flexDirection: "row-reverse",
+    flexWrap: "wrap",
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+    paddingBottom: Spacing.lg,
+  },
+  sheetOption: {
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1.5,
+    minWidth: (SCREEN_WIDTH - Spacing.lg * 2 - Spacing.sm * 2) / 3,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  optionCheck: {
+    position: "absolute",
+    top: -6,
+    left: -6,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  list: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
   emptyList: { flex: 1 },
   doctorCard: {
     flexDirection: "row",
