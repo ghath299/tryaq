@@ -756,6 +756,7 @@ export default function MedicinesScreen() {
           <FlatList
             data={filteredMedicines}
             keyExtractor={(item) => item.id}
+            style={{ flex: 1 }}
             contentContainerStyle={[
               styles.list,
               { paddingBottom: tabBarHeight + insets.bottom + Spacing.xl },

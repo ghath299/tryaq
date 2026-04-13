@@ -541,6 +541,7 @@ export default function DoctorsScreen() {
       <FlatList
         data={filteredDoctors}
         keyExtractor={(item) => item.id}
+        style={{ flex: 1 }}
         overScrollMode="never"
         contentContainerStyle={[
           styles.list,
