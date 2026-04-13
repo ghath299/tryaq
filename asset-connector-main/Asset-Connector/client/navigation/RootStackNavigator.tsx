@@ -1,16 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Pressable, ActivityIndicator, View } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withSequence,
-} from "react-native-reanimated";
+import { ActivityIndicator, View } from "react-native";
 
-import DrawerNavigator from "@/navigation/DrawerNavigator";
+import PatientTabNavigator from "@/navigation/PatientTabNavigator";
 import LoginScreen from "@/screens/LoginScreen";
 import LocationPermissionScreen from "@/screens/LocationPermissionScreen";
 import OTPVerificationScreen from "@/screens/OTPVerificationScreen";
@@ -26,7 +18,6 @@ import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Spacing, Animation } from "@/constants/theme";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -44,35 +35,6 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-function DrawerButton() {
-  const { theme } = useTheme();
-  const navigation = useNavigation();
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePress = () => {
-    scale.value = withSequence(
-      withSpring(0.9, Animation.spring.snappy),
-      withSpring(1, Animation.spring.gentle),
-    );
-    navigation.dispatch(DrawerActions.openDrawer());
-  };
-
-  return (
-    <AnimatedPressable
-      android_ripple={{ color: "transparent" }}
-      onPress={handlePress}
-      style={[{ marginLeft: Spacing.lg }, animatedStyle]}
-    >
-      <Feather name="menu" size={24} color={theme.text} />
-    </AnimatedPressable>
-  );
-}
 
 function AuthNavigator() {
   const { theme } = useTheme();
@@ -119,30 +81,22 @@ function PatientNavigator() {
     <Stack.Navigator
       screenOptions={{
         ...screenOptions,
-
-        // ✅ هذا الجزء هو اللي يحل مشكلة "الهيدر يبقى أبيض"
         headerStyle: {
-          // نخلي لون الهيدر مثل خلفية الثيم
           backgroundColor: theme.backgroundRoot,
         },
         headerTintColor: theme.text,
         headerTitleStyle: {
           color: theme.text,
         },
-
-        // ✅ يمنع شفافيات/لون أبيض وراه
         headerTransparent: false,
-
-        // ✅ يخفي الظل الافتراضي (إذا تحب تخليه رجّعها true)
         headerShadowVisible: false,
-
         animation: "fade_from_bottom",
         animationDuration: 300,
       }}
     >
       <Stack.Screen
         name="Main"
-        component={DrawerNavigator}
+        component={PatientTabNavigator}
         options={{ headerShown: false }}
       />
 
@@ -199,7 +153,6 @@ function PatientNavigator() {
         component={MyBookingsScreen}
         options={{
           title: t("myBookings"),
-          headerLeft: () => <DrawerButton />,
           animation: "fade_from_bottom",
         }}
       />
@@ -209,7 +162,6 @@ function PatientNavigator() {
         component={MyOrdersScreen}
         options={{
           title: t("myOrders"),
-          headerLeft: () => <DrawerButton />,
           animation: "fade_from_bottom",
         }}
       />

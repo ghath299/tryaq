@@ -1,15 +1,13 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Platform } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withSequence,
 } from "react-native-reanimated";
 
 import HomeScreen from "@/screens/HomeScreen";
@@ -19,7 +17,7 @@ import PharmaciesScreen from "@/screens/PharmaciesScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, Animation } from "@/constants/theme";
+import { Animation } from "@/constants/theme";
 
 export type PatientTabParamList = {
   HomeTab: undefined;
@@ -29,38 +27,6 @@ export type PatientTabParamList = {
 };
 
 const Tab = createBottomTabNavigator<PatientTabParamList>();
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-function DrawerButton() {
-  const { theme } = useTheme();
-  const navigation = useNavigation();
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePress = () => {
-    scale.value = withSequence(
-      withSpring(0.9, Animation.spring.snappy),
-      withSpring(1, Animation.spring.gentle),
-    );
-    navigation.dispatch(DrawerActions.openDrawer());
-  };
-
-  return (
-    <AnimatedPressable
-      android_ripple={{ color: theme.backgroundRoot }}
-      onPress={handlePress}
-      style={[
-        { marginRight: Spacing.lg },
-        animatedStyle,
-      ]}
-    >
-      <Feather name="menu" size={24} color={theme.text} />
-    </AnimatedPressable>
-  );
-}
 
 interface AnimatedTabIconProps {
   name: keyof typeof Feather.glyphMap;
@@ -109,7 +75,6 @@ export default function PatientTabNavigator() {
         tabBarActiveTintColor: theme.primary,
         tabBarInactiveTintColor: theme.tabIconDefault,
 
-        // ✅ تم حذف position:absolute من هنا
         tabBarStyle: {
           backgroundColor: Platform.select({
             ios: "transparent",
@@ -143,9 +108,6 @@ export default function PatientTabNavigator() {
               ]}
             />
           ),
-
-        headerLeft: () => null,
-        headerRight: () => <DrawerButton />,
 
         animation: "fade",
         freezeOnBlur: true,

@@ -26,10 +26,9 @@ Preferred communication style: Simple, everyday language.
 - TanStack React Query — server state management and API caching
 
 **Navigation** (React Navigation v7):
-- **Patient**: Bottom tab navigator (Home, Doctors, Medicines, Pharmacies) wrapped in a drawer navigator for settings/profile
-- **Doctor**: Drawer navigator (Dashboard, Appointments, Patients, Schedule, Profile)
-- **Pharmacist**: Drawer navigator (Dashboard, Orders, Inventory, Prescriptions, Profile)
-- **Root**: Native stack navigator handles auth screens (Login → Location Permission → OTP) and detail screens (DoctorDetail, PharmacyDetail, PharmacyPicker, PharmacyRoute, BookAppointment, etc.)
+- **Patient**: Bottom tab navigator (Home, Doctors, Medicines, Pharmacies)
+- **Root**: Native stack navigator handles auth screens (Login → Location Permission → OTP) and detail screens (DoctorDetail, PharmacyDetail, PharmacyPicker, PharmacyRoute, BookAppointment, MyBookings, MyOrders, CareerJoin, etc.)
+- **Note**: Side drawer was removed. All secondary screens (MyBookings, MyOrders, CareerJoin) are accessed via the root stack navigator.
 
 **Animation**: Heavy use of `react-native-reanimated` throughout. Components like `AnimatedButton`, `AnimatedCard`, `ScrollFadeIn`, and list items all use spring/timing animations. Every transition, card, and button has micro-interactions.
 
