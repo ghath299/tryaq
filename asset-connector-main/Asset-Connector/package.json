@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "npm run server:dev & npm run expo:dev",
     "expo:web": "EXPO_OFFLINE=1 npx expo start --web --port 5000 --localhost",
-    "expo:dev": "npx expo start --tunnel --port 8081 --clear",
-    "ghath": "npx expo start --tunnel --port 8081 --clear",
+    "expo:dev": "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --port 8081 --clear --host lan",
+    "ghath": "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --port 8081 --clear --host lan",
     "server:dev": "NODE_ENV=development PORT=5000 tsx server/index.ts",
     "expo:start:static:build": "npx expo start --no-dev --minify --localhost",
     "expo:static:build": "node scripts/build.js",
