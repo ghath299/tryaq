@@ -62,6 +62,10 @@ function FilterButton({
   const scale = useSharedValue(1);
   const progress = useSharedValue(isActive ? 1 : 0);
 
+  // Pre-compute colors outside useAnimatedStyle (worklet can't call addAlpha)
+  const colorBgActive = addAlpha(theme.primary, 0.09);
+  const colorBorderActive = addAlpha(theme.primary, 0.38);
+
   React.useEffect(() => {
     progress.value = withTiming(isActive ? 1 : 0, { duration: 250 });
   }, [isActive]);
@@ -71,12 +75,12 @@ function FilterButton({
     backgroundColor: interpolateColor(
       progress.value,
       [0, 1],
-      [theme.backgroundSecondary, addAlpha(theme.primary, 0.09)]
+      [theme.backgroundSecondary, colorBgActive]
     ),
     borderColor: interpolateColor(
       progress.value,
       [0, 1],
-      [theme.border, addAlpha(theme.primary, 0.38)]
+      [theme.border, colorBorderActive]
     ),
   }));
 
