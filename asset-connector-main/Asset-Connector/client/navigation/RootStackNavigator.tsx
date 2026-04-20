@@ -8,12 +8,9 @@ import LocationPermissionScreen from "@/screens/LocationPermissionScreen";
 import OTPVerificationScreen from "@/screens/OTPVerificationScreen";
 import CareerJoinScreen from "@/screens/CareerJoinScreen";
 import DoctorDetailScreen from "@/screens/DoctorDetailScreen";
-import PharmacyDetailScreen from "@/screens/PharmacyDetailScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import MyBookingsScreen from "@/screens/MyBookingsScreen";
 import MyOrdersScreen from "@/screens/MyOrdersScreen";
-import MedicinePharmaciesScreen from "@/screens/MedicinePharmaciesScreen";
-import PharmacyPickerScreen from "@/screens/PharmacyPickerScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
@@ -25,10 +22,7 @@ export type RootStackParamList = {
   OTPVerification: undefined;
   Main: undefined;
   DoctorDetail: { doctorId: string };
-  PharmacyDetail: { pharmacyId: string };
   BookAppointment: { doctorId: string };
-  MedicinePharmacies: { medicineId?: string; initialQuery?: string };
-  PharmacyPicker: { pharmacyIds?: string[]; medicineName?: string };
   MyBookings: undefined;
   MyOrders: undefined;
   CareerJoin: { type: "doctor" | "pharmacist" };
@@ -106,34 +100,6 @@ function PatientNavigator() {
         options={{
           title: "",
           headerBackTitle: t("doctors"),
-          animation: "slide_from_right",
-        }}
-      />
-
-      <Stack.Screen
-        name="PharmacyDetail"
-        component={PharmacyDetailScreen}
-        options={{
-          title: "",
-          headerBackTitle: t("pharmacies"),
-          animation: "slide_from_right",
-        }}
-      />
-
-      <Stack.Screen
-        name="MedicinePharmacies"
-        component={MedicinePharmaciesScreen}
-        options={{
-          title: "الصيدليات المتوفرة",
-          animation: "slide_from_right",
-        }}
-      />
-
-      <Stack.Screen
-        name="PharmacyPicker"
-        component={PharmacyPickerScreen}
-        options={{
-          title: t("pharmacies"),
           animation: "slide_from_right",
         }}
       />

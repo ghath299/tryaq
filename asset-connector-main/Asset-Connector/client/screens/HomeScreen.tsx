@@ -491,7 +491,6 @@ const TIP_CARD_WIDTH = SCREEN_WIDTH;
 
 function HealthTipCard() {
   const { theme } = useTheme();
-  const isRTL = true;
   const [activeTip, setActiveTip] = useState(0);
   const tipListRef = useRef<FlatList>(null);
   const pulseAnim = useSharedValue(1);
@@ -539,20 +538,20 @@ function HealthTipCard() {
     return (
       <LinearGradient
         colors={item.colors}
-        start={{ x: isRTL ? 1 : 0, y: 0 }}
-        end={{ x: isRTL ? 0 : 1, y: 1 }}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0, y: 1 }}
         style={styles.tipCard}
       >
         <ThemedText
           type="small"
-          style={[styles.tipSectionLabel, { textAlign: isRTL ? "right" : "left" }]}
+          style={[styles.tipSectionLabel, { textAlign: "right" }]}
         >
           {sectionTitle}
         </ThemedText>
 
         <Animated.View style={[
           styles.tipIconContainer,
-          isRTL ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" },
+          { alignSelf: "flex-end" },
           pulseStyle,
         ]}>
           <View style={styles.tipIconCircle}>
@@ -562,13 +561,13 @@ function HealthTipCard() {
 
         <ThemedText
           type="h3"
-          style={[styles.tipTitle, { textAlign: isRTL ? "right" : "left" }]}
+          style={[styles.tipTitle, { textAlign: "right" }]}
         >
           {tipTitle}
         </ThemedText>
         <ThemedText
           type="body"
-          style={[styles.tipDesc, { textAlign: isRTL ? "right" : "left" }]}
+          style={[styles.tipDesc, { textAlign: "right" }]}
         >
           {desc}
         </ThemedText>
@@ -591,24 +590,20 @@ function HealthTipCard() {
 
         <View style={[
           styles.tipPattern,
-          isRTL && { right: undefined, left: 0 },
+          { right: undefined, left: 0 },
         ]}>
           <View style={[
             styles.tipPatternCircle,
-            isRTL
-              ? { top: -20, left: -20, width: 100, height: 100 }
-              : { top: -20, right: -20, width: 100, height: 100 },
+            { top: -20, left: -20, width: 100, height: 100 },
           ]} />
           <View style={[
             styles.tipPatternCircle,
-            isRTL
-              ? { bottom: 10, left: 50, width: 50, height: 50 }
-              : { bottom: 10, right: 50, width: 50, height: 50 },
+            { bottom: 10, left: 50, width: 50, height: 50 },
           ]} />
         </View>
       </LinearGradient>
     );
-  }, [isRTL, pulseStyle]);
+  }, [pulseStyle]);
 
   return (
     <FlatList

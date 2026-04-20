@@ -47,8 +47,6 @@ export default function DoctorDetailScreen() {
   const navigation = useNavigation<any>();
   const { width: W } = useWindowDimensions();
 
-  const isRTL = true;
-
   const TXT = {
     route: "المسار",
     clinicInfo: "معلومات العيادة",
@@ -149,7 +147,7 @@ export default function DoctorDetailScreen() {
           <View style={styles.nameBlock}>
             <ThemedText
               type="h2"
-              style={[styles.nameText, isRTL && { textAlign: "right" }]}
+              style={[styles.nameText, { textAlign: "right" }]}
             >
               {name}
             </ThemedText>
@@ -164,7 +162,7 @@ export default function DoctorDetailScreen() {
             <View
               style={[
                 styles.ratingRow,
-                isRTL && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <View
@@ -228,7 +226,7 @@ export default function DoctorDetailScreen() {
           <View
             style={[
               styles.sectionHeader,
-              isRTL && { flexDirection: "row-reverse" },
+              { flexDirection: "row-reverse" },
             ]}
           >
             <View
@@ -243,7 +241,7 @@ export default function DoctorDetailScreen() {
               type="h4"
               style={{
                 fontWeight: "600",
-                [isRTL ? "marginRight" : "marginLeft"]: Spacing.md,
+                marginRight: Spacing.md,
               }}
             >
               {TXT.clinicInfo}
@@ -262,7 +260,7 @@ export default function DoctorDetailScreen() {
             <View
               style={[
                 styles.infoRow,
-                isRTL && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <View
@@ -276,7 +274,7 @@ export default function DoctorDetailScreen() {
               <View
                 style={[
                   styles.infoContent,
-                  isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {},
+                  { marginRight: Spacing.md, marginLeft: 0 },
                 ]}
               >
                 <ThemedText
@@ -290,7 +288,7 @@ export default function DoctorDetailScreen() {
                   {TXT.clinic}
                 </ThemedText>
                 <ThemedText
-                  style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}
+                  style={[{ marginTop: 2 }, { textAlign: "right" }]}
                 >
                   {clinicAddress}
                 </ThemedText>
@@ -298,7 +296,7 @@ export default function DoctorDetailScreen() {
                   type="caption"
                   style={[
                     { color: theme.textSecondary, marginTop: 2 },
-                    isRTL && { textAlign: "right" },
+                    { textAlign: "right" },
                   ]}
                 >
                   {province} - {district}
@@ -311,7 +309,7 @@ export default function DoctorDetailScreen() {
             <View
               style={[
                 styles.infoRow,
-                isRTL && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <View
@@ -325,7 +323,7 @@ export default function DoctorDetailScreen() {
               <View
                 style={[
                   styles.infoContent,
-                  isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {},
+                  { marginRight: Spacing.md, marginLeft: 0 },
                 ]}
               >
                 <ThemedText
@@ -339,7 +337,7 @@ export default function DoctorDetailScreen() {
                   {TXT.workingHours}
                 </ThemedText>
                 <ThemedText
-                  style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}
+                  style={[{ marginTop: 2 }, { textAlign: "right" }]}
                 >
                   {doctor.workingHours}
                 </ThemedText>
@@ -347,7 +345,7 @@ export default function DoctorDetailScreen() {
                   type="caption"
                   style={[
                     { color: theme.textSecondary, marginTop: 2 },
-                    isRTL && { textAlign: "right" },
+                    { textAlign: "right" },
                   ]}
                 >
                   {doctor.workingDays.join(" - ")}
@@ -360,7 +358,7 @@ export default function DoctorDetailScreen() {
             <View
               style={[
                 styles.infoRow,
-                isRTL && { flexDirection: "row-reverse" },
+                { flexDirection: "row-reverse" },
               ]}
             >
               <View
@@ -374,7 +372,7 @@ export default function DoctorDetailScreen() {
               <View
                 style={[
                   styles.infoContent,
-                  isRTL ? { marginRight: Spacing.md, marginLeft: 0 } : {},
+                  { marginRight: Spacing.md, marginLeft: 0 },
                 ]}
               >
                 <ThemedText
@@ -388,7 +386,7 @@ export default function DoctorDetailScreen() {
                   {TXT.distance}
                 </ThemedText>
                 <ThemedText
-                  style={[{ marginTop: 2 }, isRTL && { textAlign: "right" }]}
+                  style={[{ marginTop: 2 }, { textAlign: "right" }]}
                 >
                   {doctor.distance} {TXT.km}
                 </ThemedText>

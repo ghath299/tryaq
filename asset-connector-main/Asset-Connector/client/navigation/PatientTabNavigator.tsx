@@ -12,8 +12,7 @@ import Animated, {
 
 import HomeScreen from "@/screens/HomeScreen";
 import DoctorsScreen from "@/screens/DoctorsScreen";
-import MedicinesScreen from "@/screens/MedicinesScreen";
-import PharmaciesScreen from "@/screens/PharmaciesScreen";
+import ComingSoonScreen from "@/screens/ComingSoonScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
@@ -152,7 +151,7 @@ export default function PatientTabNavigator() {
 
       <Tab.Screen
         name="MedicinesTab"
-        component={MedicinesScreen}
+        component={ComingSoonScreen}
         options={{
           title: t("medicines"),
           headerTitle: t("medicines"),
@@ -169,7 +168,7 @@ export default function PatientTabNavigator() {
 
       <Tab.Screen
         name="PharmaciesTab"
-        component={PharmaciesScreen}
+        component={ComingSoonScreen}
         options={{
           title: t("pharmacies"),
           headerTitle: t("pharmacies"),
