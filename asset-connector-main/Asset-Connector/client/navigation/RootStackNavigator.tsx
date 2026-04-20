@@ -9,6 +9,7 @@ import OTPVerificationScreen from "@/screens/OTPVerificationScreen";
 import CareerJoinScreen from "@/screens/CareerJoinScreen";
 import DoctorDetailScreen from "@/screens/DoctorDetailScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
+import SearchScreen from "@/screens/SearchScreen";
 import MyBookingsScreen from "@/screens/MyBookingsScreen";
 import MyOrdersScreen from "@/screens/MyOrdersScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   LocationPermission: undefined;
   OTPVerification: undefined;
   Main: undefined;
+  Search: undefined;
   DoctorDetail: { doctorId: string };
   BookAppointment: { doctorId: string };
   MyBookings: undefined;
@@ -92,6 +94,12 @@ function PatientNavigator() {
         name="Main"
         component={PatientTabNavigator}
         options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{ headerShown: false, animation: "ios_from_right" }}
       />
 
       <Stack.Screen

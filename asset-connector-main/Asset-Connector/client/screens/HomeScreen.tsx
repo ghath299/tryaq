@@ -14,7 +14,6 @@ import {
   Dimensions,
   Image,
   Platform,
-  TextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -76,19 +75,31 @@ const HEALTH_TIPS = [
   "تجنب التدخين يحمي رئتيك ويحسن صحتك العامة بشكل كبير.",
 ];
 
-function SearchBar() {
+function SearchBar({ onPress }: { onPress: () => void }) {
   const { theme, isDark } = useTheme();
+  const scale = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
   return (
     <Animated.View entering={FadeIn.duration(400)} style={styles.searchWrap}>
-      <View style={[styles.searchBox, { backgroundColor: isDark ? theme.card : "#FFFFFF", borderColor: theme.border }]}>
-        <Feather name="search" size={18} color={theme.textSecondary} style={{ marginLeft: 12 }} />
-        <TextInput
-          editable={false}
-          placeholder="ابحث عن طبيب، دواء، أو صيدلية..."
-          placeholderTextColor={theme.textSecondary}
-          style={[styles.searchInput, { color: theme.text, textAlign: "right" }]}
-        />
-      </View>
+      <AnimatedPressable
+        onPress={onPress}
+        onPressIn={() => { scale.value = withSpring(0.97); }}
+        onPressOut={() => { scale.value = withSpring(1); }}
+        style={animStyle}
+      >
+        <View style={[styles.searchBox, { backgroundColor: isDark ? theme.card : "#FFFFFF", borderColor: theme.border }]}>
+          <Feather name="search" size={18} color={theme.textSecondary} style={{ marginLeft: 12 }} />
+          <View style={[styles.searchInput, { flex: 1 }]}>
+            <ThemedText style={{ color: theme.textSecondary, textAlign: "right", fontSize: 14 }}>
+              ابحث عن طبيب، دواء، أو صيدلية...
+            </ThemedText>
+          </View>
+          <View style={[styles.searchMic, { backgroundColor: addAlpha(theme.primary, 0.1) }]}>
+            <Feather name="mic" size={15} color={theme.primary} />
+          </View>
+        </View>
+      </AnimatedPressable>
     </Animated.View>
   );
 }
@@ -380,7 +391,7 @@ export default function HomeScreen() {
             <Feather name="activity" size={20} color={theme.primary} />
           </View>
         </View>
-        <SearchBar />
+        <SearchBar onPress={() => navigation.navigate("Search" as never)} />
       </LinearGradient>
 
       <ScrollView
@@ -504,6 +515,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingHorizontal: 10,
     fontFamily: Platform.OS === "ios" ? "Tajawal" : "Tajawal-Regular",
+  },
+  searchMic: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 6,
+    marginRight: 4,
   },
   promoSection: { marginBottom: Spacing.md },
   promoCard: {
