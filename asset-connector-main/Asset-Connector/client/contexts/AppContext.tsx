@@ -31,7 +31,7 @@ interface AppContextType {
 }
 
 const translations: Record<string, string> = {
-  appName: "منصة صحية ذكية",
+  appName: "ترياق",
   home: "الرئيسية",
   doctors: "الأطباء",
   medicines: "العلاجات",

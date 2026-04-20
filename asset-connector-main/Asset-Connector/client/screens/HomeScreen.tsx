@@ -373,7 +373,7 @@ export default function HomeScreen() {
               مرحباً بك في
             </ThemedText>
             <ThemedText type="h4" style={{ color: theme.text, textAlign: "center", fontWeight: "700" }}>
-              منصة صحية ذكية
+              ترياق
             </ThemedText>
           </View>
           <View style={[styles.logoBox, { backgroundColor: addAlpha(theme.primary, 0.15) }]}>

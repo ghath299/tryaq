@@ -191,7 +191,7 @@ export default function LoginScreen() {
                 style={styles.appNameGradient}
               >
                 <ThemedText type="body" style={styles.appNameText}>
-                  منصة صحية ذكية
+                  ترياق
                 </ThemedText>
               </LinearGradient>
             </View>

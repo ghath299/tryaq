@@ -1,4 +1,4 @@
-# Smart Healthcare Platform (منصة صحية ذكية)
+# ترياق — Smart Healthcare Platform
 
 ## Overview
 
