@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState, useLayoutEffect, useCallback } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import {
   View,
   StyleSheet,
@@ -6,7 +12,9 @@ import {
   FlatList,
   Pressable,
   Dimensions,
+  Image,
   Platform,
+  TextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -19,6 +27,7 @@ import Animated, {
   withTiming,
   withSequence,
   withRepeat,
+  FadeIn,
   FadeInUp,
   cancelAnimation,
 } from "react-native-reanimated";
@@ -28,458 +37,105 @@ import * as Haptics from "expo-haptics";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
-import { Spacing, BorderRadius, Animation } from "@/constants/theme";
-import { doctors, pharmacies, announcements } from "@/data/mockData";
-
-const HEALTH_TIPS = [
-  {
-    id: "1",
-    icon: "droplet" as const,
-    title: "اشرب 8 أكواب ماء يومياً",
-    desc: "الماء ضروري لصحة الجسم والبشرة ويساعد على تحسين وظائف الأعضاء",
-    colors: ["#00B4DB", "#0083B0"] as [string, string],
-  },
-  {
-    id: "2",
-    icon: "moon" as const,
-    title: "نم 7-8 ساعات كل ليلة",
-    desc: "النوم الكافي يقوي المناعة ويحسن التركيز والصحة النفسية",
-    colors: ["#6C63FF", "#4834DF"] as [string, string],
-  },
-  {
-    id: "3",
-    icon: "heart" as const,
-    title: "مارس الرياضة 30 دقيقة يومياً",
-    desc: "النشاط البدني يقلل خطر أمراض القلب ويحسن المزاج والطاقة",
-    colors: ["#FF6B6B", "#EE5A24"] as [string, string],
-  },
-  {
-    id: "4",
-    icon: "sun" as const,
-    title: "تعرض لأشعة الشمس صباحاً",
-    desc: "أشعة الشمس الصباحية تمنحك فيتامين D وتحسن النوم والمزاج",
-    colors: ["#F9A826", "#F39C12"] as [string, string],
-  },
-  {
-    id: "5",
-    icon: "smile" as const,
-    title: "تناول الفواكه والخضروات يومياً",
-    desc: "الفواكه والخضروات غنية بالفيتامينات والمعادن الضرورية للجسم",
-    colors: ["#00C851", "#007E33"] as [string, string],
-  },
-  {
-    id: "6",
-    icon: "wind" as const,
-    title: "تنفس بعمق لتقليل التوتر",
-    desc: "التنفس العميق يهدئ الأعصاب ويخفض ضغط الدم ويحسن التركيز",
-    colors: ["#A29BFE", "#6C5CE7"] as [string, string],
-  },
-  {
-    id: "7",
-    icon: "coffee" as const,
-    title: "قلل من تناول الكافيين",
-    desc: "الإفراط في الكافيين يسبب الأرق والقلق وزيادة ضربات القلب",
-    colors: ["#E17055", "#D63031"] as [string, string],
-  },
-  {
-    id: "8",
-    icon: "eye" as const,
-    title: "أرح عينيك من الشاشات",
-    desc: "اتبع قاعدة 20-20-20: كل 20 دقيقة انظر لمسافة 20 قدم لمدة 20 ثانية",
-    colors: ["#00CEC9", "#0984E3"] as [string, string],
-  },
-  {
-    id: "9",
-    icon: "users" as const,
-    title: "حافظ على علاقاتك الاجتماعية",
-    desc: "العلاقات الاجتماعية الصحية تقلل التوتر وتحسن الصحة النفسية",
-    colors: ["#FD79A8", "#E84393"] as [string, string],
-  },
-  {
-    id: "10",
-    icon: "clipboard" as const,
-    title: "قم بفحص طبي دوري",
-    desc: "الفحوصات الدورية تساعد في الكشف المبكر عن الأمراض وعلاجها",
-    colors: ["#74B9FF", "#0984E3"] as [string, string],
-  },
-];
+import { Spacing, BorderRadius, addAlpha } from "@/constants/theme";
+import { doctors, pharmacies } from "@/data/mockData";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const SLIDER_WIDTH = SCREEN_WIDTH - Spacing.lg * 2;
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-interface SectionHeaderProps {
-  title: string;
-  onViewAll?: () => void;
-  viewAllLabel: string;
-  index?: number;
+const PROMO_SLIDES = [
+  {
+    id: "1",
+    title: "احجز موعدك الأول",
+    highlight: "بخصم 20%",
+    sub: "خصومات وعروض حصرية",
+    colors: ["#4DC9C9", "#3AAFAF"] as [string, string],
+  },
+  {
+    id: "2",
+    title: "أطباء متخصصون",
+    highlight: "في انتظارك",
+    sub: "استشارة طبية موثوقة وسريعة",
+    colors: ["#5EDFFF", "#1F6AE1"] as [string, string],
+  },
+  {
+    id: "3",
+    title: "صيدليات قريبة منك",
+    highlight: "24 ساعة",
+    sub: "ابحث عن دوائك بسهولة",
+    colors: ["#43C6AC", "#1F6AE1"] as [string, string],
+  },
+];
+
+const HEALTH_TIPS = [
+  "شرب كمية كافية من الماء يومياً يحسن وظائف الجسم ويحافظ على صحتك.",
+  "النوم لساعات كافية يقوي جهاز المناعة ويحسن التركيز.",
+  "ممارسة الرياضة 30 دقيقة يومياً تقلل خطر أمراض القلب.",
+  "تناول الفواكه والخضروات يومياً يمنحك الفيتامينات والمعادن الضرورية.",
+  "تجنب التدخين يحمي رئتيك ويحسن صحتك العامة بشكل كبير.",
+];
+
+function SearchBar() {
+  const { theme, isDark } = useTheme();
+  return (
+    <Animated.View entering={FadeIn.duration(400)} style={styles.searchWrap}>
+      <View style={[styles.searchBox, { backgroundColor: isDark ? theme.card : "#FFFFFF", borderColor: theme.border }]}>
+        <Feather name="search" size={18} color={theme.textSecondary} style={{ marginLeft: 12 }} />
+        <TextInput
+          editable={false}
+          placeholder="ابحث عن طبيب، دواء، أو صيدلية..."
+          placeholderTextColor={theme.textSecondary}
+          style={[styles.searchInput, { color: theme.text, textAlign: "right" }]}
+        />
+      </View>
+    </Animated.View>
+  );
 }
 
-function SectionHeader({
-  title,
-  onViewAll,
-  viewAllLabel,
-  index = 0,
-}: SectionHeaderProps) {
-  const { theme } = useTheme();
-  const scale = useSharedValue(1);
+function PromoSlide({ item, active }: { item: typeof PROMO_SLIDES[0]; active: boolean }) {
+  const scale = useSharedValue(active ? 1 : 1);
+  const doctorImg = require("../assets/placeholders/doctor.png");
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
 
-  const handlePress = () => {
-    if (onViewAll) {
-      scale.value = withSequence(
-        withSpring(0.95, Animation.spring.snappy),
-        withSpring(1, Animation.spring.gentle),
-      );
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      onViewAll();
-    }
-  };
-
-  return (
-    <Animated.View
-      entering={FadeInUp.delay(index * 100).duration(400)}
-      style={styles.sectionHeader}
-    >
-      <ThemedText type="h3" style={{ color: "#FFFFFF" }}>{title}</ThemedText>
-      {onViewAll ? (
-        <AnimatedPressable
-          // ✅ تمويه التحديد بلون الخلفية للقضاء على المربع الرمادي
-          android_ripple={{ color: theme.backgroundRoot }}
-          onPress={handlePress}
-          style={animatedStyle}
-        >
-          <View style={styles.viewAllButton}>
-            <ThemedText
-              type="small"
-              style={{ color: "#FFFFFF", fontWeight: "600" }}
-            >
-              {viewAllLabel}
-            </ThemedText>
-            <Feather name="chevron-right" size={16} color="#FFFFFF" />
-          </View>
-        </AnimatedPressable>
-      ) : null}
-    </Animated.View>
-  );
-}
-
-interface PromotedDoctorCardProps {
-  doctor: (typeof doctors)[0];
-  onPress: () => void;
-  index: number;
-  rank: number;
-}
-
-function PromotedDoctorCard({
-  doctor,
-  onPress,
-  index,
-  rank,
-}: PromotedDoctorCardProps) {
-  const { theme } = useTheme();
-  const scale = useSharedValue(1);
-  const translateY = useSharedValue(0);
-
-  const name = doctor.nameAr;
-  const specialty = doctor.specialtyAr;
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { translateY: translateY.value }],
-  }));
-
-  const handlePressIn = () => {
-    scale.value = withSpring(0.95, Animation.spring.snappy);
-    translateY.value = withSpring(-4, Animation.spring.snappy);
-  };
-
-  const handlePressOut = () => {
-    scale.value = withSpring(1, Animation.spring.gentle);
-    translateY.value = withSpring(0, Animation.spring.gentle);
-  };
-
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  };
-
-  return (
-    <Animated.View entering={FadeInUp.delay(200 + index * 80).duration(400)}>
-      <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[styles.promotedCardWrapper, animatedStyle]}
-      >
-        <View style={styles.promotedCardShadow}>
-          <LinearGradient
-            colors={["rgba(94,223,255,0.10)", "rgba(31,106,225,0.10)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.promotedCard}
-          >
-            <View style={styles.promotedCardInner}>
-              <View style={styles.promotedIconWrapper}>
-                <LinearGradient
-                  colors={[theme.primary, theme.primaryDark]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.promotedIconGradient}
-                >
-                  <Feather name="activity" size={32} color="#FFFFFF" />
-                </LinearGradient>
-              </View>
-
-              <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
-                {name}
-              </ThemedText>
-
-              <ThemedText
-                type="small"
-                style={{ color: theme.textSecondary }}
-                numberOfLines={1}
-              >
-                {specialty}
-              </ThemedText>
-
-              <View style={styles.promotedRating}>
-                <Feather name="star" size={12} color="#FFB800" />
-                <ThemedText
-                  type="caption"
-                  style={{ color: theme.textSecondary, marginLeft: 4 }}
-                >
-                  {doctor.rating}
-                </ThemedText>
-              </View>
-            </View>
-
-            <LinearGradient
-              colors={["#FF6B6B", "#E63946"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.rankBadge}
-            >
-              <ThemedText
-                type="caption"
-                style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 9 }}
-              >
-                {rank}
-              </ThemedText>
-            </LinearGradient>
-          </LinearGradient>
-        </View>
-      </AnimatedPressable>
-    </Animated.View>
-  );
-}
-
-interface PromotedPharmacyCardProps {
-  pharmacy: (typeof pharmacies)[0];
-  onPress: () => void;
-  index: number;
-  rank: number;
-}
-
-function PromotedPharmacyCard({
-  pharmacy,
-  onPress,
-  index,
-  rank,
-}: PromotedPharmacyCardProps) {
-  const { theme } = useTheme();
-  const { t } = useApp();
-  const scale = useSharedValue(1);
-  const translateY = useSharedValue(0);
-
-  const name = pharmacy.nameAr;
-  const district = pharmacy.districtAr;
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { translateY: translateY.value }],
-  }));
-
-  const handlePressIn = () => {
-    scale.value = withSpring(0.95, Animation.spring.snappy);
-    translateY.value = withSpring(-4, Animation.spring.snappy);
-  };
-
-  const handlePressOut = () => {
-    scale.value = withSpring(1, Animation.spring.gentle);
-    translateY.value = withSpring(0, Animation.spring.gentle);
-  };
-
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  };
-
-  return (
-    <Animated.View entering={FadeInUp.delay(300 + index * 80).duration(400)}>
-      <AnimatedPressable
-        android_ripple={{ color: "transparent" }}
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[styles.promotedCardWrapper, animatedStyle]}
-      >
-        <View style={styles.promotedCardShadow}>
-          <LinearGradient
-            colors={["rgba(94,223,255,0.10)", "rgba(31,106,225,0.10)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.promotedCard}
-          >
-            <View style={styles.promotedCardInner}>
-              <View style={styles.promotedIconWrapper}>
-                <LinearGradient
-                  colors={[theme.primary, theme.primaryDark]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.promotedIconGradient}
-                >
-                  <Feather name="briefcase" size={32} color="#FFFFFF" />
-                </LinearGradient>
-              </View>
-
-              <ThemedText type="body" style={styles.promotedName} numberOfLines={1}>
-                {name}
-              </ThemedText>
-
-              <ThemedText
-                type="small"
-                style={{ color: theme.textSecondary }}
-                numberOfLines={1}
-              >
-                {district}
-              </ThemedText>
-
-              <View style={styles.promotedRating}>
-                <Feather name="star" size={12} color="#FFB800" />
-                <ThemedText
-                  type="caption"
-                  style={{ color: theme.textSecondary, marginLeft: 4 }}
-                >
-                  {pharmacy.rating}
-                </ThemedText>
-              </View>
-            </View>
-
-            <LinearGradient
-              colors={["#FFD700", "#FFA500"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.rankBadge}
-            >
-              <ThemedText
-                type="body"
-                style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 14 }}
-              >
-                {rank}
-              </ThemedText>
-            </LinearGradient>
-          </LinearGradient>
-        </View>
-      </AnimatedPressable>
-    </Animated.View>
-  );
-}
-
-interface AnnouncementSlideProps {
-  item: (typeof announcements)[0];
-  index: number;
-  activeIndex: number;
-}
-
-function AnnouncementSlide({
-  item,
-  index,
-  activeIndex,
-}: AnnouncementSlideProps) {
-  const { theme } = useTheme();
-  const pulseValue = useSharedValue(1);
-
-  const title = item.titleAr;
-  const description = item.descriptionAr;
-
   useEffect(() => {
-    if (index === activeIndex) {
-      pulseValue.value = withRepeat(
-        withSequence(
-          withTiming(1.02, { duration: 2000 }),
-          withTiming(1, { duration: 2000 }),
-        ),
+    if (active) {
+      scale.value = withRepeat(
+        withSequence(withTiming(1.015, { duration: 2500 }), withTiming(1, { duration: 2500 })),
         -1,
-        true,
+        true
       );
+    } else {
+      cancelAnimation(scale);
+      scale.value = withTiming(1, { duration: 200 });
     }
-  }, [index, activeIndex]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: index === activeIndex ? pulseValue.value : 1 }],
-  }));
-
-  const getColors = (): [string, string] => {
-    switch (item.type) {
-      case "event":
-        return [theme.primary, theme.primaryDark];
-      case "promotion":
-        return ["#FF6B9D", "#FF8E53"];
-      default:
-        return [theme.primary, "#4FACFE"];
-    }
-  };
+  }, [active]);
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[{ width: SCREEN_WIDTH - Spacing.lg * 2 }, animStyle]}>
       <LinearGradient
-        colors={getColors()}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.slide}
+        colors={item.colors}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.promoCard}
       >
-        <View style={styles.slidePattern}>
-          {[...Array(6)].map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.patternCircle,
-                {
-                  width: 80 + i * 40,
-                  height: 80 + i * 40,
-                  right: -40 - i * 20,
-                  top: -20 + i * 10,
-                  opacity: 0.1 - i * 0.015,
-                },
-              ]}
-            />
-          ))}
+        <View style={styles.promoBubble1} />
+        <View style={styles.promoBubble2} />
+
+        <View style={styles.promoContent}>
+          <ThemedText style={styles.promoTitle}>{item.title}</ThemedText>
+          <ThemedText style={styles.promoHighlight}>{item.highlight}</ThemedText>
+          <ThemedText style={styles.promoSub}>{item.sub}</ThemedText>
         </View>
 
-        <View style={styles.slideContent}>
-          <ThemedText type="h2" style={styles.slideTitle}>
-            {title}
-          </ThemedText>
-          <ThemedText type="body" style={styles.slideDescription}>
-            {description}
-          </ThemedText>
-        </View>
-
-        <View style={styles.slideIcon}>
-          <Feather
-            name={
-              item.type === "event"
-                ? "calendar"
-                : item.type === "promotion"
-                  ? "gift"
-                  : "bell"
-            }
-            size={64}
-            color="rgba(255,255,255,0.2)"
+        <View style={styles.promoImageWrap}>
+          <Image
+            source={doctorImg}
+            style={styles.promoImage}
+            resizeMode="cover"
           />
         </View>
       </LinearGradient>
@@ -487,146 +143,190 @@ function AnnouncementSlide({
   );
 }
 
-const TIP_CARD_WIDTH = SCREEN_WIDTH;
-
-function HealthTipCard() {
+function SectionRow({ title, onViewAll }: { title: string; onViewAll?: () => void }) {
   const { theme } = useTheme();
-  const [activeTip, setActiveTip] = useState(0);
-  const tipListRef = useRef<FlatList>(null);
-  const pulseAnim = useSharedValue(1);
+  const scale = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
-  const handleViewableTips = useRef(({ viewableItems }: any) => {
-    if (viewableItems.length > 0) {
-      setActiveTip(viewableItems[0].index);
-    }
-  }).current;
-
-  const tipViewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
-
-  useEffect(() => {
-    pulseAnim.value = withRepeat(
-      withSequence(
-        withTiming(1.06, { duration: 1800 }),
-        withTiming(1, { duration: 1800 })
-      ),
-      -1,
-      true
-    );
-    return () => {
-      cancelAnimation(pulseAnim);
-    };
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const next = (activeTip + 1) % HEALTH_TIPS.length;
-      tipListRef.current?.scrollToIndex({ index: next, animated: true });
-      setActiveTip(next);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [activeTip]);
-
-  const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseAnim.value }],
-  }));
-
-  const renderTipItem = useCallback(({ item, index }: { item: typeof HEALTH_TIPS[0]; index: number }) => {
-    const tipTitle = item.title;
-    const desc = item.desc;
-    const sectionTitle = "نصائح صحية";
-
-    return (
-      <LinearGradient
-        colors={item.colors}
-        start={{ x: 1, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.tipCard}
-      >
-        <ThemedText
-          type="small"
-          style={[styles.tipSectionLabel, { textAlign: "right" }]}
-        >
-          {sectionTitle}
-        </ThemedText>
-
-        <Animated.View style={[
-          styles.tipIconContainer,
-          { alignSelf: "flex-end" },
-          pulseStyle,
-        ]}>
-          <View style={styles.tipIconCircle}>
-            <Feather name={item.icon} size={32} color={item.colors[0]} />
-          </View>
-        </Animated.View>
-
-        <ThemedText
-          type="h3"
-          style={[styles.tipTitle, { textAlign: "right" }]}
-        >
-          {tipTitle}
-        </ThemedText>
-        <ThemedText
-          type="body"
-          style={[styles.tipDesc, { textAlign: "right" }]}
-        >
-          {desc}
-        </ThemedText>
-
-        <View style={styles.tipDotsRow}>
-          {HEALTH_TIPS.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.tipDot,
-                {
-                  backgroundColor:
-                    i === index ? "#FFFFFF" : "rgba(255,255,255,0.35)",
-                  width: i === index ? 18 : 6,
-                },
-              ]}
-            />
-          ))}
-        </View>
-
-        <View style={[
-          styles.tipPattern,
-          { right: undefined, left: 0 },
-        ]}>
-          <View style={[
-            styles.tipPatternCircle,
-            { top: -20, left: -20, width: 100, height: 100 },
-          ]} />
-          <View style={[
-            styles.tipPatternCircle,
-            { bottom: 10, left: 50, width: 50, height: 50 },
-          ]} />
-        </View>
-      </LinearGradient>
-    );
-  }, [pulseStyle]);
+  const press = () => {
+    if (!onViewAll) return;
+    scale.value = withSequence(withSpring(0.9), withSpring(1));
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onViewAll();
+  };
 
   return (
-    <FlatList
-      ref={tipListRef}
-      data={HEALTH_TIPS}
-      horizontal
-      pagingEnabled
-      showsHorizontalScrollIndicator={false}
-      onViewableItemsChanged={handleViewableTips}
-      viewabilityConfig={tipViewabilityConfig}
-      keyExtractor={(item) => item.id}
-      renderItem={renderTipItem}
-      decelerationRate="fast"
-      snapToInterval={TIP_CARD_WIDTH}
-      style={styles.tipContainer}
-    />
+    <View style={styles.sectionRow}>
+      {onViewAll ? (
+        <AnimatedPressable onPress={press} style={animStyle}>
+          <View style={styles.viewAllRow}>
+            <ThemedText type="small" style={[styles.viewAllText, { color: theme.primary }]}>
+              عرض الكل
+            </ThemedText>
+            <Feather name="chevron-left" size={14} color={theme.primary} />
+          </View>
+        </AnimatedPressable>
+      ) : <View />}
+      <ThemedText type="h3" style={[styles.sectionTitle, { color: theme.text }]}>
+        {title}
+      </ThemedText>
+    </View>
+  );
+}
+
+function StarRow({ rating }: { rating: number }) {
+  const full = Math.floor(rating);
+  return (
+    <View style={styles.starRow}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Feather
+          key={i}
+          name="star"
+          size={11}
+          color={i <= full ? "#FFB800" : "#DDE2E8"}
+          style={{ marginRight: 1 }}
+        />
+      ))}
+      <ThemedText style={styles.ratingText}>{rating}</ThemedText>
+    </View>
+  );
+}
+
+function DoctorCard({ doctor, onPress, index }: { doctor: typeof doctors[0]; onPress: () => void; index: number }) {
+  const { theme, isDark } = useTheme();
+  const scale = useSharedValue(1);
+  const translateY = useSharedValue(0);
+  const doctorImg = require("../assets/placeholders/doctor.png");
+
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
+  }));
+
+  return (
+    <Animated.View entering={FadeInUp.delay(100 + index * 60).duration(400)}>
+      <AnimatedPressable
+        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onPress(); }}
+        onPressIn={() => { scale.value = withSpring(0.95); translateY.value = withSpring(-3); }}
+        onPressOut={() => { scale.value = withSpring(1); translateY.value = withSpring(0); }}
+        style={[styles.doctorCard, animStyle, {
+          backgroundColor: isDark ? theme.card : "#FFFFFF",
+          shadowColor: isDark ? "transparent" : "#1F6AE1",
+          borderColor: isDark ? theme.border : "rgba(94,223,255,0.15)",
+        }]}
+      >
+        <View style={[styles.avatarWrap, { borderColor: addAlpha(theme.primary, 0.3), backgroundColor: addAlpha(theme.primary, 0.07) }]}>
+          <Image source={doctorImg} style={styles.avatarImg} resizeMode="cover" />
+          {doctor.isVerified && (
+            <View style={[styles.verifiedDot, { backgroundColor: theme.primary }]}>
+              <Feather name="check" size={7} color="#FFF" />
+            </View>
+          )}
+        </View>
+        <ThemedText type="small" style={[styles.doctorName, { color: theme.text }]} numberOfLines={1}>
+          {doctor.nameAr}
+        </ThemedText>
+        <ThemedText type="caption" style={[styles.doctorSpecialty, { color: theme.textSecondary }]} numberOfLines={1}>
+          {doctor.specialtyAr}
+        </ThemedText>
+        <StarRow rating={doctor.rating} />
+      </AnimatedPressable>
+    </Animated.View>
+  );
+}
+
+function PharmacyCard({ pharmacy, onPress, index }: { pharmacy: typeof pharmacies[0]; onPress: () => void; index: number }) {
+  const { theme, isDark } = useTheme();
+  const scale = useSharedValue(1);
+  const translateY = useSharedValue(0);
+
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
+  }));
+
+  const isOpen24 = pharmacy.workingHours?.includes("24");
+
+  return (
+    <Animated.View entering={FadeInUp.delay(150 + index * 60).duration(400)}>
+      <AnimatedPressable
+        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onPress(); }}
+        onPressIn={() => { scale.value = withSpring(0.95); translateY.value = withSpring(-3); }}
+        onPressOut={() => { scale.value = withSpring(1); translateY.value = withSpring(0); }}
+        style={[styles.pharmacyCard, animStyle, {
+          backgroundColor: isDark ? theme.card : "#FFFFFF",
+          shadowColor: isDark ? "transparent" : "#1F6AE1",
+          borderColor: isDark ? theme.border : "rgba(94,223,255,0.15)",
+        }]}
+      >
+        <View style={[styles.pharmacyLogoWrap, { borderColor: addAlpha(theme.primary, 0.25), backgroundColor: addAlpha(theme.primary, 0.06) }]}>
+          <LinearGradient
+            colors={[addAlpha(theme.primary, 0.15), addAlpha(theme.primaryDark, 0.1)]}
+            style={styles.pharmacyLogoGrad}
+          >
+            <Feather name="plus-square" size={28} color={theme.primary} />
+          </LinearGradient>
+        </View>
+        <ThemedText type="small" style={[styles.pharmacyName, { color: theme.text }]} numberOfLines={1}>
+          {pharmacy.nameAr}
+        </ThemedText>
+        <View style={[styles.pharmacyBadge, { backgroundColor: addAlpha(isOpen24 ? "#00C851" : theme.primary, 0.12) }]}>
+          <Feather
+            name={isOpen24 ? "clock" : "map-pin"}
+            size={10}
+            color={isOpen24 ? "#00C851" : theme.primary}
+            style={{ marginRight: 3 }}
+          />
+          <ThemedText type="caption" style={{ color: isOpen24 ? "#00C851" : theme.primary, fontSize: 10, fontWeight: "600" }}>
+            {isOpen24 ? "Open 24h" : "قريب منك"}
+          </ThemedText>
+        </View>
+      </AnimatedPressable>
+    </Animated.View>
+  );
+}
+
+function HealthTipBanner() {
+  const { theme, isDark } = useTheme();
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setActive((p) => (p + 1) % HEALTH_TIPS.length), 6000);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <Animated.View entering={FadeInUp.delay(400).duration(400)} style={[styles.tipBanner, {
+      backgroundColor: isDark ? theme.card : "#FFFFFF",
+      borderColor: isDark ? theme.border : "rgba(94,223,255,0.2)",
+      shadowColor: isDark ? "transparent" : "#1F6AE1",
+    }]}>
+      <View style={styles.tipHeader}>
+        <Feather name="chevron-left" size={16} color={theme.primary} />
+        <ThemedText type="body" style={[styles.tipTitle, { color: theme.text }]}>
+          نصائح طبية اليوم
+        </ThemedText>
+      </View>
+      <ThemedText type="body" style={[styles.tipText, { color: theme.textSecondary }]}>
+        {HEALTH_TIPS[active]}
+      </ThemedText>
+      <View style={styles.tipDots}>
+        {HEALTH_TIPS.map((_, i) => (
+          <View
+            key={i}
+            style={[styles.tipDot, {
+              backgroundColor: i === active ? theme.primary : theme.border,
+              width: i === active ? 16 : 6,
+            }]}
+          />
+        ))}
+      </View>
+    </Animated.View>
   );
 }
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { t } = useApp();
   const navigation = useNavigation<any>();
 
@@ -635,364 +335,389 @@ export default function HomeScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerStyle: { backgroundColor: theme.backgroundRoot },
-      headerTintColor: theme.text,
-      headerTitleStyle: { color: theme.text },
-      headerShadowVisible: false,
-      headerTransparent: false,
+      headerShown: false,
     });
-  }, [navigation, theme.backgroundRoot, theme.text]);
+  }, [navigation]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const nextSlide = (activeSlide + 1) % announcements.length;
-      sliderRef.current?.scrollToIndex({ index: nextSlide, animated: true });
-      setActiveSlide(nextSlide);
+      const next = (activeSlide + 1) % PROMO_SLIDES.length;
+      sliderRef.current?.scrollToIndex({ index: next, animated: true });
+      setActiveSlide(next);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [activeSlide]);
 
-  const handleViewableItemsChanged = useRef(({ viewableItems }: any) => {
-    if (viewableItems.length > 0) {
-      setActiveSlide(viewableItems[0].index);
-    }
+  const handleViewable = useRef(({ viewableItems }: any) => {
+    if (viewableItems.length > 0) setActiveSlide(viewableItems[0].index);
   }).current;
 
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
 
+  const sortedDoctors = [...doctors].sort((a, b) => b.rating - a.rating).slice(0, 6);
+  const sortedPharmacies = [...pharmacies].sort((a, b) => b.rating - a.rating).slice(0, 6);
+
   return (
-    <ScrollView
-      // ✅ السر الأول للقضاء على الرمشة: إجبار الخلفية على لون الثيم ومنع الـ OverScroll
-      style={[styles.container, { backgroundColor: theme.backgroundRoot }]}
-      contentContainerStyle={{
-        backgroundColor: theme.backgroundRoot,
-        paddingTop: Spacing.md,
-        paddingBottom: tabBarHeight + insets.bottom + Spacing.xl,
-      }}
-      showsVerticalScrollIndicator={false}
-      overScrollMode="never"
-      removeClippedSubviews={false}
-    >
-      <View style={[styles.bannerSection, { backgroundColor: theme.bannerBackground, shadowColor: "#00000010", shadowOpacity: 0.08, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 2 }]}>
-        <ThemedText type="h3" style={styles.announcementTitle}>{t("announcements")}</ThemedText>
+    <View style={{ flex: 1, backgroundColor: theme.backgroundRoot }}>
+      <LinearGradient
+        colors={isDark
+          ? [theme.backgroundRoot, theme.backgroundRoot]
+          : ["#E8F8FB", theme.backgroundRoot]
+        }
+        style={[styles.header, { paddingTop: insets.top + 4 }]}
+      >
+        <View style={styles.headerRow}>
+          <Feather name="bell" size={22} color={theme.text} />
+          <View style={styles.headerCenter}>
+            <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center" }}>
+              مرحباً بك في
+            </ThemedText>
+            <ThemedText type="h4" style={{ color: theme.text, textAlign: "center", fontWeight: "700" }}>
+              منصة صحية ذكية
+            </ThemedText>
+          </View>
+          <View style={[styles.logoBox, { backgroundColor: addAlpha(theme.primary, 0.15) }]}>
+            <Feather name="activity" size={20} color={theme.primary} />
+          </View>
+        </View>
+        <SearchBar />
+      </LinearGradient>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingBottom: tabBarHeight + insets.bottom + Spacing.xl,
+          paddingTop: Spacing.md,
+        }}
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+      >
+        <Animated.View entering={FadeIn.duration(500)} style={styles.promoSection}>
+          <FlatList
+            ref={sliderRef}
+            data={PROMO_SLIDES}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onViewableItemsChanged={handleViewable}
+            viewabilityConfig={viewabilityConfig}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingHorizontal: Spacing.lg, gap: Spacing.lg }}
+            decelerationRate="fast"
+            snapToInterval={SCREEN_WIDTH - Spacing.lg * 2 + Spacing.lg}
+            renderItem={({ item, index }) => (
+              <PromoSlide item={item} active={index === activeSlide} />
+            )}
+          />
+          <View style={styles.dots}>
+            {PROMO_SLIDES.map((_, i) => (
+              <View
+                key={i}
+                style={[styles.dot, {
+                  backgroundColor: i === activeSlide ? theme.primary : theme.border,
+                  width: i === activeSlide ? 20 : 7,
+                }]}
+              />
+            ))}
+          </View>
+        </Animated.View>
+
+        <SectionRow
+          title={t("promotedDoctors")}
+          onViewAll={() => navigation.navigate("DoctorsTab" as never)}
+        />
         <FlatList
-          ref={sliderRef}
-          data={announcements}
+          data={sortedDoctors}
           horizontal
-          pagingEnabled
+          inverted
           showsHorizontalScrollIndicator={false}
-          onViewableItemsChanged={handleViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.hList}
           renderItem={({ item, index }) => (
-            <AnnouncementSlide
-              item={item}
+            <DoctorCard
+              doctor={item}
               index={index}
-              activeIndex={activeSlide}
+              onPress={() => navigation.navigate("DoctorDetail", { doctorId: item.id })}
             />
           )}
-          style={styles.slider}
-          contentContainerStyle={styles.sliderContent}
-          decelerationRate="fast"
-          snapToInterval={SLIDER_WIDTH + Spacing.md}
         />
 
-        <View style={styles.dots}>
-          {announcements.map((_, index) => (
-            <Animated.View
-              key={index}
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    index === activeSlide ? theme.primary : theme.border,
-                  width: index === activeSlide ? 24 : 8,
-                },
-              ]}
+        <SectionRow title={t("promotedPharmacies")} />
+        <FlatList
+          data={sortedPharmacies}
+          horizontal
+          inverted
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.hList}
+          renderItem={({ item, index }) => (
+            <PharmacyCard
+              pharmacy={item}
+              index={index}
+              onPress={() => {}}
             />
-          ))}
+          )}
+        />
+
+        <View style={styles.tipSection}>
+          <HealthTipBanner />
         </View>
-      </View>
-
-      <SectionHeader
-        title={t("promotedDoctors")}
-        onViewAll={() => navigation.navigate("DoctorsTab" as never)}
-        viewAllLabel={t("viewAll")}
-        index={0}
-      />
-      <FlatList
-        data={[...doctors].sort((a, b) => b.rating - a.rating).slice(0, 5)}
-        horizontal
-        inverted={true}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.horizontalList}
-        renderItem={({ item, index }) => (
-          <PromotedDoctorCard
-            doctor={item}
-            index={index}
-            rank={index + 1}
-            onPress={() =>
-              navigation.navigate("DoctorDetail", { doctorId: item.id })
-            }
-          />
-        )}
-      />
-
-      <SectionHeader
-        title={t("promotedPharmacies")}
-        onViewAll={() => navigation.navigate("PharmaciesTab" as never)}
-        viewAllLabel={t("viewAll")}
-        index={1}
-      />
-      <FlatList
-        data={[...pharmacies].sort((a, b) => b.rating - a.rating)}
-        horizontal
-        inverted={true}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.horizontalList}
-        renderItem={({ item, index }) => (
-          <PromotedPharmacyCard
-            pharmacy={item}
-            index={index}
-            rank={index + 1}
-            onPress={() =>
-              navigation.navigate("PharmacyDetail", { pharmacyId: item.id })
-            }
-          />
-        )}
-      />
-
-      <HealthTipCard />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  bannerSection: {
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  announcementTitle: {
+  header: {
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.sm,
-    fontWeight: "600",
+    paddingBottom: Spacing.md,
   },
-  sectionDivider: {
-    height: 1,
-    marginVertical: Spacing.lg,
-    borderRadius: 0,
+  headerRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: Spacing.md,
   },
-  slider: { marginBottom: Spacing.md },
-  sliderContent: { paddingHorizontal: Spacing.lg },
-  slide: {
-    width: SLIDER_WIDTH,
-    height: 180,
-    borderRadius: BorderRadius.xl,
-    padding: Spacing.xl,
-    marginRight: Spacing.md,
+  headerCenter: { flex: 1, alignItems: "center" },
+  logoBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  searchWrap: { marginBottom: 4 },
+  searchBox: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    height: 48,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingHorizontal: 10,
+    fontFamily: Platform.OS === "ios" ? "Tajawal" : "Tajawal-Regular",
+  },
+  promoSection: { marginBottom: Spacing.md },
+  promoCard: {
+    borderRadius: 20,
+    height: 160,
+    flexDirection: "row-reverse",
     overflow: "hidden",
     position: "relative",
   },
-  slidePattern: {
+  promoBubble1: {
     position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: "50%",
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    top: -40,
+    left: -30,
   },
-  patternCircle: {
+  promoBubble2: {
     position: "absolute",
-    borderRadius: 9999,
-    backgroundColor: "#FFFFFF",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    bottom: -20,
+    left: 60,
   },
-  slideContent: { flex: 1, justifyContent: "center", maxWidth: "70%" },
-  slideTitle: { color: "#FFFFFF", marginBottom: Spacing.sm, fontSize: 22 },
-  slideDescription: { color: "rgba(255,255,255,0.9)", lineHeight: 22 },
-  slideIcon: { position: "absolute", right: Spacing.xl, bottom: Spacing.xl },
+  promoContent: {
+    flex: 1,
+    justifyContent: "center",
+    paddingRight: Spacing.xl,
+    paddingLeft: Spacing.sm,
+    paddingVertical: Spacing.lg,
+  },
+  promoTitle: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+    textAlign: "right",
+    lineHeight: 22,
+  },
+  promoHighlight: {
+    color: "#FFFFFF",
+    fontSize: 26,
+    fontWeight: "900",
+    textAlign: "right",
+    lineHeight: 34,
+  },
+  promoSub: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 12,
+    textAlign: "right",
+    marginTop: 2,
+  },
+  promoImageWrap: {
+    width: 120,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 0,
+  },
+  promoImage: {
+    width: 110,
+    height: 150,
+    borderRadius: 12,
+  },
   dots: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: Spacing.lg,
+    marginTop: Spacing.md,
+    gap: 5,
   },
-  dot: { height: 8, borderRadius: 4, marginHorizontal: 4 },
-  sectionHeader: {
+  dot: { height: 7, borderRadius: 3.5 },
+  sectionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    marginBottom: Spacing.md,
-    marginTop: Spacing.md,
-    backgroundColor: "#34495E",
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.sm,
   },
-  viewAllButton: { flexDirection: "row", alignItems: "center" },
-  horizontalList: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm },
-  promotedCardWrapper: {
-    width: 150,
-    marginRight: Spacing.md,
+  sectionTitle: { fontWeight: "700", textAlign: "right" },
+  viewAllRow: { flexDirection: "row", alignItems: "center", gap: 2 },
+  viewAllText: { fontWeight: "600", fontSize: 13 },
+  hList: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.sm,
+    gap: Spacing.sm,
   },
-  promotedCardShadow: {
-    borderRadius: BorderRadius.xl,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(94, 223, 255, 0.3)",
-    shadowColor: "#1F6AE1",
+  doctorCard: {
+    width: 120,
+    borderRadius: 16,
+    padding: Spacing.md,
+    alignItems: "center",
+    borderWidth: 1,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
     elevation: 3,
-    overflow: "hidden",
   },
-  promotedCard: {
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.xl,
-    alignItems: "center",
+  avatarWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    borderWidth: 2.5,
+    overflow: "hidden",
+    marginBottom: Spacing.sm,
     position: "relative",
-    overflow: "hidden",
   },
-  promotedCardInner: {
-    alignItems: "center",
-    width: "100%",
-  },
-  promotedIconWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: Spacing.md,
-    shadowColor: "#1F6AE1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  promotedIconGradient: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
-  },
-  promotedName: {
-    textAlign: "center",
-    marginBottom: Spacing.xs,
-    fontWeight: "500",
-  },
-  promotedRating: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: Spacing.sm,
-  },
-  verifiedBadge: {
+  avatarImg: { width: "100%", height: "100%" },
+  verifiedDot: {
     position: "absolute",
-    top: Spacing.md,
-    right: Spacing.md,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    bottom: 2,
+    right: 2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-  },
-  rankBadge: {
-    position: "absolute",
-    top: Spacing.md,
-    right: Spacing.md,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#E63946",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 8,
     borderWidth: 1.5,
-    borderColor: "#FFFFFF",
+    borderColor: "#FFF",
   },
-  deliveryBadge: {
+  doctorName: {
+    fontWeight: "600",
+    textAlign: "center",
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  doctorSpecialty: {
+    textAlign: "center",
+    fontSize: 11,
+    marginBottom: 5,
+  },
+  starRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.full,
-    marginTop: Spacing.sm,
+    gap: 1,
   },
-  tipContainer: {
-    marginBottom: Spacing.md,
-  },
-  tipCard: {
-    width: TIP_CARD_WIDTH,
-    padding: Spacing.xl,
-    paddingVertical: Spacing.xl,
-    overflow: "hidden",
-    position: "relative",
-  },
-  tipSectionLabel: {
-    color: "rgba(255,255,255,0.7)",
-    fontSize: 13,
+  ratingText: {
+    fontSize: 10,
+    color: "#FFB800",
     fontWeight: "600",
-    marginBottom: Spacing.md,
-    letterSpacing: 1,
-    textTransform: "uppercase",
+    marginLeft: 3,
   },
-  tipIconContainer: {
-    marginBottom: Spacing.md,
+  pharmacyCard: {
+    width: 120,
+    borderRadius: 16,
+    padding: Spacing.md,
+    alignItems: "center",
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  tipIconCircle: {
+  pharmacyLogoWrap: {
     width: 68,
     height: 68,
     borderRadius: 34,
-    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    overflow: "hidden",
+    marginBottom: Spacing.sm,
+  },
+  pharmacyLogoGrad: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
+  },
+  pharmacyName: {
+    fontWeight: "600",
+    textAlign: "center",
+    fontSize: 12,
+    marginBottom: 6,
+  },
+  pharmacyBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  tipSection: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+  },
+  tipBanner: {
+    borderRadius: 16,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  tipHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.sm,
   },
   tipTitle: {
-    color: "#FFFFFF",
-    fontSize: 20,
     fontWeight: "700",
-    marginBottom: Spacing.sm,
-    lineHeight: 30,
+    textAlign: "right",
   },
-  tipDesc: {
-    color: "rgba(255,255,255,0.9)",
-    fontSize: 15,
+  tipText: {
+    textAlign: "right",
     lineHeight: 24,
+    fontSize: 14,
   },
-  tipDotsRow: {
+  tipDots: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
     marginTop: Spacing.md,
+    gap: 5,
   },
-  tipDot: {
-    height: 6,
-    borderRadius: 3,
-    marginHorizontal: 3,
-  },
-  tipPattern: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: "40%",
-  },
-  tipPatternCircle: {
-    position: "absolute",
-    borderRadius: 9999,
-    backgroundColor: "rgba(255,255,255,0.08)",
-  },
+  tipDot: { height: 6, borderRadius: 3 },
 });
