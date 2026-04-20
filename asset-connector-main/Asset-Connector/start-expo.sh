@@ -1,10 +1,10 @@
 #!/bin/bash
-# تشغيل Metro Bundler على Replit (بدون tunnel)
-# العرض: السيرفر (port 5000) يعمل كـ proxy لـ Metro (port 8081)
+# تشغيل Metro Bundler على Replit
+# السيرفر (port 5000) يعيد كتابة الـ manifest لكي كل الطلبات تمر عبر port 80
 
 echo ""
 echo "══════════════════════════════════════════════"
-echo "🚀 هلا بيك يا غيث — تشغيل مشروعك..."
+echo "🚀 جاري تشغيل Metro Bundler..."
 echo "══════════════════════════════════════════════"
 echo ""
 
@@ -19,16 +19,14 @@ DOMAIN="${REPLIT_DEV_DOMAIN:-localhost}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📱 لتشغيل التطبيق على جوالك:"
 echo ""
-echo "   1. افتح Expo Go"
-echo "   2. اضغط 'Enter URL manually'"
-echo "   3. اكتب هذا الرابط:"
+echo "   افتح Expo Go  ←  Enter URL manually  ←  اكتب:"
 echo ""
 echo "      exp://${DOMAIN}"
 echo ""
+echo "   (بدون :8081 — كل شيء يمر عبر port 80)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "⏳ جاري تشغيل Metro Bundler على port 8081..."
-echo "   (انتظر دقيقة حتى يجهز ثم اكتب الرابط في Expo Go)"
+echo "⏳ انتظر حتى يظهر 'Metro waiting on' ثم افتح Expo Go..."
 echo ""
 
 REACT_NATIVE_PACKAGER_HOSTNAME="${DOMAIN}" npx expo start -c --port 8081 --host lan

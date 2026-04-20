@@ -3,7 +3,10 @@ import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import * as fs from "fs";
 import * as path from "path";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import {
+  createProxyMiddleware,
+  responseInterceptor,
+} from "http-proxy-middleware";
 
 const app = express();
 const log = console.log;
@@ -158,12 +161,38 @@ function configureExpoAndLanding(
 
   log("Serving static Expo files with dynamic manifest routing");
 
+  const publicDomain =
+    process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS || "localhost";
+
   // Proxy all Expo / Metro traffic → localhost:8081
+  // selfHandleResponse lets us rewrite manifest JSON so all :8081 URLs
+  // become port-80 URLs that pass through the Replit HTTPS proxy.
   const metroProxy = createProxyMiddleware({
     target: "http://localhost:8081",
-    changeOrigin: false,
+    changeOrigin: true,
+    selfHandleResponse: true,
     ws: true,
     on: {
+      proxyRes: responseInterceptor(
+        async (responseBuffer, proxyRes) => {
+          const ct = proxyRes.headers["content-type"] ?? "";
+          if (ct.includes("application/json")) {
+            let body = responseBuffer.toString("utf8");
+            // Rewrite exp://HOST:8081 → exp://HOST  (Expo Go uses port 80)
+            body = body.replace(
+              /exp:\/\/([^"\\]+):8081/g,
+              `exp://${publicDomain}`,
+            );
+            // Rewrite http://HOST:8081 → https://HOST  (bundle downloads)
+            body = body.replace(
+              /http:\/\/([^"\\]+):8081/g,
+              `https://${publicDomain}`,
+            );
+            return body;
+          }
+          return responseBuffer;
+        },
+      ),
       error: (_err, _req, res) => {
         if (res && "writeHead" in res) {
           (res as import("http").ServerResponse).writeHead(503);
