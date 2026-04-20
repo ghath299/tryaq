@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import * as fs from "fs";
 import * as path from "path";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 const app = express();
 const log = console.log;
@@ -142,7 +143,10 @@ function serveLandingPage({
   res.status(200).send(html);
 }
 
-function configureExpoAndLanding(app: express.Application) {
+function configureExpoAndLanding(
+  app: express.Application,
+  server: import("http").Server,
+) {
   const templatePath = path.resolve(
     process.cwd(),
     "server",
@@ -154,36 +158,43 @@ function configureExpoAndLanding(app: express.Application) {
 
   log("Serving static Expo files with dynamic manifest routing");
 
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith("/api")) {
-      return next();
-    }
-
-    if (req.path !== "/" && req.path !== "/manifest") {
-      return next();
-    }
-
-    const platform = req.header("expo-platform");
-    if (platform && (platform === "ios" || platform === "android")) {
-      return serveExpoManifest(platform, res);
-    }
-
-    if (req.path === "/") {
-      return serveLandingPage({
-        req,
-        res,
-        landingPageTemplate,
-        appName,
-      });
-    }
-
-    next();
+  // Proxy all Expo / Metro traffic → localhost:8081
+  const metroProxy = createProxyMiddleware({
+    target: "http://localhost:8081",
+    changeOrigin: false,
+    ws: true,
+    on: {
+      error: (_err, _req, res) => {
+        if (res && "writeHead" in res) {
+          (res as import("http").ServerResponse).writeHead(503);
+          (res as import("http").ServerResponse).end(
+            "Metro bundler not running. Run: bash start-expo.sh",
+          );
+        }
+      },
+    },
   });
 
-  app.use("/assets", express.static(path.resolve(process.cwd(), "assets")));
+  // Forward WebSocket upgrades to Metro (hot-reload)
+  server.on("upgrade", (req, socket, head) => {
+    (metroProxy as any).upgrade(req, socket, head);
+  });
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith("/api")) return next();
+
+    // Landing page for browsers (no expo-platform header)
+    if (req.path === "/" && !req.header("expo-platform")) {
+      return serveLandingPage({ req, res, landingPageTemplate, appName });
+    }
+
+    // Everything else → Metro proxy (manifest, bundles, assets, hot-reload)
+    return (metroProxy as any)(req, res, next);
+  });
+
   app.use(express.static(path.resolve(process.cwd(), "dist")));
 
-  log("Expo routing: Checking expo-platform header on / and /manifest");
+  log("Expo proxy → Metro on :8081  |  run: bash start-expo.sh");
 }
 
 function setupErrorHandler(app: express.Application) {
@@ -214,7 +225,7 @@ function setupErrorHandler(app: express.Application) {
 
   const server = await registerRoutes(app);
 
-  configureExpoAndLanding(app);
+  configureExpoAndLanding(app, server);
 
   setupErrorHandler(app);
 

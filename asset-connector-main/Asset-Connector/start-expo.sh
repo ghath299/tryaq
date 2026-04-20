@@ -1,5 +1,6 @@
 #!/bin/bash
-# سكريبت تشغيل Expo بدون tunnel (يعمل على Replit)
+# تشغيل Metro Bundler على Replit (بدون tunnel)
+# العرض: السيرفر (port 5000) يعمل كـ proxy لـ Metro (port 8081)
 
 echo ""
 echo "══════════════════════════════════════════════"
@@ -14,12 +15,20 @@ sleep 1
 cd "$(dirname "$0")" || exit 1
 
 DOMAIN="${REPLIT_DEV_DOMAIN:-localhost}"
-EXPO_URL="exp://${DOMAIN}:8081"
 
-echo "📱 في Expo Go → 'Enter URL manually' → اكتب:"
-echo "   ${EXPO_URL}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "📱 لتشغيل التطبيق على جوالك:"
 echo ""
-echo "🚀 جاري تشغيل Metro Bundler..."
+echo "   1. افتح Expo Go"
+echo "   2. اضغط 'Enter URL manually'"
+echo "   3. اكتب هذا الرابط:"
+echo ""
+echo "      exp://${DOMAIN}"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "⏳ جاري تشغيل Metro Bundler على port 8081..."
+echo "   (انتظر دقيقة حتى يجهز ثم اكتب الرابط في Expo Go)"
 echo ""
 
-REACT_NATIVE_PACKAGER_HOSTNAME="${DOMAIN}" npx expo start -c --port 8081
+REACT_NATIVE_PACKAGER_HOSTNAME="${DOMAIN}" npx expo start -c --port 8081 --host lan
