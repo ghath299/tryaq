@@ -3,10 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import * as fs from "fs";
 import * as path from "path";
-import {
-  createProxyMiddleware,
-  responseInterceptor,
-} from "http-proxy-middleware";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 const app = express();
 const log = console.log;
@@ -164,35 +161,72 @@ function configureExpoAndLanding(
   const publicDomain =
     process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS || "localhost";
 
-  // Proxy all Expo / Metro traffic → localhost:8081
-  // selfHandleResponse lets us rewrite manifest JSON so all :8081 URLs
-  // become port-80 URLs that pass through the Replit HTTPS proxy.
+  // Rewrites all Metro :8081 references → publicDomain (port 80/443)
+  function rewriteManifestBody(body: string): string {
+    // exp://HOST:8081 → exp://HOST  (Expo Go manifest URL)
+    body = body.replace(/exp:\/\/[^"'\\]+:8081/g, `exp://${publicDomain}`);
+    // http://HOST:8081 → https://HOST  (bundle, asset URLs)
+    body = body.replace(/http:\/\/[^"'\\]+:8081/g, `https://${publicDomain}`);
+    return body;
+  }
+
+  // ── Manifest endpoints: fetch manually, rewrite URLs, stream back ──────
+  // Metro serves the manifest at "/", "/_expo/manifest", and with query params
+  const MANIFEST_PATHS = ["/", "/_expo/manifest"];
+
+  for (const mPath of MANIFEST_PATHS) {
+    app.get(mPath, async (req: Request, res: Response, next: NextFunction) => {
+      // Browser (no Expo header) → landing page
+      if (
+        mPath === "/" &&
+        !req.header("expo-platform") &&
+        !req.header("exponent-platform")
+      ) {
+        return serveLandingPage({ req, res, landingPageTemplate, appName });
+      }
+
+      try {
+        const qs = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+        const metroUrl = `http://localhost:8081${mPath}${qs}`;
+        const metroRes = await fetch(metroUrl, {
+          headers: {
+            ...Object.fromEntries(
+              Object.entries(req.headers).filter(([k]) => k !== "host"),
+            ),
+            host: "localhost:8081",
+          } as HeadersInit,
+          signal: AbortSignal.timeout(15000),
+        });
+
+        const ct = metroRes.headers.get("content-type") ?? "";
+        let body = await metroRes.text();
+
+        if (ct.includes("application/json") || ct.includes("text/")) {
+          body = rewriteManifestBody(body);
+        }
+
+        for (const [key, val] of metroRes.headers.entries()) {
+          if (key.toLowerCase() !== "content-length") res.setHeader(key, val);
+        }
+        res.status(metroRes.status).send(body);
+      } catch {
+        res
+          .status(503)
+          .send("Metro bundler not running.\nRun: bash start-expo.sh");
+      }
+    });
+  }
+
+  // ── Streaming proxy for bundles, assets, hot-reload ────────────────────
+  // No buffering — large bundles stream directly from Metro to Expo Go.
+  // proxyTimeout 5 min: first-run bundle compilation can take a long time.
   const metroProxy = createProxyMiddleware({
     target: "http://localhost:8081",
     changeOrigin: true,
-    selfHandleResponse: true,
     ws: true,
+    proxyTimeout: 5 * 60 * 1000,
+    timeout: 5 * 60 * 1000,
     on: {
-      proxyRes: responseInterceptor(
-        async (responseBuffer, proxyRes) => {
-          const ct = proxyRes.headers["content-type"] ?? "";
-          if (ct.includes("application/json")) {
-            let body = responseBuffer.toString("utf8");
-            // Rewrite exp://HOST:8081 → exp://HOST  (Expo Go uses port 80)
-            body = body.replace(
-              /exp:\/\/([^"\\]+):8081/g,
-              `exp://${publicDomain}`,
-            );
-            // Rewrite http://HOST:8081 → https://HOST  (bundle downloads)
-            body = body.replace(
-              /http:\/\/([^"\\]+):8081/g,
-              `https://${publicDomain}`,
-            );
-            return body;
-          }
-          return responseBuffer;
-        },
-      ),
       error: (_err, _req, res) => {
         if (res && "writeHead" in res) {
           (res as import("http").ServerResponse).writeHead(503);
@@ -211,19 +245,12 @@ function configureExpoAndLanding(
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith("/api")) return next();
-
-    // Landing page for browsers (no expo-platform header)
-    if (req.path === "/" && !req.header("expo-platform")) {
-      return serveLandingPage({ req, res, landingPageTemplate, appName });
-    }
-
-    // Everything else → Metro proxy (manifest, bundles, assets, hot-reload)
     return (metroProxy as any)(req, res, next);
   });
 
   app.use(express.static(path.resolve(process.cwd(), "dist")));
 
-  log("Expo proxy → Metro on :8081  |  run: bash start-expo.sh");
+  log(`Expo proxy → Metro :8081  |  connect Expo Go to: exp://${publicDomain}`);
 }
 
 function setupErrorHandler(app: express.Application) {
