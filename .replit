@@ -1,4 +1,5 @@
 modules = ["nodejs-20"]
+
 [nix]
 channel = "stable-25_05"
 packages = ["unzip", "nano", "psmisc"]
@@ -9,6 +10,28 @@ expertMode = true
 [workflows]
 runButton = "Project"
 
+# 🔹 Workflow تشغيل التطبيق
+[[workflows.workflow]]
+name = "Start App"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --web --port 5000"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+# 🔹 Workflow البيلد (زر ثاني)
+[[workflows.workflow]]
+name = "Build APK"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo '🚀 Starting build...' && npm run build && echo '✅ Build finished! Check link above 👆'"
+
 [[workflows.workflow]]
 name = "Project"
 mode = "parallel"
@@ -16,27 +39,11 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start application"
-
-[[workflows.workflow]]
-name = "Start application"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace/asset-connector-main/Asset-Connector && npm run server:dev"
-waitForPort = 5000
+args = "Start App"
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 5001
-externalPort = 3000
 
 [[ports]]
 localPort = 5002
