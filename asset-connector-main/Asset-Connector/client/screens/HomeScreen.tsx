@@ -291,35 +291,49 @@ function PharmacyCard({ pharmacy, onPress, index }: { pharmacy: typeof pharmacie
 function HealthTipBanner() {
   const { theme, isDark } = useTheme();
   const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setActive((p) => (p + 1) % HEALTH_TIPS.length), 6000);
-    return () => clearInterval(t);
+  const nextTip = useCallback(() => {
+    setActive((p) => (p + 1) % HEALTH_TIPS.length);
   }, []);
 
+  useEffect(() => {
+    const t = setInterval(nextTip, 6000);
+    return () => clearInterval(t);
+  }, [nextTip]);
+
   return (
-    <Animated.View entering={FadeInUp.delay(400).duration(400)} style={[styles.tipBanner, {
-      backgroundColor: isDark ? theme.card : "#FFFFFF",
-      borderColor: isDark ? theme.border : "rgba(94,223,255,0.2)",
-      shadowColor: isDark ? "transparent" : "#1F6AE1",
-    }]}>
-      <View style={styles.tipHeader}>
+    <Animated.View
+      entering={FadeInUp.delay(400).duration(400)}
+      style={[
+        styles.tipBanner,
+        {
+          backgroundColor: isDark ? theme.card : "#FFFFFF",
+          borderColor: isDark ? theme.border : "rgba(94,223,255,0.2)",
+          shadowColor: isDark ? "transparent" : "#1F6AE1",
+        },
+      ]}
+    >
+      <Pressable onPress={nextTip} style={styles.tipHeader}>
         <Feather name="chevron-left" size={16} color={theme.primary} />
         <ThemedText type="body" style={[styles.tipTitle, { color: theme.text }]}>
           نصائح طبية اليوم
         </ThemedText>
-      </View>
-      <ThemedText type="body" style={[styles.tipText, { color: theme.textSecondary }]}>
-        {HEALTH_TIPS[active]}
-      </ThemedText>
+      </Pressable>
+      <Pressable onPress={nextTip}>
+        <ThemedText type="body" style={[styles.tipText, { color: theme.textSecondary }]}>
+          {HEALTH_TIPS[active]}
+        </ThemedText>
+      </Pressable>
       <View style={styles.tipDots}>
         {HEALTH_TIPS.map((_, i) => (
           <View
             key={i}
-            style={[styles.tipDot, {
-              backgroundColor: i === active ? theme.primary : theme.border,
-              width: i === active ? 16 : 6,
-            }]}
+            style={[
+              styles.tipDot,
+              {
+                backgroundColor: i === active ? theme.primary : theme.border,
+                width: i === active ? 16 : 6,
+              },
+            ]}
           />
         ))}
       </View>
