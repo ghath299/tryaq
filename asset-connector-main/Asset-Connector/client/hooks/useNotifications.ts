@@ -102,6 +102,19 @@ export async function markAllRead(): Promise<void> {
   } catch {}
 }
 
+export async function markNotifRead(id: string): Promise<void> {
+  try {
+    const notifs = await getStoredNotifications();
+    const updated = notifs.map((n) =>
+      n.id === id ? { ...n, read: true } : n
+    );
+    await AsyncStorage.setItem(NOTIFS_KEY, JSON.stringify(updated));
+    const unread = updated.filter((n) => !n.read).length;
+    await AsyncStorage.setItem(BADGE_KEY, String(unread));
+    await Notifications.setBadgeCountAsync(unread);
+  } catch {}
+}
+
 export async function clearAllNotifications(): Promise<void> {
   try {
     await AsyncStorage.setItem(NOTIFS_KEY, JSON.stringify([]));

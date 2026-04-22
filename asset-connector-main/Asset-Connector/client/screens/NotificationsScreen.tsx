@@ -4,6 +4,8 @@ import {
   StyleSheet,
   FlatList,
   Pressable,
+  Modal,
+  ScrollView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   FadeIn,
   FadeInDown,
+  FadeInUp,
   FadeOut,
   useSharedValue,
   withSpring,
@@ -26,6 +29,7 @@ import {
   TaryaqNotification,
   getStoredNotifications,
   markAllRead,
+  markNotifRead,
   clearAllNotifications,
 } from "@/hooks/useNotifications";
 
@@ -70,9 +74,11 @@ const TYPE_CONFIG: Record<
 function NotifCard({
   item,
   index,
+  onPress,
 }: {
   item: TaryaqNotification;
   index: number;
+  onPress: (n: TaryaqNotification) => void;
 }) {
   const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
@@ -87,8 +93,9 @@ function NotifCard({
       exiting={FadeOut.duration(200)}
     >
       <AnimatedPressable
-        onPressIn={() => { scale.value = withSpring(0.98); }}
+        onPressIn={() => { scale.value = withSpring(0.97); }}
         onPressOut={() => { scale.value = withSpring(1); }}
+        onPress={() => onPress(item)}
         style={[
           styles.card,
           animStyle,
@@ -170,11 +177,11 @@ export default function NotificationsScreen() {
   const { theme, isDark } = useTheme();
 
   const [notifs, setNotifs] = useState<TaryaqNotification[]>([]);
+  const [selectedNotif, setSelectedNotif] = useState<TaryaqNotification | null>(null);
 
   const load = useCallback(async () => {
     const data = await getStoredNotifications();
     setNotifs(data);
-    await markAllRead();
   }, []);
 
   useEffect(() => {
@@ -185,6 +192,27 @@ export default function NotificationsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     await clearAllNotifications();
     setNotifs([]);
+  };
+
+  const handleNotifPress = async (item: TaryaqNotification) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (!item.read) {
+      await markNotifRead(item.id);
+      setNotifs((prev) =>
+        prev.map((n) => (n.id === item.id ? { ...n, read: true } : n))
+      );
+    }
+    setSelectedNotif({ ...item, read: true });
+  };
+
+  const handleModalNavigate = () => {
+    if (!selectedNotif) return;
+    setSelectedNotif(null);
+    if (selectedNotif.type === "appointment") {
+      navigation.navigate("MyBookings");
+    } else if (selectedNotif.type === "doctor") {
+      navigation.goBack();
+    }
   };
 
   const unreadCount = notifs.filter((n) => !n.read).length;
@@ -320,10 +348,148 @@ export default function NotificationsScreen() {
           ]}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
-            <NotifCard item={item} index={index} />
+            <NotifCard item={item} index={index} onPress={handleNotifPress} />
           )}
         />
       )}
+
+      {/* Detail Modal */}
+      <Modal
+        visible={!!selectedNotif}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setSelectedNotif(null)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setSelectedNotif(null)}
+        >
+          <Animated.View
+            entering={FadeInUp.springify().damping(18).stiffness(160)}
+            style={[
+              styles.modalSheet,
+              { backgroundColor: isDark ? theme.card : "#FFFFFF" },
+            ]}
+          >
+            <Pressable onPress={() => {}}>
+              {selectedNotif && (() => {
+                const cfg = TYPE_CONFIG[selectedNotif.type];
+                const showNav =
+                  selectedNotif.type === "appointment" ||
+                  selectedNotif.type === "doctor";
+                return (
+                  <>
+                    {/* Handle */}
+                    <View
+                      style={[
+                        styles.modalHandle,
+                        { backgroundColor: addAlpha(theme.text, 0.15) },
+                      ]}
+                    />
+
+                    {/* Icon + Type */}
+                    <View style={styles.modalHeader}>
+                      <View
+                        style={[
+                          styles.modalIcon,
+                          { backgroundColor: cfg.bg },
+                        ]}
+                      >
+                        <Feather name={cfg.icon as any} size={26} color={cfg.color} />
+                      </View>
+                      <View
+                        style={[
+                          styles.typeBadge,
+                          { backgroundColor: cfg.bg },
+                        ]}
+                      >
+                        <ThemedText
+                          type="caption"
+                          style={{ color: cfg.color, fontWeight: "700", fontSize: 12 }}
+                        >
+                          {cfg.label}
+                        </ThemedText>
+                      </View>
+                    </View>
+
+                    {/* Title */}
+                    <ThemedText
+                      type="h4"
+                      style={[styles.modalTitle, { color: theme.text }]}
+                    >
+                      {selectedNotif.title}
+                    </ThemedText>
+
+                    {/* Time */}
+                    <ThemedText
+                      type="caption"
+                      style={[styles.modalTime, { color: theme.textSecondary }]}
+                    >
+                      {selectedNotif.time}
+                    </ThemedText>
+
+                    {/* Body */}
+                    <ScrollView style={styles.modalBodyScroll} showsVerticalScrollIndicator={false}>
+                      <ThemedText
+                        type="body"
+                        style={[styles.modalBody, { color: theme.textSecondary }]}
+                      >
+                        {selectedNotif.body}
+                      </ThemedText>
+                    </ScrollView>
+
+                    {/* Actions */}
+                    <View style={styles.modalActions}>
+                      <Pressable
+                        onPress={() => setSelectedNotif(null)}
+                        style={[
+                          styles.modalBtn,
+                          styles.modalBtnSecondary,
+                          { backgroundColor: addAlpha(theme.text, 0.07) },
+                        ]}
+                      >
+                        <ThemedText
+                          type="body"
+                          style={{ color: theme.textSecondary, fontWeight: "600" }}
+                        >
+                          إغلاق
+                        </ThemedText>
+                      </Pressable>
+
+                      {showNav && (
+                        <Pressable
+                          onPress={handleModalNavigate}
+                          style={[
+                            styles.modalBtn,
+                            styles.modalBtnPrimary,
+                            { backgroundColor: cfg.color },
+                          ]}
+                        >
+                          <ThemedText
+                            type="body"
+                            style={{ color: "#FFFFFF", fontWeight: "700" }}
+                          >
+                            {selectedNotif.type === "appointment"
+                              ? "عرض المواعيد"
+                              : "الأطباء"}
+                          </ThemedText>
+                          <Feather
+                            name="arrow-left"
+                            size={16}
+                            color="#FFFFFF"
+                            style={{ marginRight: 4 }}
+                          />
+                        </Pressable>
+                      )}
+                    </View>
+                  </>
+                );
+              })()}
+            </Pressable>
+          </Animated.View>
+        </Pressable>
+      </Modal>
 
     </View>
   );
@@ -442,4 +608,71 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    justifyContent: "flex-end",
+  },
+  modalSheet: {
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: 36,
+    paddingTop: 12,
+    maxHeight: "80%",
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: Spacing.md,
+  },
+  modalHeader: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  modalIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalTitle: {
+    textAlign: "right",
+    fontWeight: "700",
+    lineHeight: 28,
+    marginBottom: 6,
+  },
+  modalTime: {
+    textAlign: "right",
+    marginBottom: Spacing.md,
+    fontSize: 12,
+  },
+  modalBodyScroll: {
+    maxHeight: 140,
+    marginBottom: Spacing.lg,
+  },
+  modalBody: {
+    textAlign: "right",
+    lineHeight: 24,
+    fontSize: 15,
+  },
+  modalActions: {
+    flexDirection: "row-reverse",
+    gap: Spacing.sm,
+  },
+  modalBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: BorderRadius.lg,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row-reverse",
+  },
+  modalBtnSecondary: {},
+  modalBtnPrimary: {},
 });
