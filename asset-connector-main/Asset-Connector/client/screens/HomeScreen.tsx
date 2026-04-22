@@ -278,15 +278,9 @@ function PharmacyCard({ pharmacy, onPress, index }: { pharmacy: typeof pharmacie
         <ThemedText type="small" style={[styles.pharmacyName, { color: theme.text }]} numberOfLines={1}>
           {pharmacy.nameAr}
         </ThemedText>
-        <View style={[styles.pharmacyBadge, { backgroundColor: addAlpha(isOpen24 ? "#00C851" : theme.primary, 0.12) }]}>
-          <Feather
-            name={isOpen24 ? "clock" : "map-pin"}
-            size={10}
-            color={isOpen24 ? "#00C851" : theme.primary}
-            style={{ marginRight: 3 }}
-          />
-          <ThemedText type="caption" style={{ color: isOpen24 ? "#00C851" : theme.primary, fontSize: 10, fontWeight: "600" }}>
-            {isOpen24 ? "Open 24h" : "قريب منك"}
+        <View style={[styles.pharmacyBadge, { backgroundColor: addAlpha(theme.primary, 0.12) }]}>
+          <ThemedText type="caption" style={{ color: theme.primary, fontSize: 10, fontWeight: "600" }}>
+            قريب
           </ThemedText>
         </View>
       </AnimatedPressable>
