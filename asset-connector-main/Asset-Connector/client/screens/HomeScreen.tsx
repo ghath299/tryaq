@@ -421,10 +421,10 @@ export default function HomeScreen() {
             )}
           </Pressable>
           <View style={styles.headerCenter}>
-            <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center", fontWeight: "600" }}>
+            <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center" }}>
               مرحباً بك في
             </ThemedText>
-            <ThemedText type="h4" style={{ color: theme.text, textAlign: "center", fontWeight: "800" }}>
+            <ThemedText type="h4" style={{ color: theme.text, textAlign: "center", fontWeight: "700" }}>
               ترياق
             </ThemedText>
           </View>
@@ -502,10 +502,10 @@ export default function HomeScreen() {
         />
 
         <SectionRow title={t("promotedPharmacies")} />
-        <View style={[styles.comingSoonBox, { backgroundColor: isDark ? theme.card : "#FFFFFF" }]}>
+        <View style={styles.comingSoonBox}>
           <ThemedText
             type="body"
-            style={[styles.comingSoonText, { color: theme.text }]}
+            style={[styles.comingSoonText, { color: theme.textSecondary }]}
           >
             ستتوفر هذه الخدمة قريباً
           </ThemedText>
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: Spacing.md,
   },
-  headerCenter: { flex: 1, alignItems: "center", paddingHorizontal: 8 },
+  headerCenter: { flex: 1, alignItems: "center" },
   logoBox: {
     width: 38,
     height: 38,
