@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "0f3b9096-889a-4af8-8a32-293c9722a94b"
+      }
+    },
+    "android": {
+      "package": "com.tariq.app"
+    }
+  }
+}

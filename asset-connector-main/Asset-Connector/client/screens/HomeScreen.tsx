@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   useAnimatedStyle,
@@ -431,7 +431,7 @@ export default function HomeScreen() {
             hitSlop={10}
             style={[styles.logoBox, { backgroundColor: addAlpha("#EF4444", 0.12) }]}
           >
-            <Feather name="alert-circle" size={20} color="#EF4444" />
+            <FontAwesome5 name="ambulance" size={17} color="#EF4444" />
           </Pressable>
         </View>
         <SearchBar onPress={() => navigation.navigate("Search" as never)} />

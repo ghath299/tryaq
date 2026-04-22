@@ -1,7 +1,7 @@
 modules = ["nodejs-20"]
 [nix]
 channel = "stable-25_05"
-packages = ["unzip", "nano", "psmisc"]
+packages = ["unzip"]
 
 [agent]
 expertMode = true

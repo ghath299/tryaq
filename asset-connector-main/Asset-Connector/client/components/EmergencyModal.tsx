@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
@@ -116,7 +116,7 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
           </Pressable>
           <View style={styles.titleWrap}>
             <View style={[styles.titleIcon, { backgroundColor: addAlpha("#EF4444", 0.12) }]}>
-              <Feather name="alert-circle" size={22} color="#EF4444" />
+              <FontAwesome5 name="ambulance" size={20} color="#EF4444" />
             </View>
             <ThemedText
               type="h4"
@@ -152,7 +152,7 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
                     <ThemedText style={styles.actionNum}>122</ThemedText>
                   </View>
                   <View style={styles.actionIcon}>
-                    <Feather name="phone-call" size={26} color="#FFF" />
+                    <FontAwesome5 name="ambulance" size={22} color="#FFF" />
                   </View>
                 </View>
               </LinearGradient>
@@ -178,7 +178,7 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
                     <ThemedText style={styles.actionSub}>يفتح Google Maps تلقائياً</ThemedText>
                   </View>
                   <View style={styles.actionIcon}>
-                    <Feather name="map-pin" size={26} color="#FFF" />
+                    <FontAwesome5 name="hospital-alt" size={22} color="#FFF" />
                   </View>
                 </View>
               </LinearGradient>
