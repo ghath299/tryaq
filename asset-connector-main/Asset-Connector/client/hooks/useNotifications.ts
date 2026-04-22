@@ -123,33 +123,6 @@ export async function getUnreadCount(): Promise<number> {
   }
 }
 
-export async function scheduleHealthTipNotification(): Promise<void> {
-  if (Platform.OS === "web") return;
-  try {
-    const granted = await requestNotificationPermission();
-    if (!granted) return;
-
-    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-    const alreadyScheduled = scheduled.some((n) =>
-      (n.content.data as any)?.type === "daily_tip"
-    );
-    if (alreadyScheduled) return;
-
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "💊 نصيحة صحية من ترياق",
-        body: "ممارسة الرياضة 30 دقيقة يومياً تقلل خطر أمراض القلب بنسبة 35%.",
-        sound: true,
-        data: { type: "daily_tip" },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: 8,
-        minute: 0,
-      } as Notifications.DailyTriggerInput,
-    });
-  } catch {}
-}
 
 export async function sendImmediateNotification(
   title: string,
@@ -174,7 +147,6 @@ export function useNotificationSetup() {
 
     (async () => {
       await requestNotificationPermission();
-      await scheduleHealthTipNotification();
     })();
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
