@@ -346,10 +346,6 @@ export default function HomeScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const sliderRef = useRef<FlatList>(null);
   const [badgeCount, setBadgeCount] = useState(0);
-  const bellScale = useSharedValue(1);
-  const bellAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: bellScale.value }],
-  }));
 
   useNotificationSetup();
 
@@ -366,11 +362,6 @@ export default function HomeScreen() {
 
   const handleBellPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    bellScale.value = withSequence(
-      withSpring(0.8, { damping: 4 }),
-      withSpring(1.15, { damping: 6 }),
-      withSpring(1)
-    );
     navigation.navigate("Notifications" as never);
   }, [navigation]);
 
@@ -408,10 +399,10 @@ export default function HomeScreen() {
         style={[styles.header, { paddingTop: insets.top + 4 }]}
       >
         <View style={styles.headerRow}>
-          <AnimatedPressable
+          <Pressable
             onPress={handleBellPress}
             hitSlop={10}
-            style={[styles.bellBtn, { backgroundColor: addAlpha(theme.primary, 0.1) }, bellAnimStyle]}
+            style={[styles.bellBtn, { backgroundColor: addAlpha(theme.primary, 0.1) }]}
           >
             <Feather name="bell" size={20} color={theme.primary} />
             {badgeCount > 0 && (
@@ -424,7 +415,7 @@ export default function HomeScreen() {
                 </ThemedText>
               </Animated.View>
             )}
-          </AnimatedPressable>
+          </Pressable>
           <View style={styles.headerCenter}>
             <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center" }}>
               مرحباً بك في
