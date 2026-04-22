@@ -767,8 +767,8 @@ const styles = StyleSheet.create({
   pharmacyName: {
     fontWeight: "600",
     textAlign: "center",
-    fontSize: 12,
-    marginBottom: 6,
+    fontSize: 13,
+    marginBottom: 10,
   },
   pharmacyBadge: {
     flexDirection: "row",
