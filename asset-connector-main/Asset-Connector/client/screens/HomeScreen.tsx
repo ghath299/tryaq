@@ -101,9 +101,6 @@ function SearchBar({ onPress }: { onPress: () => void }) {
               ابحث عن طبيب، دواء، أو صيدلية...
             </ThemedText>
           </View>
-          <View style={[styles.searchMic, { backgroundColor: addAlpha(theme.primary, 0.1) }]}>
-            <Feather name="mic" size={15} color={theme.primary} />
-          </View>
         </View>
       </AnimatedPressable>
     </Animated.View>
@@ -590,15 +587,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingHorizontal: 10,
     fontFamily: Platform.OS === "ios" ? "Tajawal" : "Tajawal-Regular",
-  },
-  searchMic: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 6,
-    marginRight: 4,
   },
   promoSection: { marginBottom: Spacing.md },
   promoCard: {
