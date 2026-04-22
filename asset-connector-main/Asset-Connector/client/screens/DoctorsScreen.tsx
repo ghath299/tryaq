@@ -17,7 +17,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   FadeInUp,
   FadeIn,
-  SlideInDown,
+  SlideInUp,
+  SlideOutDown,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -157,13 +158,14 @@ function FilterSheet({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       statusBarTranslucent
       onRequestClose={onClose}
     >
       <Pressable style={styles.sheetOverlay} onPress={onClose}>
         <Animated.View
-          entering={SlideInDown.duration(300)}
+          entering={SlideInUp.duration(320).damping(18)}
+          exiting={SlideOutDown.duration(250)}
           style={[
             styles.sheetContainer,
             {
