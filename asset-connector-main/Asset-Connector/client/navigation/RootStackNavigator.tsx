@@ -12,6 +12,7 @@ import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
 import SearchScreen from "@/screens/SearchScreen";
 import MyBookingsScreen from "@/screens/MyBookingsScreen";
 import MyOrdersScreen from "@/screens/MyOrdersScreen";
+import NotificationsScreen from "@/screens/NotificationsScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   OTPVerification: undefined;
   Main: undefined;
   Search: undefined;
+  Notifications: undefined;
   DoctorDetail: { doctorId: string };
   BookAppointment: { doctorId: string };
   MyBookings: undefined;
@@ -100,6 +102,12 @@ function PatientNavigator() {
         name="Search"
         component={SearchScreen}
         options={{ headerShown: false, animation: "ios_from_right" }}
+      />
+
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ headerShown: false, animation: "slide_from_right" }}
       />
 
       <Stack.Screen

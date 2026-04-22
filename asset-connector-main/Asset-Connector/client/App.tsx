@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, ActivityIndicator, Platform } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -7,6 +7,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
+import * as Notifications from "expo-notifications";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
@@ -27,6 +28,17 @@ const MyTheme = {
     card: "#0D1117",
   },
 };
+
+if (Platform.OS !== "web") {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+}
 
 function AppContent() {
   const [fontsLoaded, fontError] = Font.useFonts({

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ترياق",
+    "name": "تريـاق",
     "slug": "smart-health-platform",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -30,9 +30,10 @@
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.POST_NOTIFICATIONS"
       ]
     },
     "web": {
@@ -53,6 +54,16 @@
         }
       ],
       "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#5EDFFF",
+          "sounds": [],
+          "androidMode": "default",
+          "androidCollapsedTitle": "إشعارات ترياق"
+        }
+      ],
       [
         "expo-location",
         {

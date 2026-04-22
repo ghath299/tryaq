@@ -4,6 +4,7 @@ import React, {
   useState,
   useLayoutEffect,
   useCallback,
+  useMemo,
 } from "react";
 import {
   View,
@@ -29,7 +30,7 @@ import Animated, {
   FadeInUp,
   cancelAnimation,
 } from "react-native-reanimated";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -37,6 +38,12 @@ import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
 import { Spacing, BorderRadius, addAlpha } from "@/constants/theme";
 import { doctors, pharmacies } from "@/data/mockData";
+import {
+  getUnreadCount,
+  useNotificationSetup,
+  requestNotificationPermission,
+  scheduleHealthTipNotification,
+} from "@/hooks/useNotifications";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -338,6 +345,34 @@ export default function HomeScreen() {
 
   const [activeSlide, setActiveSlide] = useState(0);
   const sliderRef = useRef<FlatList>(null);
+  const [badgeCount, setBadgeCount] = useState(0);
+  const bellScale = useSharedValue(1);
+  const bellAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: bellScale.value }],
+  }));
+
+  useNotificationSetup();
+
+  useFocusEffect(
+    useCallback(() => {
+      getUnreadCount().then(setBadgeCount);
+      if (Platform.OS !== "web") {
+        requestNotificationPermission().then((ok) => {
+          if (ok) scheduleHealthTipNotification();
+        });
+      }
+    }, [])
+  );
+
+  const handleBellPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    bellScale.value = withSequence(
+      withSpring(0.8, { damping: 4 }),
+      withSpring(1.15, { damping: 6 }),
+      withSpring(1)
+    );
+    navigation.navigate("Notifications" as never);
+  }, [navigation]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -373,7 +408,23 @@ export default function HomeScreen() {
         style={[styles.header, { paddingTop: insets.top + 4 }]}
       >
         <View style={styles.headerRow}>
-          <Feather name="bell" size={22} color={theme.text} />
+          <AnimatedPressable
+            onPress={handleBellPress}
+            hitSlop={10}
+            style={[styles.bellBtn, { backgroundColor: addAlpha(theme.primary, 0.1) }, bellAnimStyle]}
+          >
+            <Feather name="bell" size={20} color={theme.primary} />
+            {badgeCount > 0 && (
+              <Animated.View
+                entering={FadeIn.duration(200)}
+                style={[styles.bellBadge, { backgroundColor: "#EF4444" }]}
+              >
+                <ThemedText style={styles.bellBadgeText}>
+                  {badgeCount > 9 ? "9+" : String(badgeCount)}
+                </ThemedText>
+              </Animated.View>
+            )}
+          </AnimatedPressable>
           <View style={styles.headerCenter}>
             <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center" }}>
               مرحباً بك في
@@ -491,6 +542,33 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bellBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  bellBadge: {
+    position: "absolute",
+    top: -4,
+    left: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 3,
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  bellBadgeText: {
+    color: "#FFF",
+    fontSize: 10,
+    fontWeight: "700",
+    lineHeight: 13,
   },
   searchWrap: { marginBottom: 4 },
   searchBox: {
