@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "309047121444",
+    "project_id": "ghath-c86ae",
+    "firebase_url": "https://ghath-c86ae-default-rtdb.firebaseio.com",
+    "storage_bucket": "ghath-c86ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "REPLACE_WITH_ANDROID_APP_ID",
+        "android_client_info": {
+          "package_name": "com.smarthealthplatform.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "REPLACE_WITH_ANDROID_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
