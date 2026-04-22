@@ -493,23 +493,6 @@ export default function HomeScreen() {
           )}
         />
 
-        <SectionRow title={t("promotedPharmacies")} />
-        <FlatList
-          data={sortedPharmacies}
-          horizontal
-          inverted
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.hList}
-          renderItem={({ item, index }) => (
-            <PharmacyCard
-              pharmacy={item}
-              index={index}
-              onPress={() => {}}
-            />
-          )}
-        />
-
         <View style={styles.tipSection}>
           <HealthTipBanner />
         </View>
