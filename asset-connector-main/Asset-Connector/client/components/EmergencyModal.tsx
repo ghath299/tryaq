@@ -60,10 +60,10 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
       const mapsUrl = Platform.select({
         ios: `comgooglemaps://?center=${latitude},${longitude}&q=hospital&zoom=14`,
         android: `geo:${latitude},${longitude}?q=hospital`,
-        default: `https://www.google.com/maps/search/مستشفى+مستوصف/@${latitude},${longitude},14z`,
+        default: `https://www.google.com/maps/search/hospital/@${latitude},${longitude},14z`,
       });
 
-      const webFallback = `https://www.google.com/maps/search/مستشفى+مستوصف/@${latitude},${longitude},14z`;
+      const webFallback = `https://www.google.com/maps/search/hospital/@${latitude},${longitude},14z`;
 
       const canOpen = await Linking.canOpenURL(mapsUrl!);
       if (canOpen) {
@@ -79,7 +79,7 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
   };
 
   const handleManualSearch = () => {
-    Linking.openURL("https://www.google.com/maps/search/مستشفى+العراق");
+    Linking.openURL("https://www.google.com/maps/search/hospital");
     handleClose();
   };
 
