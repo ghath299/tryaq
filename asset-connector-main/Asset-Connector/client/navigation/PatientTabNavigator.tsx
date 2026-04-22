@@ -110,6 +110,16 @@ export default function PatientTabNavigator() {
         animation: "fade",
         freezeOnBlur: true,
 
+        headerStyle: {
+          backgroundColor: theme.backgroundRoot,
+        },
+        headerTitleStyle: {
+          color: "#FFFFFF",
+          fontWeight: "700",
+          fontFamily: Platform.OS === "ios" ? "Tajawal" : "Tajawal-Regular",
+        },
+        headerTitleAlign: "right",
+
         sceneStyle: {
           backgroundColor: theme.backgroundRoot,
         },
