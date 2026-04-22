@@ -4,7 +4,6 @@ import {
   StyleSheet,
   FlatList,
   Pressable,
-  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -28,7 +27,6 @@ import {
   getStoredNotifications,
   markAllRead,
   clearAllNotifications,
-  sendImmediateNotification,
 } from "@/hooks/useNotifications";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -172,7 +170,6 @@ export default function NotificationsScreen() {
   const { theme, isDark } = useTheme();
 
   const [notifs, setNotifs] = useState<TaryaqNotification[]>([]);
-  const [sending, setSending] = useState(false);
 
   const load = useCallback(async () => {
     const data = await getStoredNotifications();
@@ -188,33 +185,6 @@ export default function NotificationsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     await clearAllNotifications();
     setNotifs([]);
-  };
-
-  const handleTestNotif = async () => {
-    if (sending) return;
-    setSending(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    const messages = [
-      {
-        title: "💊 نصيحة صحية من ترياق",
-        body: "تناول وجبة الإفطار يومياً يساعد على تنظيم مستوى السكر في الدم.",
-      },
-      {
-        title: "🏥 تذكير بالموعد",
-        body: "لا تنسَ مراجعة طبيبك بشكل دوري للفحص الوقائي والمتابعة الصحية.",
-      },
-      {
-        title: "🎁 عرض جديد من صيدلية النيل",
-        body: "خصم 15% على مستلزمات الضغط والسكر هذا الأسبوع فقط.",
-      },
-      {
-        title: "🩺 طبيب جديد متاح",
-        body: "د. علي كريم — اختصاصي قلب — بدأ الحجوزات في عيادة البصرة.",
-      },
-    ];
-    const msg = messages[Math.floor(Math.random() * messages.length)];
-    await sendImmediateNotification(msg.title, msg.body);
-    setTimeout(() => setSending(false), 3000);
   };
 
   const unreadCount = notifs.filter((n) => !n.read).length;
@@ -346,7 +316,7 @@ export default function NotificationsScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={[
             styles.list,
-            { paddingBottom: insets.bottom + 120 },
+            { paddingBottom: insets.bottom + 24 },
           ]}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
@@ -355,44 +325,6 @@ export default function NotificationsScreen() {
         />
       )}
 
-      {Platform.OS !== "web" && (
-        <Animated.View
-          entering={FadeIn.delay(200).duration(400)}
-          style={[
-            styles.fab,
-            { bottom: insets.bottom + 24 },
-          ]}
-        >
-          <Pressable
-            onPress={handleTestNotif}
-            android_ripple={{ color: "rgba(255,255,255,0.2)", borderless: true }}
-            style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
-          >
-            <LinearGradient
-              colors={["#5EDFFF", "#1F6AE1"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.fabGradient}
-            >
-              {sending ? (
-                <Feather name="check-circle" size={22} color="#FFF" />
-              ) : (
-                <Feather name="send" size={22} color="#FFF" />
-              )}
-              <ThemedText
-                style={{
-                  color: "#FFF",
-                  fontWeight: "700",
-                  marginRight: 8,
-                  fontSize: 14,
-                }}
-              >
-                {sending ? "تم الإرسال!" : "اختبر إشعاراً خارجياً"}
-              </ThemedText>
-            </LinearGradient>
-          </Pressable>
-        </Animated.View>
-      )}
     </View>
   );
 }
@@ -509,26 +441,5 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     alignItems: "center",
     justifyContent: "center",
-  },
-  fab: {
-    position: "absolute",
-    left: Spacing.lg,
-    right: Spacing.lg,
-    height: 54,
-    borderRadius: BorderRadius.lg,
-    overflow: "hidden",
-    elevation: 8,
-    shadowColor: "#1F6AE1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-  },
-  fabGradient: {
-    flex: 1,
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    borderRadius: BorderRadius.lg,
   },
 });

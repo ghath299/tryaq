@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -159,17 +159,4 @@ export function useNotificationSetup() {
       }
     };
   }, []);
-
-  const triggerTestNotification = useCallback(async () => {
-    const tips = [
-      "تناول الفواكه والخضروات يومياً يمنحك الطاقة اللازمة طوال اليوم.",
-      "النوم 7-8 ساعات يومياً يقوي جهاز المناعة ويحسن المزاج.",
-      "تجنب الجلوس لفترات طويلة — قف وتمشَّ خمس دقائق كل ساعة.",
-      "قلّل من استهلاك السكر والملح للحفاظ على ضغط الدم وصحة القلب.",
-    ];
-    const randomTip = tips[Math.floor(Math.random() * tips.length)];
-    await sendImmediateNotification("💊 نصيحة صحية من ترياق", randomTip);
-  }, []);
-
-  return { triggerTestNotification };
 }
