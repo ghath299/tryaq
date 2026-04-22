@@ -18,7 +18,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius, addAlpha } from "@/constants/theme";
 
-type Step = "menu" | "locating" | "denied";
+type Step = "menu" | "select_type" | "locating" | "denied";
 
 interface EmergencyModalProps {
   visible: boolean;
@@ -78,8 +78,14 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
     }
   };
 
-  const handleManualSearch = () => {
-    Linking.openURL("https://www.google.com/maps/search/hospital");
+  const openGoogleMapsSearch = (query: string) => {
+    Linking.openURL(`https://www.google.com/maps/search/${encodeURIComponent(query)}`);
+  };
+
+  const handleSearchChoice = (type: "hospital" | "clinic") => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setStep("locating");
+    openGoogleMapsSearch(type === "hospital" ? "hospital" : "clinic");
     handleClose();
   };
 
@@ -159,7 +165,7 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
             </Pressable>
 
             <Pressable
-              onPress={handleFindHospital}
+              onPress={() => setStep("select_type")}
               android_ripple={{ color: "rgba(255,255,255,0.2)" }}
               style={({ pressed }) => [
                 styles.actionBtn,
@@ -175,7 +181,7 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
                 <View style={styles.actionContent}>
                   <View style={styles.actionTextWrap}>
                     <ThemedText style={styles.actionTitle}>أقرب مستشفى / مستوصف</ThemedText>
-                    <ThemedText style={styles.actionSub}>يفتح Google Maps تلقائياً</ThemedText>
+                    <ThemedText style={styles.actionSub}>يخيريك قبل التحويل إلى خرائط Google</ThemedText>
                   </View>
                   <View style={styles.actionIcon}>
                     <FontAwesome5 name="hospital-alt" size={22} color="#FFF" />
@@ -190,6 +196,62 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
             >
               في حالات الخطر الشديد اتصل فوراً بـ 122
             </ThemedText>
+          </Animated.View>
+        )}
+
+        {step === "select_type" && (
+          <Animated.View entering={FadeIn.duration(250)} style={styles.menuWrap}>
+            <Pressable
+              onPress={() => handleSearchChoice("hospital")}
+              android_ripple={{ color: "rgba(255,255,255,0.2)" }}
+              style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.85 }]}
+            >
+              <LinearGradient
+                colors={["#1F6AE1", "#1558CC"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionGrad}
+              >
+                <View style={styles.actionContent}>
+                  <View style={styles.actionTextWrap}>
+                    <ThemedText style={styles.actionTitle}>مستشفى</ThemedText>
+                    <ThemedText style={styles.actionSub}>يفتح خرائط Google على مستشفى قريب</ThemedText>
+                  </View>
+                  <View style={styles.actionIcon}>
+                    <FontAwesome5 name="hospital-alt" size={22} color="#FFF" />
+                  </View>
+                </View>
+              </LinearGradient>
+            </Pressable>
+
+            <Pressable
+              onPress={() => handleSearchChoice("clinic")}
+              android_ripple={{ color: "rgba(255,255,255,0.2)" }}
+              style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.85 }]}
+            >
+              <LinearGradient
+                colors={["#10B981", "#0F9D78"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionGrad}
+              >
+                <View style={styles.actionContent}>
+                  <View style={styles.actionTextWrap}>
+                    <ThemedText style={styles.actionTitle}>مستوصف</ThemedText>
+                    <ThemedText style={styles.actionSub}>يفتح خرائط Google على مستوصف قريب</ThemedText>
+                  </View>
+                  <View style={styles.actionIcon}>
+                    <FontAwesome5 name="clinic-medical" size={22} color="#FFF" />
+                  </View>
+                </View>
+              </LinearGradient>
+            </Pressable>
+
+            <Pressable onPress={() => setStep("menu")} style={styles.backLink}>
+              <ThemedText type="caption" style={{ color: theme.textSecondary, textAlign: "center" }}>
+                العودة
+              </ThemedText>
+            </Pressable>
           </Animated.View>
         )}
 
@@ -239,21 +301,6 @@ export default function EmergencyModal({ visible, onClose }: EmergencyModalProps
             >
               يمكنك البحث يدوياً عن أقرب مستشفى في منطقتك
             </ThemedText>
-
-            <Pressable
-              onPress={handleManualSearch}
-              style={[
-                styles.manualBtn,
-                { backgroundColor: addAlpha("#1F6AE1", 0.1), borderColor: addAlpha("#1F6AE1", 0.3) },
-              ]}
-            >
-              <Feather name="search" size={16} color="#1F6AE1" style={{ marginLeft: 6 }} />
-              <ThemedText
-                style={{ color: "#1F6AE1", fontWeight: "600", fontSize: 14 }}
-              >
-                بحث عام على Google Maps
-              </ThemedText>
-            </Pressable>
 
             <Pressable
               onPress={() => setStep("menu")}
