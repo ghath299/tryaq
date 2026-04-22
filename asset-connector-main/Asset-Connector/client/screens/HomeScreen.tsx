@@ -12,7 +12,6 @@ import {
   FlatList,
   Pressable,
   Dimensions,
-  Image,
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -106,7 +105,6 @@ function SearchBar({ onPress }: { onPress: () => void }) {
 
 function PromoSlide({ item, active }: { item: typeof PROMO_SLIDES[0]; active: boolean }) {
   const scale = useSharedValue(active ? 1 : 1);
-  const doctorImg = require("../assets/placeholders/doctor.png");
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -143,11 +141,9 @@ function PromoSlide({ item, active }: { item: typeof PROMO_SLIDES[0]; active: bo
         </View>
 
         <View style={styles.promoImageWrap}>
-          <Image
-            source={doctorImg}
-            style={styles.promoImage}
-            resizeMode="cover"
-          />
+          <View style={styles.promoAvatarCircle}>
+            <Feather name="user" size={52} color="rgba(255,255,255,0.85)" />
+          </View>
         </View>
       </LinearGradient>
     </Animated.View>
@@ -207,7 +203,6 @@ function DoctorCard({ doctor, onPress, index }: { doctor: typeof doctors[0]; onP
   const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
-  const doctorImg = require("../assets/placeholders/doctor.png");
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: translateY.value }],
@@ -226,7 +221,7 @@ function DoctorCard({ doctor, onPress, index }: { doctor: typeof doctors[0]; onP
         }]}
       >
         <View style={[styles.avatarWrap, { borderColor: addAlpha(theme.primary, 0.3), backgroundColor: addAlpha(theme.primary, 0.07) }]}>
-          <Image source={doctorImg} style={styles.avatarImg} resizeMode="cover" />
+          <Feather name="user" size={32} color={theme.primary} />
           {doctor.isVerified && (
             <View style={[styles.verifiedDot, { backgroundColor: theme.primary }]}>
               <Feather name="check" size={7} color="#FFF" />
@@ -353,7 +348,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const interval = setInterval(() => {
       const next = (activeSlide + 1) % PROMO_SLIDES.length;
-      sliderRef.current?.scrollToIndex({ index: next, animated: true });
+      sliderRef.current?.scrollToOffset({ offset: next * (SCREEN_WIDTH - Spacing.lg), animated: true });
       setActiveSlide(next);
     }, 5000);
     return () => clearInterval(interval);
@@ -580,9 +575,17 @@ const styles = StyleSheet.create({
   },
   promoImageWrap: {
     width: 120,
-    justifyContent: "flex-end",
+    justifyContent: "center",
     alignItems: "center",
     paddingBottom: 0,
+  },
+  promoAvatarCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   promoImage: {
     width: 110,

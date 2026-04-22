@@ -11,7 +11,6 @@ import {
   TextInput,
   Pressable,
   FlatList,
-  Image,
   Platform,
   Keyboard,
   ScrollView,
@@ -123,8 +122,6 @@ function DoctorResult({
   const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const doctorImg = require("../assets/placeholders/doctor.png");
-
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 40).duration(300)}
@@ -148,8 +145,8 @@ function DoctorResult({
             },
           ]}
         >
-          <View style={[styles.resultAvatar, { borderColor: addAlpha(theme.primary, 0.3) }]}>
-            <Image source={doctorImg} style={{ width: "100%", height: "100%", borderRadius: 28 }} resizeMode="cover" />
+          <View style={[styles.resultAvatar, { borderColor: addAlpha(theme.primary, 0.3), backgroundColor: addAlpha(theme.primary, 0.08) }]}>
+            <Feather name="user" size={26} color={theme.primary} />
             {doctor.isVerified && (
               <View style={[styles.verifiedBadge, { backgroundColor: theme.primary }]}>
                 <Feather name="check" size={7} color="#FFF" />

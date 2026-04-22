@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
   Linking,
   useWindowDimensions,
@@ -74,8 +73,6 @@ export default function DoctorDetailScreen() {
   const district = doctor.districtAr;
   const clinicAddress = doctor.clinicAddress;
 
-  const doctorSource = require("../assets/placeholders/doctor.png");
-
   const handleBookAppointment = () => {
     navigation.navigate(
       "BookAppointment" as never,
@@ -123,11 +120,9 @@ export default function DoctorDetailScreen() {
             <View
               style={[styles.avatarRing, { borderColor: theme.backgroundRoot }]}
             >
-              <Image
-                source={doctorSource}
-                style={styles.avatarImage}
-                resizeMode="cover"
-              />
+              <View style={[styles.avatarImage, { alignItems: "center", justifyContent: "center", backgroundColor: addAlpha(theme.primary, 0.08) }]}>
+                <Feather name="user" size={64} color={theme.primary} />
+              </View>
             </View>
             {doctor.isVerified && (
               <View
