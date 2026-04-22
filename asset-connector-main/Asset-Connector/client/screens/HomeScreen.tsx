@@ -275,7 +275,7 @@ function PharmacyCard({ pharmacy, onPress, index }: { pharmacy: typeof pharmacie
             <Feather name="plus-square" size={28} color={theme.primary} />
           </LinearGradient>
         </View>
-        <ThemedText type="small" style={[styles.pharmacyName, { color: theme.text }]} numberOfLines={1}>
+        <ThemedText type="small" style={[styles.pharmacyName, { color: "#FFFFFF" }]} numberOfLines={1}>
           {pharmacy.nameAr}
         </ThemedText>
         <View style={[styles.pharmacyBadge, { backgroundColor: addAlpha(theme.primary, 0.12) }]}>
