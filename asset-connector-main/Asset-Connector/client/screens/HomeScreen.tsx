@@ -42,8 +42,8 @@ import {
   getUnreadCount,
   useNotificationSetup,
   requestNotificationPermission,
-  scheduleHealthTipNotification,
 } from "@/hooks/useNotifications";
+import EmergencyModal from "@/components/EmergencyModal";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -346,6 +346,7 @@ export default function HomeScreen() {
   const [activeSlide, setActiveSlide] = useState(0);
   const sliderRef = useRef<FlatList>(null);
   const [badgeCount, setBadgeCount] = useState(0);
+  const [emergencyVisible, setEmergencyVisible] = useState(false);
 
   useNotificationSetup();
 
@@ -353,9 +354,7 @@ export default function HomeScreen() {
     useCallback(() => {
       getUnreadCount().then(setBadgeCount);
       if (Platform.OS !== "web") {
-        requestNotificationPermission().then((ok) => {
-          if (ok) scheduleHealthTipNotification();
-        });
+        requestNotificationPermission();
       }
     }, [])
   );
@@ -424,9 +423,16 @@ export default function HomeScreen() {
               ترياق
             </ThemedText>
           </View>
-          <View style={[styles.logoBox, { backgroundColor: addAlpha(theme.primary, 0.15) }]}>
-            <Feather name="activity" size={20} color={theme.primary} />
-          </View>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              setEmergencyVisible(true);
+            }}
+            hitSlop={10}
+            style={[styles.logoBox, { backgroundColor: addAlpha("#EF4444", 0.12) }]}
+          >
+            <Feather name="alert-circle" size={20} color="#EF4444" />
+          </Pressable>
         </View>
         <SearchBar onPress={() => navigation.navigate("Search" as never)} />
       </LinearGradient>
@@ -511,6 +517,11 @@ export default function HomeScreen() {
           <HealthTipBanner />
         </View>
       </ScrollView>
+
+      <EmergencyModal
+        visible={emergencyVisible}
+        onClose={() => setEmergencyVisible(false)}
+      />
     </View>
   );
 }
