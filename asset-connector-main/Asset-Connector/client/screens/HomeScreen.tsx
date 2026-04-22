@@ -502,10 +502,10 @@ export default function HomeScreen() {
         />
 
         <SectionRow title={t("promotedPharmacies")} />
-        <View style={styles.comingSoonBox}>
+        <View style={[styles.comingSoonBox, { backgroundColor: isDark ? theme.card : "#FFFFFF" }]}>
           <ThemedText
             type="body"
-            style={[styles.comingSoonText, { color: theme.textSecondary }]}
+            style={[styles.comingSoonText, { color: theme.text }]}
           >
             ستتوفر هذه الخدمة قريباً
           </ThemedText>
