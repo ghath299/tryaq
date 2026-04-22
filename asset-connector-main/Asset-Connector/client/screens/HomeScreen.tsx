@@ -421,10 +421,10 @@ export default function HomeScreen() {
             )}
           </Pressable>
           <View style={styles.headerCenter}>
-            <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center" }}>
+            <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center", fontWeight: "600" }}>
               مرحباً بك في
             </ThemedText>
-            <ThemedText type="h4" style={{ color: theme.text, textAlign: "center", fontWeight: "700" }}>
+            <ThemedText type="h4" style={{ color: theme.text, textAlign: "center", fontWeight: "800" }}>
               ترياق
             </ThemedText>
           </View>
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: Spacing.md,
   },
-  headerCenter: { flex: 1, alignItems: "center" },
+  headerCenter: { flex: 1, alignItems: "center", paddingHorizontal: 8 },
   logoBox: {
     width: 38,
     height: 38,
