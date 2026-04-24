@@ -141,10 +141,12 @@ export default function OTPVerificationScreen() {
       if (result.success) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
+        // عرض المحاولات المتبقية إذا وُجدت
         if (result.attemptsRemaining !== undefined) {
           setAttemptsLeft(result.attemptsRemaining);
         }
 
+        // إذا انتهت المحاولات أو انتهت الصلاحية
         if (result.attemptsRemaining === 0 || result.expired) {
           setError("اطلب رمزاً جديداً");
           setOtp(Array(OTP_LENGTH).fill(""));
@@ -186,6 +188,7 @@ export default function OTPVerificationScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         Alert.alert("✅ تم الإرسال", "تم إرسال رمز جديد");
       } else {
+        // محظور من إعادة الإرسال
         Alert.alert("⚠️ محظور", result.message || "حاول بعد قليل");
       }
     } catch {
