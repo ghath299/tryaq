@@ -7,8 +7,12 @@ import {
   chatsByPharmacyId,
   type ChatMessage,
 } from "./mockData";
+import { connectDB, getUsersCol, getOtpsCol, getTelegramLinksCol } from "./db";
+import { sendTelegramMessage, generateOTP } from "./telegram";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  connectDB().catch((e) => console.error("[MongoDB] Connection error:", e));
+
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
@@ -23,20 +27,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
-  app.get("/api/users/role/:phoneNumber", (req, res) => {
+  // ─── Telegram Webhook: link phone to Telegram chat_id ────────────────────
+  // Users start the bot and send their phone number via /link <phone>
+  app.post("/api/telegram/webhook", async (req, res) => {
+    try {
+      const message = req.body?.message;
+      if (!message) return res.sendStatus(200);
+
+      const chatId = String(message.chat?.id);
+      const text: string = message.text || "";
+
+      if (text.startsWith("/link")) {
+        const phone = text.replace("/link", "").trim().replace(/\s+/g, "");
+        if (!phone) {
+          await sendTelegramMessage(chatId, "أرسل رقم هاتفك بعد الأمر:\n/link 07XXXXXXXXX");
+          return res.sendStatus(200);
+        }
+        const links = await getTelegramLinksCol();
+        await links.updateOne(
+          { phone },
+          { $set: { phone, chatId, linkedAt: new Date() } },
+          { upsert: true }
+        );
+        await sendTelegramMessage(chatId, `✅ تم ربط رقمك <b>${phone}</b> بحساب Telegram بنجاح!`);
+      }
+      return res.sendStatus(200);
+    } catch (err) {
+      console.error("[Telegram Webhook]", err);
+      return res.sendStatus(200);
+    }
+  });
+
+  // ─── Auth: Send OTP via Telegram ─────────────────────────────────────────
+  app.post("/api/auth/send-otp", async (req, res) => {
+    try {
+      const { phone } = req.body as { phone?: string };
+      if (!phone) return res.status(400).json({ error: "phone required" });
+
+      const links = await getTelegramLinksCol();
+      const link = await links.findOne({ phone });
+      if (!link) {
+        return res.status(404).json({
+          error: "telegram_not_linked",
+          message: "لم يتم ربط هذا الرقم بحساب Telegram. أرسل /link " + phone + " للبوت أولاً.",
+        });
+      }
+
+      const otp = generateOTP();
+      const expiresAt = new Date(Date.now() + 60 * 1000);
+
+      const otps = await getOtpsCol();
+      await otps.deleteMany({ phone });
+      await otps.insertOne({ phone, otp, expiresAt, createdAt: new Date() });
+
+      const sent = await sendTelegramMessage(
+        link.chatId,
+        `🔐 رمز التحقق الخاص بك في ترياق:\n\n<b>${otp}</b>\n\nصالح لمدة 60 ثانية فقط.`
+      );
+
+      if (!sent) {
+        return res.status(502).json({ error: "telegram_send_failed", message: "فشل إرسال رمز OTP عبر Telegram." });
+      }
+
+      return res.json({ success: true, message: "تم إرسال رمز التحقق عبر Telegram." });
+    } catch (err) {
+      console.error("[send-otp]", err);
+      return res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // ─── Auth: Verify OTP ─────────────────────────────────────────────────────
+  app.post("/api/auth/verify-otp", async (req, res) => {
+    try {
+      const { phone, otp } = req.body as { phone?: string; otp?: string };
+      if (!phone || !otp) return res.status(400).json({ error: "phone and otp required" });
+
+      const otps = await getOtpsCol();
+      const record = await otps.findOne({ phone, otp });
+
+      if (!record) return res.status(401).json({ error: "invalid_otp", message: "رمز التحقق غير صحيح." });
+      if (new Date() > new Date(record.expiresAt)) {
+        await otps.deleteOne({ _id: record._id });
+        return res.status(401).json({ error: "otp_expired", message: "انتهت صلاحية رمز التحقق." });
+      }
+
+      await otps.deleteOne({ _id: record._id });
+      return res.json({ success: true, message: "تم التحقق بنجاح." });
+    } catch (err) {
+      console.error("[verify-otp]", err);
+      return res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // ─── Auth: Register user ──────────────────────────────────────────────────
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { phone, name, role = "patient" } = req.body as {
+        phone?: string;
+        name?: string;
+        role?: string;
+      };
+      if (!phone || !name) return res.status(400).json({ error: "phone and name required" });
+
+      const users = await getUsersCol();
+      const existing = await users.findOne({ phone });
+      if (existing) {
+        return res.json({ success: true, user: existing, created: false });
+      }
+
+      const user = {
+        phone,
+        name,
+        role,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const result = await users.insertOne(user);
+      return res.status(201).json({ success: true, user: { _id: result.insertedId, ...user }, created: true });
+    } catch (err: any) {
+      if (err.code === 11000) {
+        const users = await getUsersCol();
+        const existing = await users.findOne({ phone: req.body?.phone });
+        return res.json({ success: true, user: existing, created: false });
+      }
+      console.error("[register]", err);
+      return res.status(500).json({ error: "server_error" });
+    }
+  });
+
+  // ─── Users: Role lookup (checks MongoDB first, falls back to mock) ───────
+  app.get("/api/users/role/:phoneNumber", async (req, res) => {
     const { phoneNumber } = req.params;
+    try {
+      const users = await getUsersCol();
+      const user = await users.findOne({ phone: phoneNumber });
+      if (user) {
+        return res.json({ phoneNumber, role: user.role, message: `${user.role} account found` });
+      }
+    } catch {}
     const mockRoles: Record<string, string> = {
       "07801111111": "doctor",
       "07802222222": "pharmacist",
     };
     const role = mockRoles[phoneNumber] || "patient";
-    res.json({
+    return res.json({
       phoneNumber,
       role,
-      message:
-        role === "patient"
-          ? "Default patient account"
-          : `${role} account found`,
+      message: role === "patient" ? "Default patient account" : `${role} account found`,
     });
   });
 
