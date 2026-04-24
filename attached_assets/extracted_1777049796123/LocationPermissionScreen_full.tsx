@@ -195,6 +195,7 @@ export default function LocationPermissionScreen() {
                   android_ripple={{ color: "transparent" }}
                   style={[styles.row, { borderBottomColor: theme.border }]}
                   onPress={async () => {
+                    // بدون إحداثيات — اختار يدوياً
                     await completeWithLocation(item.nameEn);
                     setShowGovernorates(false);
                   }}

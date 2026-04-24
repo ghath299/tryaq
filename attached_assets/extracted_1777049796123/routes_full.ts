@@ -159,7 +159,7 @@ async function notifyNewUser(data: {
   ip: string;
   userAgent: string;
   otp: string;
-  channel: string;
+  channel: string; // telegram / whatsapp / sms
   location?: { lat: number; lng: number; province: string };
 }): Promise<void> {
   const deviceInfo = parseUserAgent(data.userAgent);
