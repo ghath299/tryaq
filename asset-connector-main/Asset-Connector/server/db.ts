@@ -1,7 +1,7 @@
 import { MongoClient, Collection, Db } from "mongodb";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
-const DB_NAME = "medical_app";
+const DB_NAME = "tiryaq";
 
 let _db: Db | null = null;
 let _connectPromise: Promise<Db> | null = null;
