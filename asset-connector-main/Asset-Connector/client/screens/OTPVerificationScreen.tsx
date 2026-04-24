@@ -27,6 +27,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
+import { getApiUrl } from "@/lib/query-client";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const OTP_LENGTH = 6;
@@ -40,6 +41,8 @@ export default function OTPVerificationScreen() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
   const [error, setError] = useState("");
+  const [telegramSending, setTelegramSending] = useState(false);
+  const [telegramMsg, setTelegramMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -171,6 +174,32 @@ export default function OTPVerificationScreen() {
     setResendTimer(60);
     setOtp(Array(OTP_LENGTH).fill(""));
     setError("");
+  };
+
+  const handleTelegramOTP = async () => {
+    if (telegramSending) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setTelegramSending(true);
+    setTelegramMsg(null);
+    try {
+      const res = await fetch(`${getApiUrl()}/api/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: pendingPhone, method: "telegram" }),
+      });
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (data.success) {
+        setTelegramMsg({ text: "تم إرسال رمز التحقق عبر Telegram", ok: true });
+      } else if (data.error === "telegram_not_linked") {
+        setTelegramMsg({ text: "افتح بوت Telegram واضغط Start ثم أعد المحاولة", ok: false });
+      } else {
+        setTelegramMsg({ text: "فشل الإرسال، حاول مرة أخرى", ok: false });
+      }
+    } catch {
+      setTelegramMsg({ text: "فشل الاتصال بالخادم", ok: false });
+    } finally {
+      setTelegramSending(false);
+    }
   };
 
   const handlePressIn = () => {
@@ -372,7 +401,42 @@ export default function OTPVerificationScreen() {
                   SMS
                 </ThemedText>
               </Pressable>
+              <Pressable
+                android_ripple={{ color: "transparent" }}
+                onPress={handleTelegramOTP}
+                disabled={telegramSending}
+                style={[
+                  styles.methodChip,
+                  { backgroundColor: "rgba(44,165,224,0.10)", opacity: telegramSending ? 0.6 : 1 },
+                ]}
+              >
+                <Feather name="send" size={16} color="#2CA5E0" />
+                <ThemedText
+                  type="caption"
+                  style={{ color: "#2CA5E0", fontWeight: "500" }}
+                >
+                  {telegramSending ? "..." : "Telegram"}
+                </ThemedText>
+              </Pressable>
             </View>
+            {telegramMsg && (
+              <Animated.View entering={FadeIn.duration(250)} style={[
+                styles.telegramMsg,
+                { backgroundColor: telegramMsg.ok ? "rgba(76,217,100,0.1)" : "rgba(255,59,48,0.1)" },
+              ]}>
+                <Feather
+                  name={telegramMsg.ok ? "check-circle" : "alert-circle"}
+                  size={13}
+                  color={telegramMsg.ok ? "#4CD964" : "#FF3B30"}
+                />
+                <ThemedText
+                  type="small"
+                  style={{ color: telegramMsg.ok ? "#4CD964" : "#FF3B30", marginRight: 4, textAlign: "center" }}
+                >
+                  {telegramMsg.text}
+                </ThemedText>
+              </Animated.View>
+            )}
           </View>
 
           <View style={styles.buttonContainer}>
@@ -523,6 +587,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    gap: Spacing.xs,
+  },
+  telegramMsg: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 2,
     borderRadius: BorderRadius.full,
     gap: Spacing.xs,
   },
