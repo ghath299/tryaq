@@ -14,7 +14,7 @@ import {
   Pressable,
   Dimensions,
   Platform,
-  Alert,
+  Modal,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -355,6 +355,7 @@ export default function HomeScreen() {
   const sliderRef = useRef<FlatList>(null);
   const [badgeCount, setBadgeCount] = useState(0);
   const [emergencyVisible, setEmergencyVisible] = useState(false);
+  const [logoutVisible, setLogoutVisible] = useState(false);
 
   useNotificationSetup();
 
@@ -374,20 +375,8 @@ export default function HomeScreen() {
 
   const handleLogout = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      "تسجيل الخروج",
-      "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
-      [
-        { text: "إلغاء", style: "cancel" },
-        {
-          text: "خروج",
-          style: "destructive",
-          onPress: () => logout(),
-        },
-      ],
-      { cancelable: true }
-    );
-  }, [logout]);
+    setLogoutVisible(true);
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -549,6 +538,50 @@ export default function HomeScreen() {
         visible={emergencyVisible}
         onClose={() => setEmergencyVisible(false)}
       />
+
+      {/* Logout confirmation modal */}
+      <Modal
+        visible={logoutVisible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setLogoutVisible(false)}
+      >
+        <Pressable
+          style={styles.logoutOverlay}
+          onPress={() => setLogoutVisible(false)}
+        >
+          <Pressable style={[styles.logoutSheet, { backgroundColor: isDark ? theme.card : "#FFFFFF" }]} onPress={() => {}}>
+            <View style={[styles.logoutIconWrap, { backgroundColor: addAlpha("#EF4444", 0.1) }]}>
+              <Feather name="log-out" size={28} color="#EF4444" />
+            </View>
+            <ThemedText type="h4" style={[styles.logoutTitle, { color: theme.text }]}>
+              تسجيل الخروج
+            </ThemedText>
+            <ThemedText type="body" style={[styles.logoutSubtitle, { color: theme.textSecondary }]}>
+              هل أنت متأكد من رغبتك في تسجيل الخروج؟
+            </ThemedText>
+            <View style={styles.logoutBtns}>
+              <Pressable
+                onPress={() => setLogoutVisible(false)}
+                style={[styles.logoutBtn, { backgroundColor: addAlpha(theme.text, 0.07) }]}
+              >
+                <ThemedText type="body" style={{ color: theme.textSecondary, fontWeight: "600" }}>
+                  إلغاء
+                </ThemedText>
+              </Pressable>
+              <Pressable
+                onPress={() => { setLogoutVisible(false); logout(); }}
+                style={[styles.logoutBtn, { backgroundColor: "#EF4444" }]}
+              >
+                <ThemedText type="body" style={{ color: "#FFFFFF", fontWeight: "700" }}>
+                  خروج
+                </ThemedText>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -847,4 +880,47 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   tipDot: { height: 6, borderRadius: 3 },
+  logoutOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: Spacing.xl,
+  },
+  logoutSheet: {
+    width: "100%",
+    borderRadius: 24,
+    padding: Spacing.xl,
+    alignItems: "center",
+  },
+  logoutIconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: Spacing.md,
+  },
+  logoutTitle: {
+    textAlign: "center",
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  logoutSubtitle: {
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: Spacing.xl,
+  },
+  logoutBtns: {
+    flexDirection: "row-reverse",
+    gap: Spacing.sm,
+    width: "100%",
+  },
+  logoutBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
