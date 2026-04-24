@@ -31,14 +31,15 @@ interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  authStep: "login" | "location" | "otp" | "complete";
+  authStep: "login" | "location" | "channel" | "otp" | "complete";
   pendingPhone: string;
   setUser: (user: AuthUser | null) => void;
-  setAuthStep: (step: "login" | "location" | "otp" | "complete") => void;
+  setAuthStep: (step: "login" | "location" | "channel" | "otp" | "complete") => void;
   setPendingPhone: (phone: string) => void;
   login: (fullName: string, phoneNumber: string) => Promise<void>;
   verifyOTP: (code: string) => Promise<OTPResult>;
   resendOTP: (channel?: string) => Promise<OTPResult>;
+  sendOTPAndProceed: (channel: string) => Promise<OTPResult>;
   setLocationGranted: (coords?: { lat: number; lng: number; province: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -49,7 +50,7 @@ const AUTH_STORAGE_KEY = "@smart_health_auth";
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authStep, setAuthStep] = useState<"login" | "location" | "otp" | "complete">("login");
+  const [authStep, setAuthStep] = useState<"login" | "location" | "channel" | "otp" | "complete">("login");
   const [pendingPhone, setPendingPhone] = useState("");
   const [pendingName, setPendingName] = useState("");
   const [pendingLocation, setPendingLocation] = useState<{ lat: number; lng: number; province: string } | undefined>();
@@ -135,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthStep("location");
   };
 
-  // ── بعد الموقع — يرسل OTP مع الموقع ─────────────────────────────────────────
+  // ── بعد الموقع — يحفظ الموقع وينتقل لاختيار القناة (OTP يُرسل لاحقاً) ────────
   const setLocationGranted = async (coords?: { lat: number; lng: number; province: string }) => {
     setPendingLocation(coords);
 
@@ -148,10 +149,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return currentUser;
     });
 
-    // إرسال OTP مع الموقع
-    await sendOTP(pendingName, pendingPhone, "telegram", coords);
+    // انتقل لشاشة اختيار القناة — OTP يُرسل بعد اختيار المستخدم
+    setTimeout(() => setAuthStep("channel"), 50);
+  };
 
-    setTimeout(() => setAuthStep("otp"), 50);
+  // ── بعد اختيار القناة — يرسل OTP وينتقل لشاشة الإدخال ────────────────────────
+  const sendOTPAndProceed = async (channel: string): Promise<OTPResult> => {
+    const result = await sendOTP(pendingName, pendingPhone, channel, pendingLocation);
+    if (result.success) {
+      setTimeout(() => setAuthStep("otp"), 50);
+    }
+    return result;
   };
 
   const fetchUserRole = async (phoneNumber: string): Promise<UserRole> => {
@@ -228,7 +236,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     setUser(null);
-    setAuthStep("login");
+    setAuthStep("login" as any);
     setPendingPhone("");
     setPendingName("");
     setPendingLocation(undefined);
@@ -255,6 +263,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         verifyOTP,
         resendOTP,
+        sendOTPAndProceed,
         setLocationGranted,
         logout,
       }}

@@ -6,6 +6,7 @@ import PatientTabNavigator from "@/navigation/PatientTabNavigator";
 import LoginScreen from "@/screens/LoginScreen";
 import LocationPermissionScreen from "@/screens/LocationPermissionScreen";
 import OTPVerificationScreen from "@/screens/OTPVerificationScreen";
+import ChannelPickerScreen from "@/screens/ChannelPickerScreen";
 import CareerJoinScreen from "@/screens/CareerJoinScreen";
 import DoctorDetailScreen from "@/screens/DoctorDetailScreen";
 import BookAppointmentScreen from "@/screens/BookAppointmentScreen";
@@ -21,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export type RootStackParamList = {
   Login: undefined;
   LocationPermission: undefined;
+  ChannelPicker: undefined;
   OTPVerification: undefined;
   Main: undefined;
   Search: undefined;
@@ -58,6 +60,12 @@ function AuthNavigator() {
         <Stack.Screen
           name="LocationPermission"
           component={LocationPermissionScreen}
+        />
+      )}
+      {authStep === "channel" && (
+        <Stack.Screen
+          name="ChannelPicker"
+          component={ChannelPickerScreen}
         />
       )}
       {authStep === "otp" && (

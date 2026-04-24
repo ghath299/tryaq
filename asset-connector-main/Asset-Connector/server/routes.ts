@@ -374,6 +374,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.json({ success: true, message: "تم التحقق بنجاح" });
   });
 
+  // ══════════════════════════════════════════════════════════════════════════════
+  // GET /api/config/telegram  ← رابط البوت
+  // ══════════════════════════════════════════════════════════════════════════════
+  app.get("/api/config/telegram", async (_req, res) => {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) return res.json({ botUrl: null });
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${token}/getMe`);
+      const data = await r.json() as { ok: boolean; result?: { username?: string } };
+      if (data.ok && data.result?.username) {
+        return res.json({ botUrl: `https://t.me/${data.result.username}` });
+      }
+    } catch {
+      // fallback
+    }
+    return res.json({ botUrl: null });
+  });
+
   // ── باقي المسارات ─────────────────────────────────────────────────────────────
   app.get("/api/users/role/:phoneNumber", (req, res) => {
     const { phoneNumber } = req.params;
