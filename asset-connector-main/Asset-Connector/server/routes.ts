@@ -10,6 +10,14 @@ import {
 import { connectDB, getUsersCol, getOtpsCol, getTelegramLinksCol } from "./db";
 import { sendTelegramMessage, generateOTP } from "./telegram";
 
+// ─── In-memory OTP store (works without MongoDB) ──────────────────────────────
+interface OtpEntry { code: string; expiresAt: number; used: boolean }
+const otpStore = new Map<string, OtpEntry>(); // key = phone
+
+// ─── In-memory user store (fallback when MongoDB unavailable) ─────────────────
+interface UserEntry { phone: string; name: string; role: string; createdAt: string }
+const userStore = new Map<string, UserEntry>(); // key = phone
+
 export async function registerRoutes(app: Express): Promise<Server> {
   connectDB().catch((e) => console.error("[MongoDB] Connection error:", e));
 
@@ -27,70 +35,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
-  // ─── Telegram Webhook ────────────────────────────────────────────────────
-  // Handles /start otp_PHONE deep-link and legacy /link command
+  // ─── Telegram Webhook (deep-link & legacy /link) ─────────────────────────
   app.post("/api/telegram/webhook", async (req, res) => {
     try {
       const message = req.body?.message;
       if (!message) return res.sendStatus(200);
-
       const chatId = String(message.chat?.id);
       const text: string = message.text || "";
 
-      // Deep-link flow: /start otp_07XXXXXXXXX
       if (text.startsWith("/start otp_")) {
         const phone = text.replace("/start otp_", "").trim();
         if (!phone) return res.sendStatus(200);
 
-        const links = await getTelegramLinksCol();
-        await links.updateOne(
-          { phone },
-          { $set: { phone, chatId, linkedAt: new Date() } },
-          { upsert: true }
-        );
+        // Save chat link
+        try {
+          const links = await getTelegramLinksCol();
+          await links.updateOne({ phone }, { $set: { phone, chatId, linkedAt: new Date() } }, { upsert: true });
+        } catch {}
 
-        const otp = generateOTP();
-        const expiresAt = new Date(Date.now() + 60 * 1000);
+        const code = generateOTP();
+        otpStore.set(phone, { code, expiresAt: Date.now() + 60_000, used: false });
 
-        const otps = await getOtpsCol();
-        await otps.deleteMany({ phone, used: false });
-        await otps.insertOne({
-          phone,
-          code: otp,
-          method: "telegram",
-          expiresAt,
-          used: false,
-          createdAt: new Date(),
-        });
+        // Also persist to MongoDB if available
+        try {
+          const otps = await getOtpsCol();
+          await otps.deleteMany({ phone, used: false });
+          await otps.insertOne({ phone, code, method: "telegram", expiresAt: new Date(Date.now() + 60_000), used: false, createdAt: new Date() });
+        } catch {}
 
-        await sendTelegramMessage(
-          chatId,
-          `🔐 رمز التحقق الخاص بك في تِرياق:\n\n<code>${otp}</code>\n\nصالح لمدة 60 ثانية.`
-        );
-
+        await sendTelegramMessage(chatId, `🔐 رمز التحقق الخاص بك في تِرياق:\n\n<code>${code}</code>\n\nصالح لمدة 60 ثانية.`);
         return res.sendStatus(200);
       }
 
-      // Legacy /link command
       if (text.startsWith("/link")) {
         const phone = text.replace("/link", "").trim().replace(/\s+/g, "");
         if (!phone) {
           await sendTelegramMessage(chatId, "أرسل رقم هاتفك بعد الأمر:\n/link 07XXXXXXXXX");
           return res.sendStatus(200);
         }
-        const links = await getTelegramLinksCol();
-        await links.updateOne(
-          { phone },
-          { $set: { phone, chatId, linkedAt: new Date() } },
-          { upsert: true }
-        );
-        await sendTelegramMessage(chatId, `✅ تم ربط رقمك <b>${phone}</b> بحساب Telegram بنجاح!`);
+        try {
+          const links = await getTelegramLinksCol();
+          await links.updateOne({ phone }, { $set: { phone, chatId, linkedAt: new Date() } }, { upsert: true });
+        } catch {}
+        await sendTelegramMessage(chatId, `✅ تم ربط رقمك <b>${phone}</b> بـ Telegram بنجاح!`);
       }
-
       return res.sendStatus(200);
     } catch (err) {
       console.error("[Telegram Webhook]", err);
       return res.sendStatus(200);
+    }
+  });
+
+  // ─── Auth: Send OTP via Telegram ──────────────────────────────────────────
+  app.post("/api/auth/send-otp", async (req, res) => {
+    try {
+      const { phone } = req.body as { phone?: string };
+      if (!phone) return res.status(400).json({ error: "phone required" });
+
+      const code = generateOTP();
+      otpStore.set(phone, { code, expiresAt: Date.now() + 60_000, used: false });
+
+      // Also persist to MongoDB if available
+      try {
+        const otps = await getOtpsCol();
+        await otps.deleteMany({ phone, used: false });
+        await otps.insertOne({ phone, code, method: "telegram", expiresAt: new Date(Date.now() + 60_000), used: false, createdAt: new Date() });
+      } catch {}
+
+      const chatId = process.env.TELEGRAM_CHAT_ID;
+      if (!chatId) {
+        console.error("[send-otp] TELEGRAM_CHAT_ID not set");
+        return res.status(500).json({ error: "server_config_error", message: "TELEGRAM_CHAT_ID غير مضبوط في الخادم." });
+      }
+
+      const sent = await sendTelegramMessage(
+        chatId,
+        `🔐 رمز التحقق للرقم ${phone} في تِرياق:\n\n<code>${code}</code>\n\nصالح لمدة 60 ثانية.`
+      );
+
+      if (!sent) {
+        return res.status(502).json({ error: "telegram_send_failed", message: "فشل إرسال الرمز عبر Telegram." });
+      }
+
+      console.log(`[send-otp] OTP sent for phone=${phone}`);
+      return res.json({ success: true, message: "تم إرسال رمز التحقق عبر Telegram." });
+    } catch (err) {
+      console.error("[send-otp]", err);
+      return res.status(500).json({ error: "server_error" });
     }
   });
 
@@ -100,31 +131,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { phone, otp, name } = req.body as { phone?: string; otp?: string; name?: string };
       if (!phone || !otp) return res.status(400).json({ error: "phone and otp required" });
 
-      const otps = await getOtpsCol();
-      const record = await otps.findOne({ phone, code: otp, used: false });
+      // Check in-memory store first
+      const entry = otpStore.get(phone);
+      let verified = false;
 
-      if (!record) return res.status(401).json({ error: "invalid_otp", message: "رمز التحقق غير صحيح." });
-      if (new Date() > new Date(record.expiresAt)) {
-        await otps.updateOne({ _id: record._id }, { $set: { used: true } });
-        return res.status(401).json({ error: "otp_expired", message: "انتهت صلاحية رمز التحقق." });
+      if (entry && !entry.used && entry.code === otp) {
+        if (Date.now() > entry.expiresAt) {
+          otpStore.delete(phone);
+          return res.status(401).json({ error: "otp_expired", message: "انتهت صلاحية رمز التحقق." });
+        }
+        entry.used = true;
+        otpStore.delete(phone);
+        verified = true;
       }
 
-      await otps.updateOne({ _id: record._id }, { $set: { used: true } });
-
-      const users = await getUsersCol();
-      let user = await users.findOne({ phone });
-      if (!user) {
-        const newUser = {
-          phone,
-          name: name || phone,
-          role: "patient",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        const result = await users.insertOne(newUser);
-        user = { _id: result.insertedId, ...newUser };
+      // Fall back to MongoDB if not found in memory
+      if (!verified) {
+        try {
+          const otps = await getOtpsCol();
+          const record = await otps.findOne({ phone, code: otp, used: false });
+          if (!record) {
+            return res.status(401).json({ error: "invalid_otp", message: "رمز التحقق غير صحيح." });
+          }
+          if (new Date() > new Date(record.expiresAt)) {
+            await otps.updateOne({ _id: record._id }, { $set: { used: true } });
+            return res.status(401).json({ error: "otp_expired", message: "انتهت صلاحية رمز التحقق." });
+          }
+          await otps.updateOne({ _id: record._id }, { $set: { used: true } });
+          verified = true;
+        } catch {
+          return res.status(401).json({ error: "invalid_otp", message: "رمز التحقق غير صحيح." });
+        }
       }
 
+      // Find or create user — try MongoDB first, then in-memory
+      let user: any = null;
+      try {
+        const users = await getUsersCol();
+        user = await users.findOne({ phone });
+        if (!user) {
+          const newUser = { phone, name: name || phone, role: "patient", createdAt: new Date(), updatedAt: new Date() };
+          const result = await users.insertOne(newUser);
+          user = { _id: result.insertedId, ...newUser };
+        }
+      } catch {
+        // MongoDB unavailable — use in-memory store
+        let memUser = userStore.get(phone);
+        if (!memUser) {
+          memUser = { phone, name: name || phone, role: "patient", createdAt: new Date().toISOString() };
+          userStore.set(phone, memUser);
+        }
+        user = memUser;
+      }
+
+      console.log(`[verify-otp] Verified phone=${phone} role=${user.role}`);
       return res.json({ success: true, user, message: "تم التحقق بنجاح." });
     } catch (err) {
       console.error("[verify-otp]", err);
