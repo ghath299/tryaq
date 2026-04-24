@@ -32,6 +32,11 @@ import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const OTP_LENGTH = 6;
 
+const CHANNELS = [
+  { id: "telegram", label: "تلكرام", color: "#2CA5E0", icon: "send" as const },
+  { id: "whatsapp", label: "واتساب", color: "#25D366", icon: "message-circle" as const },
+];
+
 export default function OTPVerificationScreen() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
@@ -43,6 +48,7 @@ export default function OTPVerificationScreen() {
   const [resendTimer, setResendTimer] = useState(60);
   const [error, setError] = useState("");
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<"telegram" | "whatsapp">("telegram");
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -177,14 +183,15 @@ export default function OTPVerificationScreen() {
     setAttemptsLeft(null);
 
     try {
-      const result = await resendOTP();
+      const result = await resendOTP(selectedChannel);
 
       if (result.success) {
         setResendTimer(60);
         setOtp(Array(OTP_LENGTH).fill(""));
         setTimeout(() => inputRefs.current[0]?.focus(), 100);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert("✅ تم الإرسال", "تم إرسال رمز جديد");
+        const channelName = selectedChannel === "whatsapp" ? "واتساب" : "تلكرام";
+        Alert.alert("✅ تم الإرسال", `تم إرسال رمز جديد عبر ${channelName}`);
       } else {
         Alert.alert("⚠️ محظور", result.message || "حاول بعد قليل");
       }
@@ -265,7 +272,7 @@ export default function OTPVerificationScreen() {
               <View style={[styles.sentMessage, { backgroundColor: addAlpha("#4CD964", 0.12) }]}>
                 <Feather name="check-circle" size={14} color="#4CD964" />
                 <ThemedText type="small" style={{ color: "#4CD964", marginRight: Spacing.xs }}>
-                  تم إرسال رمز التحقق
+                  تم إرسال رمز التحقق عبر تلكرام
                 </ThemedText>
               </View>
             </Animated.View>
@@ -338,8 +345,49 @@ export default function OTPVerificationScreen() {
             entering={FadeIn.delay(500).duration(400)}
             style={styles.resendContainer}
           >
+            {/* Channel selector */}
+            <ThemedText type="small" style={{ color: theme.textSecondary, marginBottom: Spacing.sm }}>
+              إعادة الإرسال عبر
+            </ThemedText>
+            <View style={styles.channelRow}>
+              {CHANNELS.map((ch) => {
+                const active = selectedChannel === ch.id;
+                return (
+                  <Pressable
+                    key={ch.id}
+                    android_ripple={{ color: "transparent" }}
+                    onPress={() => {
+                      setSelectedChannel(ch.id as "telegram" | "whatsapp");
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    style={[
+                      styles.channelChip,
+                      {
+                        backgroundColor: active
+                          ? addAlpha(ch.color, 0.15)
+                          : addAlpha(theme.border, 0.3),
+                        borderColor: active ? ch.color : "transparent",
+                        borderWidth: active ? 1.5 : 0,
+                      },
+                    ]}
+                  >
+                    <Feather name={ch.icon} size={15} color={active ? ch.color : theme.textSecondary} />
+                    <ThemedText
+                      type="small"
+                      style={{
+                        color: active ? ch.color : theme.textSecondary,
+                        fontWeight: active ? "700" : "400",
+                      }}
+                    >
+                      {ch.label}
+                    </ThemedText>
+                  </Pressable>
+                );
+              })}
+            </View>
+
             {resendTimer > 0 ? (
-              <ThemedText type="body" style={{ color: theme.textSecondary }}>
+              <ThemedText type="body" style={{ color: theme.textSecondary, marginTop: Spacing.sm }}>
                 إعادة الإرسال بعد {resendTimer} ثانية
               </ThemedText>
             ) : (
@@ -351,7 +399,11 @@ export default function OTPVerificationScreen() {
               >
                 <ThemedText
                   type="body"
-                  style={{ color: theme.primary, fontWeight: "600" }}
+                  style={{
+                    color: selectedChannel === "whatsapp" ? "#25D366" : "#2CA5E0",
+                    fontWeight: "600",
+                    marginTop: Spacing.sm,
+                  }}
                 >
                   {isResending ? "جاري الإرسال..." : "إعادة إرسال الرمز"}
                 </ThemedText>
@@ -443,6 +495,14 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md, marginBottom: Spacing.md,
   },
   resendContainer: { alignItems: "center", marginBottom: Spacing.xl },
+  channelRow: {
+    flexDirection: "row-reverse", gap: Spacing.sm,
+  },
+  channelChip: {
+    flexDirection: "row-reverse", alignItems: "center",
+    gap: Spacing.xs, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+  },
   resendButton: { padding: Spacing.sm },
   buttonContainer: { marginTop: "auto" },
   button: { borderRadius: BorderRadius.full, overflow: "hidden" },

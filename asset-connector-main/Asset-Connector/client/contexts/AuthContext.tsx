@@ -38,7 +38,7 @@ interface AuthContextType {
   setPendingPhone: (phone: string) => void;
   login: (fullName: string, phoneNumber: string) => Promise<void>;
   verifyOTP: (code: string) => Promise<OTPResult>;
-  resendOTP: () => Promise<OTPResult>;
+  resendOTP: (channel?: string) => Promise<OTPResult>;
   setLocationGranted: (coords?: { lat: number; lng: number; province: string }) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -219,11 +219,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // ── إعادة إرسال OTP ───────────────────────────────────────────────────────────
-  const resendOTP = async (): Promise<OTPResult> => {
+  const resendOTP = async (channel: string = "telegram"): Promise<OTPResult> => {
     const phoneNumber = user?.phoneNumber || pendingPhone;
     const fullName = user?.fullName || pendingName;
     if (!phoneNumber) return { success: false, message: "رقم الهاتف غير موجود" };
-    return sendOTP(fullName, phoneNumber, "telegram", pendingLocation);
+    return sendOTP(fullName, phoneNumber, channel, pendingLocation);
   };
 
   const logout = async () => {
