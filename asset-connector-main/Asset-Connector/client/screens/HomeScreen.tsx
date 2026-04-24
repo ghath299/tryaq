@@ -14,6 +14,7 @@ import {
   Pressable,
   Dimensions,
   Platform,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -36,6 +37,7 @@ import * as Haptics from "expo-haptics";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useApp } from "@/contexts/AppContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius, addAlpha } from "@/constants/theme";
 import { doctors, pharmacies } from "@/data/mockData";
 import {
@@ -346,6 +348,7 @@ export default function HomeScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { theme, isDark } = useTheme();
   const { t } = useApp();
+  const { logout } = useAuth();
   const navigation = useNavigation<any>();
 
   const [activeSlide, setActiveSlide] = useState(0);
@@ -368,6 +371,23 @@ export default function HomeScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     navigation.navigate("Notifications" as never);
   }, [navigation]);
+
+  const handleLogout = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(
+      "تسجيل الخروج",
+      "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+      [
+        { text: "إلغاء", style: "cancel" },
+        {
+          text: "خروج",
+          style: "destructive",
+          onPress: () => logout(),
+        },
+      ],
+      { cancelable: true }
+    );
+  }, [logout]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -403,23 +423,32 @@ export default function HomeScreen() {
         style={[styles.header, { paddingTop: insets.top + 4 }]}
       >
         <View style={styles.headerRow}>
-          <Pressable
-            onPress={handleBellPress}
-            hitSlop={10}
-            style={[styles.bellBtn, { backgroundColor: addAlpha(theme.primary, 0.1) }]}
-          >
-            <Feather name="bell" size={20} color={theme.primary} />
-            {badgeCount > 0 && (
-              <Animated.View
-                entering={FadeIn.duration(200)}
-                style={[styles.bellBadge, { backgroundColor: "#EF4444" }]}
-              >
-                <ThemedText style={styles.bellBadgeText}>
-                  {badgeCount > 9 ? "9+" : String(badgeCount)}
-                </ThemedText>
-              </Animated.View>
-            )}
-          </Pressable>
+          <View style={styles.headerBtnsGroup}>
+            <Pressable
+              onPress={handleBellPress}
+              hitSlop={10}
+              style={[styles.bellBtn, { backgroundColor: addAlpha(theme.primary, 0.1) }]}
+            >
+              <Feather name="bell" size={20} color={theme.primary} />
+              {badgeCount > 0 && (
+                <Animated.View
+                  entering={FadeIn.duration(200)}
+                  style={[styles.bellBadge, { backgroundColor: "#EF4444" }]}
+                >
+                  <ThemedText style={styles.bellBadgeText}>
+                    {badgeCount > 9 ? "9+" : String(badgeCount)}
+                  </ThemedText>
+                </Animated.View>
+              )}
+            </Pressable>
+            <Pressable
+              onPress={handleLogout}
+              hitSlop={10}
+              style={[styles.bellBtn, { backgroundColor: addAlpha("#EF4444", 0.08) }]}
+            >
+              <Feather name="log-out" size={18} color="#EF4444" />
+            </Pressable>
+          </View>
           <View style={styles.headerCenter}>
             <ThemedText type="small" style={{ color: theme.textSecondary, textAlign: "center" }}>
               مرحباً بك في
@@ -534,6 +563,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: Spacing.md,
+  },
+  headerBtnsGroup: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
   },
   headerCenter: { flex: 1, alignItems: "center" },
   logoBox: {
