@@ -27,7 +27,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius, Animation, addAlpha } from "@/constants/theme";
-import { getApiUrl } from "@/lib/query-client";
+import { Linking } from "react-native";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const OTP_LENGTH = 6;
@@ -41,7 +41,6 @@ export default function OTPVerificationScreen() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
   const [error, setError] = useState("");
-  const [telegramSending, setTelegramSending] = useState(false);
   const [telegramMsg, setTelegramMsg] = useState<{ text: string; ok: boolean } | null>(null);
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
@@ -176,30 +175,14 @@ export default function OTPVerificationScreen() {
     setError("");
   };
 
-  const handleTelegramOTP = async () => {
-    if (telegramSending) return;
+  const handleTelegramOTP = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setTelegramSending(true);
-    setTelegramMsg(null);
-    try {
-      const res = await fetch(`${getApiUrl()}/api/auth/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: pendingPhone, method: "telegram" }),
-      });
-      const data = await res.json() as { success?: boolean; error?: string };
-      if (data.success) {
-        setTelegramMsg({ text: "تم إرسال رمز التحقق عبر Telegram", ok: true });
-      } else if (data.error === "telegram_not_linked") {
-        setTelegramMsg({ text: "افتح بوت Telegram واضغط Start ثم أعد المحاولة", ok: false });
-      } else {
-        setTelegramMsg({ text: "فشل الإرسال، حاول مرة أخرى", ok: false });
-      }
-    } catch {
-      setTelegramMsg({ text: "فشل الاتصال بالخادم", ok: false });
-    } finally {
-      setTelegramSending(false);
-    }
+    const phone = pendingPhone || user?.phoneNumber || "";
+    const url = `https://t.me/Tiryaq0_bot?start=otp_${phone}`;
+    Linking.openURL(url).catch(() => {
+      setTelegramMsg({ text: "تعذّر فتح Telegram. تأكد من تثبيت التطبيق.", ok: false });
+    });
+    setTelegramMsg({ text: "تم فتح Telegram. اضغط Start داخل البوت وسيصلك الرمز هناك.", ok: true });
   };
 
   const handlePressIn = () => {
@@ -404,18 +387,11 @@ export default function OTPVerificationScreen() {
               <Pressable
                 android_ripple={{ color: "transparent" }}
                 onPress={handleTelegramOTP}
-                disabled={telegramSending}
-                style={[
-                  styles.methodChip,
-                  { backgroundColor: "rgba(44,165,224,0.10)", opacity: telegramSending ? 0.6 : 1 },
-                ]}
+                style={[styles.methodChip, { backgroundColor: "rgba(44,165,224,0.10)" }]}
               >
                 <Feather name="send" size={16} color="#2CA5E0" />
-                <ThemedText
-                  type="caption"
-                  style={{ color: "#2CA5E0", fontWeight: "500" }}
-                >
-                  {telegramSending ? "..." : "Telegram"}
+                <ThemedText type="caption" style={{ color: "#2CA5E0", fontWeight: "500" }}>
+                  Telegram
                 </ThemedText>
               </Pressable>
             </View>

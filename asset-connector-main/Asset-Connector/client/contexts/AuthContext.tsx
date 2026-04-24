@@ -129,31 +129,63 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const verifyOTP = async (code: string): Promise<boolean> => {
-    if (code.length === 6) {
-      console.log(
-        "[AuthContext] OTP verified, fetching user role from server...",
+    if (code.length !== 6) return false;
+
+    const phone = user?.phoneNumber || pendingPhone;
+    const name = user?.fullName || "";
+
+    try {
+      const apiUrl = getApiUrl();
+      const response = await fetch(
+        new URL("/api/auth/verify-otp", apiUrl).toString(),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, otp: code, name }),
+        }
       );
 
-      const role = await fetchUserRole(user?.phoneNumber || pendingPhone);
-      console.log("[AuthContext] User role from server:", role);
-
-      setUser((currentUser) => {
-        if (currentUser) {
-          const updatedUser = {
-            ...currentUser,
-            isVerified: true,
-            role: role,
-          };
-          saveAuthState(updatedUser);
-          return updatedUser;
+      if (response.ok) {
+        const data = await response.json() as { success: boolean; user?: { role?: string; name?: string } };
+        if (data.success) {
+          const role = (data.user?.role as UserRole) || await fetchUserRole(phone);
+          console.log("[AuthContext] OTP verified via backend. Role:", role);
+          setUser((currentUser) => {
+            if (currentUser) {
+              const updatedUser = { ...currentUser, isVerified: true, role };
+              saveAuthState(updatedUser);
+              return updatedUser;
+            }
+            return currentUser;
+          });
+          setAuthStep("complete");
+          return true;
         }
-        return currentUser;
-      });
+        return false;
+      }
 
-      setAuthStep("complete");
-      return true;
+      // 401 = invalid/expired OTP — real rejection
+      if (response.status === 401) {
+        console.log("[AuthContext] OTP rejected by backend.");
+        return false;
+      }
+    } catch (err) {
+      console.log("[AuthContext] Backend OTP check failed, using mock fallback:", err);
     }
-    return false;
+
+    // Fallback: dev/mock mode — accept any 6-digit code when server unreachable
+    console.log("[AuthContext] Mock OTP accepted.");
+    const role = await fetchUserRole(phone);
+    setUser((currentUser) => {
+      if (currentUser) {
+        const updatedUser = { ...currentUser, isVerified: true, role };
+        saveAuthState(updatedUser);
+        return updatedUser;
+      }
+      return currentUser;
+    });
+    setAuthStep("complete");
+    return true;
   };
 
   const logout = async () => {

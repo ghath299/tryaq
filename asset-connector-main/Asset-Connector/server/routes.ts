@@ -27,8 +27,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
-  // ─── Telegram Webhook: link phone to Telegram chat_id ────────────────────
-  // Users start the bot and send their phone number via /link <phone>
+  // ─── Telegram Webhook ────────────────────────────────────────────────────
+  // Handles /start otp_PHONE deep-link and legacy /link command
   app.post("/api/telegram/webhook", async (req, res) => {
     try {
       const message = req.body?.message;
@@ -37,6 +37,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const chatId = String(message.chat?.id);
       const text: string = message.text || "";
 
+      // Deep-link flow: /start otp_07XXXXXXXXX
+      if (text.startsWith("/start otp_")) {
+        const phone = text.replace("/start otp_", "").trim();
+        if (!phone) return res.sendStatus(200);
+
+        const links = await getTelegramLinksCol();
+        await links.updateOne(
+          { phone },
+          { $set: { phone, chatId, linkedAt: new Date() } },
+          { upsert: true }
+        );
+
+        const otp = generateOTP();
+        const expiresAt = new Date(Date.now() + 60 * 1000);
+
+        const otps = await getOtpsCol();
+        await otps.deleteMany({ phone, used: false });
+        await otps.insertOne({
+          phone,
+          code: otp,
+          method: "telegram",
+          expiresAt,
+          used: false,
+          createdAt: new Date(),
+        });
+
+        await sendTelegramMessage(
+          chatId,
+          `🔐 رمز التحقق الخاص بك في تِرياق:\n\n<code>${otp}</code>\n\nصالح لمدة 60 ثانية.`
+        );
+
+        return res.sendStatus(200);
+      }
+
+      // Legacy /link command
       if (text.startsWith("/link")) {
         const phone = text.replace("/link", "").trim().replace(/\s+/g, "");
         if (!phone) {
@@ -51,6 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
         await sendTelegramMessage(chatId, `✅ تم ربط رقمك <b>${phone}</b> بحساب Telegram بنجاح!`);
       }
+
       return res.sendStatus(200);
     } catch (err) {
       console.error("[Telegram Webhook]", err);
@@ -58,61 +94,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ─── Auth: Send OTP via Telegram ─────────────────────────────────────────
-  app.post("/api/auth/send-otp", async (req, res) => {
-    try {
-      const { phone } = req.body as { phone?: string };
-      if (!phone) return res.status(400).json({ error: "phone required" });
-
-      const links = await getTelegramLinksCol();
-      const link = await links.findOne({ phone });
-      if (!link) {
-        return res.status(404).json({
-          error: "telegram_not_linked",
-          message: "لم يتم ربط هذا الرقم بحساب Telegram. أرسل /link " + phone + " للبوت أولاً.",
-        });
-      }
-
-      const otp = generateOTP();
-      const expiresAt = new Date(Date.now() + 60 * 1000);
-
-      const otps = await getOtpsCol();
-      await otps.deleteMany({ phone });
-      await otps.insertOne({ phone, otp, expiresAt, createdAt: new Date() });
-
-      const sent = await sendTelegramMessage(
-        link.chatId,
-        `🔐 رمز التحقق الخاص بك في ترياق:\n\n<b>${otp}</b>\n\nصالح لمدة 60 ثانية فقط.`
-      );
-
-      if (!sent) {
-        return res.status(502).json({ error: "telegram_send_failed", message: "فشل إرسال رمز OTP عبر Telegram." });
-      }
-
-      return res.json({ success: true, message: "تم إرسال رمز التحقق عبر Telegram." });
-    } catch (err) {
-      console.error("[send-otp]", err);
-      return res.status(500).json({ error: "server_error" });
-    }
-  });
-
   // ─── Auth: Verify OTP ─────────────────────────────────────────────────────
   app.post("/api/auth/verify-otp", async (req, res) => {
     try {
-      const { phone, otp } = req.body as { phone?: string; otp?: string };
+      const { phone, otp, name } = req.body as { phone?: string; otp?: string; name?: string };
       if (!phone || !otp) return res.status(400).json({ error: "phone and otp required" });
 
       const otps = await getOtpsCol();
-      const record = await otps.findOne({ phone, otp });
+      const record = await otps.findOne({ phone, code: otp, used: false });
 
       if (!record) return res.status(401).json({ error: "invalid_otp", message: "رمز التحقق غير صحيح." });
       if (new Date() > new Date(record.expiresAt)) {
-        await otps.deleteOne({ _id: record._id });
+        await otps.updateOne({ _id: record._id }, { $set: { used: true } });
         return res.status(401).json({ error: "otp_expired", message: "انتهت صلاحية رمز التحقق." });
       }
 
-      await otps.deleteOne({ _id: record._id });
-      return res.json({ success: true, message: "تم التحقق بنجاح." });
+      await otps.updateOne({ _id: record._id }, { $set: { used: true } });
+
+      const users = await getUsersCol();
+      let user = await users.findOne({ phone });
+      if (!user) {
+        const newUser = {
+          phone,
+          name: name || phone,
+          role: "patient",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        const result = await users.insertOne(newUser);
+        user = { _id: result.insertedId, ...newUser };
+      }
+
+      return res.json({ success: true, user, message: "تم التحقق بنجاح." });
     } catch (err) {
       console.error("[verify-otp]", err);
       return res.status(500).json({ error: "server_error" });
