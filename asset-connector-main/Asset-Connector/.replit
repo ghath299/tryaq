@@ -60,7 +60,7 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run server:dev"
-waitForPort = 5000
+waitForPort = 8081
 
 [[workflows.workflow]]
 name = "Start Frontend"
