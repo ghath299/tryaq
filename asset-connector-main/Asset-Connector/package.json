@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "npm run server:dev",
     "expo:web": "EXPO_OFFLINE=1 npx expo start --web --port 5000 --localhost",
-    "expo:dev": "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --port 8081 --clear",
-    "server:dev": "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --port 8081 --clear",
+    "expo:dev": "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --port 5000 --clear",
+    "server:dev": "REACT_NATIVE_PACKAGER_HOSTNAME=${REPLIT_DEV_DOMAIN:-localhost} npx expo start --port 5000 --clear",
     "expo:start:static:build": "npx expo start --no-dev --minify --localhost",
     "expo:static:build": "node scripts/build.js",
     "server:build": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=server_dist",
