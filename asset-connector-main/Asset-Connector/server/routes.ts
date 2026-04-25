@@ -458,6 +458,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(201).json({ imageUrl: `https://placehold.co/600x400/png?text=chat+image+${Date.now()}` });
   });
 
+  app.post("/api/payment/initiate", async (req, res) => {
+    const { provider, walletPhone, cardNumber, cardExpiry, cardCVV, cardName } = req.body;
+
+    try {
+      if (provider === "zaincash") {
+        // TODO: integrate ZainCash API here
+        // https://docs.zaincash.iq
+        res.json({ success: true, transactionId: `ZC-${Date.now()}` });
+      } else if (provider === "asia") {
+        // TODO: integrate Asia Hawala API here
+        res.json({ success: true, transactionId: `AS-${Date.now()}` });
+      } else if (provider === "card") {
+        // TODO: integrate card payment gateway here
+        res.json({ success: true, transactionId: `CC-${Date.now()}` });
+      } else {
+        res.status(400).json({ success: false, message: "Unknown provider" });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Payment processing error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

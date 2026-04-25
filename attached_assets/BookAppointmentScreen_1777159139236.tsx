@@ -25,7 +25,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { doctors } from "@/data/mockData";
 import { database } from "@/lib/firebase";
-import { getApiUrl } from "@/lib/query-client";
 
 type BookAppointmentRouteProp = RouteProp<
   { BookAppointment: { doctorId: string } },
@@ -142,18 +141,23 @@ export default function BookAppointmentScreen() {
     return Object.keys(e).length === 0;
   };
 
+  // ── معالجة الدفع الإلكتروني ──
+  // TODO: اربط هذه الدالة بـ API السيرفر عند الجاهزية
   const processElectronicPayment = async (): Promise<{ success: boolean; transactionId?: string }> => {
-    const res = await fetch(`${getApiUrl()}/api/payment/initiate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        provider: electronicProvider,
-        walletPhone,
-        cardNumber: cardNumber.replace(/\s/g, ""),
-        cardExpiry, cardCVV, cardName,
-      }),
-    });
-    return await res.json();
+    // مثال الربط بالسيرفر:
+    // const res = await fetch(`${getApiUrl()}/api/payment/initiate`, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     provider: electronicProvider,
+    //     walletPhone,
+    //     cardNumber: cardNumber.replace(/\s/g, ""),
+    //     cardExpiry, cardCVV, cardName,
+    //   }),
+    // });
+    // return await res.json();
+    await new Promise((r) => setTimeout(r, 1500));
+    return { success: true, transactionId: `TXN-${Date.now()}` };
   };
 
   const handleSubmit = async () => {
